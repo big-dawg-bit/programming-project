@@ -1,0 +1,198 @@
+// =====================================================
+// Stage Monitoring Tool - EHB
+// ERD - v1.0
+// =====================================================
+
+// ---------- USERS & ROLES ----------
+
+Table roles {
+  id integer [pk, increment]
+  name varchar [unique, not null] // student, stagecommissie, docent, mentor, admin
+  description text
+}
+
+Table users {
+  id integer [pk, increment]
+  email varchar [unique, not null]
+  password_hash varchar [not null]
+  first_name varchar
+  last_name varchar
+  role_id integer [ref: > roles.id]
+  is_active boolean [default: true]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table students {
+  id integer [pk, increment]
+  user_id integer [ref: - users.id, unique]
+  student_number varchar [unique]
+  study_program varchar
+  academic_year varchar
+}
+
+Table docenten {
+  id integer [pk, increment]
+  user_id integer [ref: - users.id, unique]
+  department varchar
+}
+
+Table companies {
+  id integer [pk, increment]
+  name varchar [not null]
+  address varchar
+  city varchar
+  postal_code varchar
+  country varchar
+  sector varchar
+  contact_email varchar
+  contact_phone varchar
+  created_at timestamp
+}
+
+Table mentors {
+  id integer [pk, increment]
+  user_id integer [ref: - users.id, unique]
+  company_id integer [ref: > companies.id]
+  function_title varchar
+}
+
+// ---------- STAGE LIFECYCLE ----------
+
+Table stage_applications {
+  id integer [pk, increment]
+  student_id integer [ref: > students.id]
+  company_id integer [ref: > companies.id]
+  mentor_id integer [ref: > mentors.id]
+  docent_id integer [ref: > docenten.id]
+  title varchar
+  description text
+  start_date date
+  end_date date
+  status varchar // ingediend, goedgekeurd, afgekeurd, aanpassingen_vereist
+  submitted_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table application_reviews {
+  id integer [pk, increment]
+  application_id integer [ref: > stage_applications.id]
+  reviewer_id integer [ref: > users.id]
+  decision varchar // goedgekeurd, afgekeurd, aanpassingen_vereist
+  feedback text
+  reviewed_at timestamp
+}
+
+Table stage_agreements {
+  id integer [pk, increment]
+  application_id integer [ref: - stage_applications.id, unique]
+  file_path varchar
+  uploaded_by integer [ref: > users.id]
+  uploaded_at timestamp
+  is_signed boolean [default: false]
+  signed_at timestamp
+}
+
+Table stages {
+  id integer [pk, increment]
+  application_id integer [ref: - stage_applications.id, unique]
+  agreement_id integer [ref: - stage_agreements.id]
+  framework_id integer [ref: > competency_frameworks.id]
+  start_date date
+  end_date date
+  status varchar // actief, beeindigd, geannuleerd
+  created_at timestamp
+}
+
+// ---------- WEEKLY LOGBOOKS ----------
+
+Table weeklogs {
+  id integer [pk, increment]
+  stage_id integer [ref: > stages.id]
+  week_number integer
+  week_start_date date
+  tasks text
+  reflection text
+  issues_learnings text
+  status varchar // concept, ingediend, gevalideerd
+  submitted_at timestamp
+  validated_at timestamp
+  validated_by integer [ref: > users.id]
+}
+
+Table weeklog_comments {
+  id integer [pk, increment]
+  weeklog_id integer [ref: > weeklogs.id]
+  author_id integer [ref: > users.id]
+  comment text
+  created_at timestamp
+}
+
+// ---------- CONFIGURABLE COMPETENCY SYSTEM ----------
+
+Table competency_frameworks {
+  id integer [pk, increment]
+  name varchar // bv "Toegepaste Informatica 2025-2026"
+  version varchar
+  description text
+  is_active boolean [default: true]
+  created_at timestamp
+  created_by integer [ref: > users.id]
+}
+
+Table competencies {
+  id integer [pk, increment]
+  framework_id integer [ref: > competency_frameworks.id]
+  code varchar
+  name varchar
+  description text
+  weight decimal // gewicht in totaalscore
+  display_order integer
+  is_active boolean [default: true]
+}
+
+// ---------- EVALUATIONS ----------
+
+Table evaluations {
+  id integer [pk, increment]
+  stage_id integer [ref: > stages.id]
+  framework_id integer [ref: > competency_frameworks.id]
+  type varchar // tussentijds, finaal
+  evaluator_id integer [ref: > users.id]
+  status varchar // open, in_progress, voltooid, vergrendeld
+  general_feedback text
+  total_score decimal
+  created_at timestamp
+  completed_at timestamp
+}
+
+Table evaluation_scores {
+  id integer [pk, increment]
+  evaluation_id integer [ref: > evaluations.id]
+  competency_id integer [ref: > competencies.id]
+  score decimal
+  student_description text // vorderingen door student
+  feedback text // feedback van docent/mentor
+}
+
+Table final_reports {
+  id integer [pk, increment]
+  stage_id integer [ref: - stages.id, unique]
+  file_path varchar
+  total_score decimal
+  generated_at timestamp
+  generated_by integer [ref: > users.id]
+}
+
+// ---------- NOTIFICATIONS ----------
+
+Table notifications {
+  id integer [pk, increment]
+  user_id integer [ref: > users.id]
+  type varchar
+  message text
+  link varchar
+  is_read boolean [default: false]
+  created_at timestamp
+}
