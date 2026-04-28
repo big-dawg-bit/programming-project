@@ -24,7 +24,7 @@ Een centrale eis van het project is dat de **evaluatiestructuur volledig configu
 | Naam | GitHub | Rol |
 |------|--------|-----|
 | Arnaud Raspe | [@big-dawg-bit](https://github.com/big-dawg-bit) | [Bv. Backend / Database] |
-| phillipe wilangi-Otongi | [@username] | [Rol] |
+| phillipe wilangi-Otongi | [@thomaskongolo11](https://github.com/thomaskongolo11) | [Rol] |
 | nail azam | [@username] | [Rol] |
 | thomas Kongole | [@username] | [Rol] |
 
