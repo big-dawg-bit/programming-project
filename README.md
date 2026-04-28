@@ -25,7 +25,7 @@ Een centrale eis van het project is dat de **evaluatiestructuur volledig configu
 |------|--------|-----|
 | Arnaud Raspe | [@big-dawg-bit](https://github.com/big-dawg-bit) | [Bv. Backend / Database] |
 | phillipe wilangi-Otongi | philippe.wilangi@outlook.com (https://github.com/PhilippeAI2025) | [Bv. Front-end / Github] |
-| nail azam | [@Nail439](https://github.com/Nail439) | [Rol] |
+| nail azam | [@Nail439](https://github.com/Nail439) | [Bv. ...] |
 | thomas Kongole | [@thomaskongolo11](https://github.com/thomaskongolo11) | [Rol] |
 
 **Begeleidende docenten:** [Naam docent 1], [Naam docent 2]
