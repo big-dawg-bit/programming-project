@@ -24,9 +24,10 @@ Een centrale eis van het project is dat de **evaluatiestructuur volledig configu
 | Naam | GitHub | Rol |
 |------|--------|-----|
 | Arnaud Raspe | [@big-dawg-bit](https://github.com/big-dawg-bit) | [Bv. Backend / Database] |
-| phillipe wilangi-Otongi | [@PhilippeAI2025](https://github.com/PhilippeAI2025) | [Bv. Front-end / Github] |
-| nail azam | [@Nail439](https://github.com/Nail439) | [Bv. ...] |
-| thomas Kongole | [@thomaskongolo11](https://github.com/thomaskongolo11) | [Rol] |
+| Phillipe Wilangi-Otongi | [@PhilippeAI2025](https://github.com/PhilippeAI2025) | [Bv. Front-end / Github] |
+| Nail Azam | [@Nail439](https://github.com/Nail439) | [Bv. ...] |
+| Thomas Kongole | [@thomaskongolo11](https://github.com/thomaskongolo11) | [Rol] |
+| Maxime Dekoster | [@Maxime207](https://github.com/maxime207) 
 
 **Begeleidende docenten:** [Naam docent 1], [Naam docent 2]
 
@@ -34,7 +35,7 @@ Een centrale eis van het project is dat de **evaluatiestructuur volledig configu
 
 ## 🎯 Gebruikersrollen
 
-Het systeem ondersteunt vijf rollen, elk met eigen rechten en functionaliteit:
+Het systeem ondersteunt vijf rollen, elk met eigen rechten en functionaliteit:M
 
 1. **Student** – stage aanvragen, agreement uploaden, logboeken bijhouden, evaluaties bekijken
 2. **Stagecommissie** – stage-aanvragen beoordelen en goedkeuren
