@@ -7,23 +7,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Company extends Model
+class Mentor extends Model
 {
     protected $guarded = [];
 
-    public function mentors(): HasMany
+    public function user(): BelongsTo
     {
-        return $this->hasMany(Mentor::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function applications(): HasMany
+    public function company(): BelongsTo
     {
-        return $this->hasMany(StageApplication::class);
+        return $this->belongsTo(Company::class);
     }
 
     public function stages(): HasMany
     {
-        return $this->hasMany(Stage::class);
+        return $this->hasMany(Stage::class, 'mentor_id');
     }
 
 }

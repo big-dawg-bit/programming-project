@@ -7,18 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Competency extends Model
+class WeeklogComment extends Model
 {
     protected $guarded = [];
 
-    public function framework(): BelongsTo
+    public function weeklog(): BelongsTo
     {
-        return $this->belongsTo(CompetencyFramework::class, 'framework_id');
+        return $this->belongsTo(Weeklog::class);
     }
 
-    public function scores(): HasMany
+    public function author(): BelongsTo
     {
-        return $this->hasMany(EvaluationScore::class, 'competency_id');
+        return $this->belongsTo(User::class, 'author_id');
     }
 
 }

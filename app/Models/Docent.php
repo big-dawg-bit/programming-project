@@ -7,18 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Competency extends Model
+class Docent extends Model
 {
     protected $guarded = [];
+    protected $table = 'docenten';
 
-    public function framework(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(CompetencyFramework::class, 'framework_id');
+        return $this->belongsTo(User::class);
     }
 
-    public function scores(): HasMany
+    public function stages(): HasMany
     {
-        return $this->hasMany(EvaluationScore::class, 'competency_id');
+        return $this->hasMany(Stage::class, 'docent_id');
     }
 
 }
