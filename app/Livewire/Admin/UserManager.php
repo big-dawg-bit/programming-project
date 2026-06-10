@@ -34,6 +34,11 @@ class UserManager extends Component
         $this->selectedRole = 'student';
     }
 
+    public function changeRole(int $userId, int $roleId): void
+    {
+        User::findOrFail($userId)->update(['role_id' => $roleId]);
+    }
+
     public function render()
     {
         return view('livewire.admin.user-manager', [
