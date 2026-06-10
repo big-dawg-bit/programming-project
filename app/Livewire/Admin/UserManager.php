@@ -39,6 +39,12 @@ class UserManager extends Component
         User::findOrFail($userId)->update(['role_id' => $roleId]);
     }
 
+    public function toggleActive(int $userId): void
+    {
+        $user = User::findOrFail($userId);
+        $user->update(['is_active' => ! $user->is_active]);
+    }
+
     public function render()
     {
         return view('livewire.admin.user-manager', [
