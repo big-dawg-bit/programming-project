@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureBladeDirectives();
     }
 
     /**
@@ -46,5 +48,12 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+    }
+    /**
+     * Register custom Blade directives.
+     */
+    protected function configureBladeDirectives(): void
+    {
+        Blade::if('role', fn (string ...$roles): bool => auth()->check() && auth()->user()->hasRole(...$roles));
     }
 }
