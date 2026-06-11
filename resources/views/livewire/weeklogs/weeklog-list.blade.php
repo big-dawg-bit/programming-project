@@ -33,11 +33,16 @@
                 <flux:input type="date" wire:model="period_end" label="Tot" />
             </div>
 
-            <flux:textarea
-                wire:model="content"
-                label="Wat heb je deze week gedaan en geleerd?"
-                rows="5"
-                placeholder="Beschrijf je taken, reflectie en eventuele problemen…" />
+            <div x-data="{ count: @js(strlen($content)) }" x-on:input="count = $event.target.value.length">
+                <flux:textarea
+                    wire:model="content"
+                    label="Wat heb je deze week gedaan en geleerd?"
+                    rows="5"
+                    placeholder="Beschrijf je taken, reflectie en eventuele problemen…" />
+                <p class="mt-1 text-xs text-neutral-500">
+                    <span x-text="count">0</span> tekens (minimaal 5)
+                </p>
+            </div>
 
             <flux:input type="number" step="0.5" wire:model="hours_worked" label="Gewerkte uren" min="0" max="80" />
 
@@ -66,8 +71,8 @@
             </flux:subheading>
         </div>
     @else
-        <div class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-            <table class="w-full text-left text-sm">
+        <div class="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
+            <table class="w-full min-w-[640px] text-left text-sm">
                 <thead class="bg-neutral-50 dark:bg-neutral-800">
                     <tr>
                         <th class="px-4 py-3 font-medium">Week</th>
