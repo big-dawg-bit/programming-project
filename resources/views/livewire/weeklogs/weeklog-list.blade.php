@@ -74,6 +74,7 @@
                         <th class="px-4 py-3 font-medium">Periode</th>
                         <th class="px-4 py-3 font-medium">Uren</th>
                         <th class="px-4 py-3 font-medium">Status</th>
+                        <th class="px-4 py-3 font-medium">Reacties</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
@@ -87,7 +88,43 @@
                             <td class="px-4 py-3">
                                 <flux:badge size="sm">{{ ucfirst($weeklog->status) }}</flux:badge>
                             </td>
+                            <td class="px-4 py-3">
+                                <flux:button size="sm" variant="ghost" icon="chat-bubble-left-right"
+                                    wire:click="toggleComments({{ $weeklog->id }})">
+                                    {{ $weeklog->comments->count() }}
+                                </flux:button>
+                            </td>
                         </tr>
+
+                        {{-- Uitklapbare comment-thread --}}
+                        @if ($openWeeklogId === $weeklog->id)
+                            <tr class="bg-neutral-50 dark:bg-neutral-900/40">
+                                <td colspan="5" class="px-4 py-4">
+                                    <div class="space-y-3">
+                                        @forelse ($weeklog->comments as $comment)
+                                            <div class="rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800">
+                                                <div class="text-xs text-neutral-500">
+                                                    {{ $comment->author?->name ?? 'Onbekend' }}
+                                                    · {{ $comment->created_at?->diffForHumans() }}
+                                                </div>
+                                                <div class="mt-1 text-sm">{{ $comment->comment }}</div>
+                                            </div>
+                                        @empty
+                                            <p class="text-sm text-neutral-500">Nog geen reacties.</p>
+                                        @endforelse
+
+                                        <form wire:submit="addComment({{ $weeklog->id }})"
+                                            class="flex flex-col gap-2 sm:flex-row sm:items-start">
+                                            <div class="flex-1">
+                                                <flux:textarea wire:model="newComment" rows="2"
+                                                    placeholder="Schrijf een reactie…" />
+                                            </div>
+                                            <flux:button type="submit" variant="primary">Reageren</flux:button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>

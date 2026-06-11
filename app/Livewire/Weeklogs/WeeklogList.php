@@ -3,6 +3,8 @@
 namespace App\Livewire\Weeklogs;
 
 use App\Models\Stage;
+use App\Models\Weeklog;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
@@ -15,7 +17,13 @@ class WeeklogList extends Component
     // Of het invulformulier zichtbaar is.
     public bool $showForm = false;
 
-    // Formuliervelden.
+    // Welk logboek zijn comment-thread open heeft staan (null = geen).
+    public ?int $openWeeklogId = null;
+
+    // Tekst van een nieuwe reactie.
+    public string $newComment = '';
+
+    // Formuliervelden voor een nieuw logboek.
     #[Validate('required|integer|min:1|max:52')]
     public int $week_number = 1;
 
@@ -58,7 +66,6 @@ class WeeklogList extends Component
             'submitted_at' => now(),
         ]);
 
-        // Formulier leegmaken en klaarzetten voor de volgende week.
         $this->reset(['period_start', 'period_end', 'content', 'hours_worked']);
         $this->week_number++;
         $this->showForm = false;
@@ -66,12 +73,39 @@ class WeeklogList extends Component
         session()->flash('weeklog-saved', 'Logboek opgeslagen.');
     }
 
+    /**
+     * Open/sluit de comment-thread van een logboek.
+     */
+    public function toggleComments(int $weeklogId): void
+    {
+        $this->openWeeklogId = $this->openWeeklogId === $weeklogId ? null : $weeklogId;
+        $this->reset('newComment');
+        $this->resetValidation();
+    }
+
+    /**
+     * Voeg een reactie toe aan een logboek (door de ingelogde gebruiker).
+     */
+    public function addComment(int $weeklogId): void
+    {
+        $this->validate(['newComment' => 'required|string|min:2']);
+
+        $weeklog = Weeklog::findOrFail($weeklogId);
+
+        $weeklog->comments()->create([
+            'author_id' => Auth::id(),
+            'comment' => $this->newComment,
+        ]);
+
+        $this->reset('newComment');
+    }
+
     public function render()
     {
         $stage = $this->currentStage();
 
         $weeklogs = $stage
-            ? $stage->weeklogs()->orderBy('week_number')->get()
+            ? $stage->weeklogs()->with('comments.author')->orderBy('week_number')->get()
             : collect();
 
         return view('livewire.weeklogs.weeklog-list', [
