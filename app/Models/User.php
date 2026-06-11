@@ -32,6 +32,7 @@ class User extends Authenticatable implements PasskeyUser
     {
         return in_array($this->role?->name, $roles, true);
     }
+
     protected function casts(): array
     {
         return [

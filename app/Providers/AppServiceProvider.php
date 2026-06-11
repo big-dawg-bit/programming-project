@@ -49,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
             : null,
         );
     }
+
     /**
      * Register custom Blade directives.
      */

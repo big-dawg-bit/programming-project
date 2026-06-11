@@ -109,7 +109,7 @@ class DatabaseSeeder extends Seeder
         foreach ($competencies as $i => $c) {
             Competency::create([
                 'framework_id' => $framework->id,
-                'code' => 'C' . ($i + 1),
+                'code' => 'C'.($i + 1),
                 'title' => $c['title'],
                 'weight' => $c['weight'],
                 'sort_order' => $i + 1,
