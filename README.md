@@ -49,14 +49,14 @@ Het systeem ondersteunt vijf rollen, elk met eigen rechten en functionaliteit:M
 
 | Categorie | Technologie |
 |-----------|-------------|
-| **Frontend** | [bv. React / Blade / Vue] |
-| **Backend** | [bv. Laravel / Node.js + Express / .NET] |
-| **Database** | [bv. MySQL / PostgreSQL / SQLite] |
-| **Authenticatie** | [bv. Laravel Breeze / JWT] |
+| **Frontend** | [Blade + Tailwind CSS + Flux UI (Livewire Flux)] |
+| **Backend** | [Laravel 13 (PHP 8.3) ] |
+| **Database** | [MySQL] |
+| **Authenticatie** | [Laravel Authentication (Flux/Breeze starter kit)] |
 | **Versiebeheer** | Git + GitHub |
 | **Projectmanagement** | Trello (Kanban) |
-| **Communicatie** | Microsoft Teams |
-| **IDE** | Visual Studio Code |
+| **Communicatie** | Microsoft Teams + Whatsapp |
+| **IDE** | PhpStorm |
 
 ---
 
