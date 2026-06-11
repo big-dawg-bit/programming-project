@@ -1,33 +1,32 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-    <head>
-        @include('partials.head')
-    </head>
-    <body class="min-h-screen bg-neutral-100 antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-            <div class="flex w-full max-w-md flex-col gap-6">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
-                    <span class="flex h-9 w-9 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
-                    </span>
-
-                    <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    @include('partials.head')
+</head>
+<body class="min-h-screen bg-[#F7F7F8] antialiased">
+<div class="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div class="flex w-full max-w-md flex-col gap-6">
+        <div class="rounded-2xl border border-zinc-200 bg-white text-zinc-800 shadow-sm">
+            <div class="flex flex-col gap-6 px-8 py-10 sm:px-10">
+                <a href="{{ route('home') }}" class="flex justify-center" wire:navigate>
+                            <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E2231A] text-lg font-bold text-white">
+                                EhB
+                            </span>
+                    <span class="sr-only">{{ config('app.name', 'Stage Monitoring Tool') }}</span>
                 </a>
 
-                <div class="flex flex-col gap-6">
-                    <div class="rounded-xl border bg-white dark:bg-stone-950 dark:border-stone-800 text-stone-800 shadow-xs">
-                        <div class="px-10 py-8">{{ $slot }}</div>
-                    </div>
-                </div>
+                {{ $slot }}
             </div>
         </div>
+    </div>
+</div>
 
-        @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
-        @endpersist
+@persist('toast')
+<flux:toast.group>
+    <flux:toast />
+</flux:toast.group>
+@endpersist
 
-        @fluxScripts
-    </body>
+@fluxScripts
+</body>
 </html>
