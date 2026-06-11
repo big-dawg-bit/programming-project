@@ -29,7 +29,7 @@ Een centrale eis van het project is dat de **evaluatiestructuur volledig configu
 | Thomas Kongole | [@thomaskongolo11](https://github.com/thomaskongolo11) | [Rol] |
 | Maxime Dekoster | [@Maxime207](https://github.com/maxime207) 
 
-**Begeleidende docenten:** [Naam docent 1], [Naam docent 2]
+**Begeleidende docenten:** [Ruben Dejonckheere], [Tom Aertsens], [Steve Weemaels], [Joachim Cartier]
 
 ---
 
