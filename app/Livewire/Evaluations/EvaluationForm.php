@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Evaluations;
 
-use App\Models\Stage;
-use Livewire\Component;
 use App\Models\Evaluation;
 use App\Models\EvaluationScore;
+use App\Models\Stage;
+use Livewire\Component;
 
 class EvaluationForm extends Component
 {
@@ -30,12 +30,6 @@ class EvaluationForm extends Component
             ->get();
     }
 
-    public function render()
-    {
-        return view('livewire.evaluations.evaluation-form', [
-            'competencies' => $this->competencies(),
-        ]);
-    }
     public function submit(): void
     {
         $evaluation = Evaluation::create([
@@ -50,9 +44,26 @@ class EvaluationForm extends Component
             EvaluationScore::create([
                 'evaluation_id' => $evaluation->id,
                 'competency_id' => $competency->id,
-                'weight_snapshot' => $competency->weight,   // gewicht NU vastleggen
+                'weight_snapshot' => $competency->weight,
                 'score' => $this->scores[$competency->id] ?? null,
             ]);
         }
+
+        // bereken het gewogen eindcijfer uit de snapshots
+        $scores = $evaluation->scores()->get();
+        $totalWeight = $scores->sum('weight_snapshot');
+
+        $overall = $totalWeight > 0
+            ? $scores->sum(fn ($s) => $s->score * $s->weight_snapshot) / $totalWeight
+            : 0;
+
+        $evaluation->update(['overall_score' => round($overall, 2)]);
+    }
+
+    public function render()
+    {
+        return view('livewire.evaluations.evaluation-form', [
+            'competencies' => $this->competencies(),
+        ]);
     }
 }

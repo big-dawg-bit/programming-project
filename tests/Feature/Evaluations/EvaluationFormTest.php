@@ -3,6 +3,7 @@
 use App\Livewire\Evaluations\EvaluationForm;
 use App\Models\Competency;
 use App\Models\CompetencyFramework;
+use App\Models\Evaluation;
 use App\Models\EvaluationScore;
 use App\Models\Stage;
 use App\Models\Student;
@@ -71,7 +72,7 @@ it('toont een extra veld wanneer een competentie wordt toegevoegd', function () 
 
 it('legt het gewicht vast bij indienen en blijft onveranderd als het gewicht later wijzigt', function () {
     $stage = makeStageWithFramework();
-    $competentieA = Competency::where('code', 'A')->first(); // gewicht 50
+    $competentieA = Competency::where('code', 'A')->first();
 
     Livewire::test(EvaluationForm::class, ['stage' => $stage])
         ->set("scores.{$competentieA->id}", 80)
@@ -79,12 +80,25 @@ it('legt het gewicht vast bij indienen en blijft onveranderd als het gewicht lat
 
     $score = EvaluationScore::where('competency_id', $competentieA->id)->first();
 
-    // gewicht vastgelegd als 50 op moment van indienen
     expect($score->weight_snapshot)->toBe(50);
 
-    // wijzig nu het gewicht naar 90
     $competentieA->update(['weight' => 90]);
 
-    // de snapshot blijft 50 — immuun voor de wijziging
     expect($score->fresh()->weight_snapshot)->toBe(50);
+});
+
+it('berekent het gewogen eindcijfer uit de snapshots', function () {
+    $stage = makeStageWithFramework();
+    $a = Competency::where('code', 'A')->first();
+    $b = Competency::where('code', 'B')->first();
+
+    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+        ->set("scores.{$a->id}", 80)
+        ->set("scores.{$b->id}", 60)
+        ->call('submit');
+
+    $evaluation = Evaluation::first();
+
+    // (80*50 + 60*50) / 100 = 70
+    expect((float) $evaluation->overall_score)->toBe(70.0);
 });
