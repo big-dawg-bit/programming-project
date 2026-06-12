@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Weeklog extends Model
 {
@@ -20,5 +19,4 @@ class Weeklog extends Model
     {
         return $this->hasMany(WeeklogComment::class, 'weeklog_id');
     }
-
 }

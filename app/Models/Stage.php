@@ -55,5 +55,4 @@ class Stage extends Model
     {
         return $this->hasOne(FinalReport::class);
     }
-
 }

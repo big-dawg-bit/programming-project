@@ -35,5 +35,4 @@ class StageApplication extends Model
     {
         return $this->hasOne(Stage::class, 'application_id');
     }
-
 }
