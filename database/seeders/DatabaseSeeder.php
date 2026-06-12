@@ -115,5 +115,10 @@ class DatabaseSeeder extends Seeder
                 'sort_order' => $i + 1,
             ]);
         }
+
+        // --- Teststage klaar voor evaluatie (feature/evaluations) ---
+        // Koppelt een stage aan het framework hierboven, zodat er na het
+        // seeden meteen een stage bestaat die geëvalueerd kan worden.
+        $this->call(StageSeeder::class);
     }
 }
