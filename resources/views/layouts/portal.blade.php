@@ -54,9 +54,29 @@
                 <h1 class="text-lg font-semibold">{{ $title ?? 'Dashboard' }}</h1>
                 <div class="flex items-center gap-4">
                     <flux:icon name="bell" class="size-5 text-neutral-400" />
-                    <span class="grid h-9 w-9 place-items-center rounded-full bg-red-500 text-sm font-semibold text-white">
-                        {{ auth()->user()?->initials() ?? 'U' }}
-                    </span>
+                    <flux:dropdown position="bottom" align="end">
+                        <button type="button" class="grid h-9 w-9 place-items-center rounded-full bg-red-500 text-sm font-semibold text-white">
+                            {{ auth()->user()?->initials() ?? 'U' }}
+                        </button>
+                        <flux:menu>
+                            <flux:menu.item :href="route('profile.edit')" icon="cog-6-tooth" wire:navigate>
+                                Instellingen
+                            </flux:menu.item>
+                            <flux:menu.separator />
+                            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                @csrf
+                                <flux:menu.item
+                                    as="button"
+                                    type="submit"
+                                    icon="arrow-right-start-on-rectangle"
+                                    class="w-full cursor-pointer"
+                                    data-test="logout-button"
+                                >
+                                    Uitloggen
+                                </flux:menu.item>
+                            </form>
+                        </flux:menu>
+                    </flux:dropdown>
                 </div>
             </header>
 
