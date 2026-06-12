@@ -102,3 +102,31 @@ it('berekent het gewogen eindcijfer uit de snapshots', function () {
     // (80*50 + 60*50) / 100 = 70
     expect((float) $evaluation->overall_score)->toBe(70.0);
 });
+
+it('ondersteunt een mid-term en final evaluatie onafhankelijk op dezelfde stage', function () {
+    $stage = makeStageWithFramework();
+    $a = Competency::where('code', 'A')->first();
+    $b = Competency::where('code', 'B')->first();
+
+    // mid-term: 80 en 60 -> 70
+    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+        ->set('type', 'mid-term')
+        ->set("scores.{$a->id}", 80)
+        ->set("scores.{$b->id}", 60)
+        ->call('submit');
+
+    // final: 90 en 100 -> 95
+    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+        ->set('type', 'final')
+        ->set("scores.{$a->id}", 90)
+        ->set("scores.{$b->id}", 100)
+        ->call('submit');
+
+    expect(Evaluation::where('stage_id', $stage->id)->count())->toBe(2);
+
+    $midterm = Evaluation::where('stage_id', $stage->id)->where('type', 'mid-term')->first();
+    $final = Evaluation::where('stage_id', $stage->id)->where('type', 'final')->first();
+
+    expect((float) $midterm->overall_score)->toBe(70.0)
+        ->and((float) $final->overall_score)->toBe(95.0);
+});
