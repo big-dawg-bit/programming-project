@@ -92,7 +92,10 @@
                             </td>
                             <td class="px-4 py-3">{{ $weeklog->hours_worked ?? '—' }}</td>
                             <td class="px-4 py-3">
-                                <flux:badge size="sm">{{ ucfirst($weeklog->status) }}</flux:badge>
+                                <flux:badge size="sm"
+                                            :color="$weeklog->status === 'approved' ? 'green' : ($weeklog->status === 'rejected' ? 'red' : 'yellow')">
+                                    {{ ucfirst($weeklog->status) }}
+                                </flux:badge>
                             </td>
                             <td class="px-4 py-3">
                                 <flux:button size="sm" variant="ghost" icon="chat-bubble-left-right"
