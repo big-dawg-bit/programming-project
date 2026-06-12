@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/users', UserManager::class)->name('admin.users');
+        Route::get('/admin/framework', \App\Livewire\Admin\FrameworkManager::class)->name('admin.framework');
     });
 
     Route::livewire('student', StudentDashboard::class)->name('student.dashboard');
