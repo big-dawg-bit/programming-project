@@ -86,17 +86,10 @@
                                     {{ $weeklog->period_start ?? '—' }} – {{ $weeklog->period_end ?? '—' }}
                                 </td>
                                 <td class="px-5 py-3">
-                                    @php
-                                        $status = $weeklog->status;
-                                        $classes = match ($status) {
-                                            'gevalideerd', 'goedgekeurd' => 'bg-green-100 text-green-700',
-                                            'ingediend' => 'bg-amber-100 text-amber-700',
-                                            default => 'bg-neutral-100 text-neutral-600',
-                                        };
-                                    @endphp
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $classes }}">
-                                        {{ ucfirst($status) }}
-                                    </span>
+                                    <flux:badge size="sm"
+                                                :color="in_array($weeklog->status, ['gevalideerd', 'goedgekeurd']) ? 'green' : ($weeklog->status === 'ingediend' ? 'yellow' : 'zinc')">
+                                        {{ ucfirst($weeklog->status) }}
+                                    </flux:badge>
                                 </td>
                             </tr>
                         @endforeach
