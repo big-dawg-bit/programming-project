@@ -10,10 +10,13 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
-#[Title('Weeklogboeken')]
+#[Layout('layouts.portal')]
+#[Title('Mijn weeklogs')]
 class WeeklogList extends Component
 {
+    // Actieve statusfilter (alle | concept | ingediend | goedgekeurd | aanpassing).
+    public string $filter = 'alle';
+
     // Of het invulformulier zichtbaar is.
     public bool $showForm = false;
 
@@ -100,17 +103,33 @@ class WeeklogList extends Component
         $this->reset('newComment');
     }
 
+    /**
+     * Welke databasestatussen onder elke filterpill vallen.
+     * (De status is een vrije string; 'draft' komt uit de migration-default.)
+     */
+    public const FILTERS = [
+        'alle' => null,
+        'concept' => ['draft', 'concept'],
+        'ingediend' => ['ingediend'],
+        'goedgekeurd' => ['goedgekeurd', 'gevalideerd'],
+        'aanpassing' => ['aanpassing', 'aanpassing_gevraagd'],
+    ];
+
     public function render()
     {
         $stage = $this->currentStage();
 
-        $weeklogs = $stage
-            ? $stage->weeklogs()->with('comments.author')->orderBy('week_number')->get()
-            : collect();
+        $query = $stage
+            ? $stage->weeklogs()->with('comments.author')->orderByDesc('week_number')
+            : null;
+
+        if ($query && ($statuses = self::FILTERS[$this->filter] ?? null)) {
+            $query->whereIn('status', $statuses);
+        }
 
         return view('livewire.weeklogs.weeklog-list', [
             'stage' => $stage,
-            'weeklogs' => $weeklogs,
+            'weeklogs' => $query ? $query->get() : collect(),
         ]);
     }
 }
