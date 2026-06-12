@@ -1,3 +1,4 @@
+<x-layouts.portal title="Weeklogboeken">
 <div class="flex h-full w-full flex-1 flex-col gap-6">
     <div class="flex items-center justify-between">
         <div>
@@ -136,3 +137,5 @@
         </div>
     @endif
 </div>
+
+</x-layouts.portal>
