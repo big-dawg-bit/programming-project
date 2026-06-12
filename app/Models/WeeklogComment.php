@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class WeeklogComment extends Model
 {
@@ -20,5 +18,4 @@ class WeeklogComment extends Model
     {
         return $this->belongsTo(User::class, 'author_id');
     }
-
 }

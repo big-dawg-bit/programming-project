@@ -28,6 +28,11 @@ class User extends Authenticatable implements PasskeyUser
      *
      * @return array<string, string>
      */
+    public function hasRole(string ...$roles): bool
+    {
+        return in_array($this->role?->name, $roles, true);
+    }
+
     protected function casts(): array
     {
         return [

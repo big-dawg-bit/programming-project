@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Docent extends Model
 {
     protected $guarded = [];
+
     protected $table = 'docenten';
 
     public function user(): BelongsTo
@@ -21,5 +21,4 @@ class Docent extends Model
     {
         return $this->hasMany(Stage::class, 'docent_id');
     }
-
 }
