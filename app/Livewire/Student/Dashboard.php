@@ -15,7 +15,7 @@ class Dashboard extends Component
     public function render()
     {
         // Voorlopig de eerste stage (testdata). Later: stage van de ingelogde student.
-        $stage = Stage::with(['student.user', 'company', 'finalReport'])
+        $stage = Stage::with(['student.user', 'company', 'mentor.user', 'finalReport'])
             ->withCount('weeklogs')
             ->first();
 
@@ -34,11 +34,15 @@ class Dashboard extends Component
             $currentWeek = max(1, min($elapsed, $totalWeeks));
         }
 
+        // Eerstvolgende week waarvoor nog een weeklog verwacht wordt.
+        $nextWeek = $currentWeek && $totalWeeks ? min($currentWeek + 1, $totalWeeks) : null;
+
         return view('livewire.student.dashboard', [
             'stage' => $stage,
             'weeklogs' => $weeklogs,
             'currentWeek' => $currentWeek,
             'totalWeeks' => $totalWeeks,
+            'nextWeek' => $nextWeek,
         ]);
     }
 }
