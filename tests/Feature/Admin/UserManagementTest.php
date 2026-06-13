@@ -1,12 +1,14 @@
 <?php
 
-use App\Models\User;
+use App\Livewire\Admin\UserManager;
 use App\Models\Role;
+use App\Models\User;
 use Livewire\Livewire;
 
 beforeEach(fn () => $this->seed());
 
-function makeUser(string $roleName): User {
+function makeUser(string $roleName): User
+{
     return User::factory()->create([
         'role_id' => Role::where('name', $roleName)->value('id'),
     ]);
@@ -20,10 +22,9 @@ it('blokkeert een niet-admin met 403', function () {
     $this->actingAs(makeUser('student'))->get('/admin/users')->assertForbidden();
 });
 
-
 it('maakt een nieuwe gebruiker met rol aan', function () {
     Livewire::actingAs(makeUser('admin'))
-        ->test(\App\Livewire\Admin\UserManager::class)
+        ->test(UserManager::class)
         ->set('name', 'Test Student')
         ->set('email', 'test@student.ehb.be')
         ->set('selectedRole', 'student')
@@ -38,7 +39,7 @@ it('wijzigt de rol van een gebruiker', function () {
     $docentId = Role::where('name', 'docent')->value('id');
 
     Livewire::actingAs(makeUser('admin'))
-        ->test(\App\Livewire\Admin\UserManager::class)
+        ->test(UserManager::class)
         ->call('changeRole', $user->id, $docentId);
 
     expect($user->fresh()->role_id)->toBe($docentId);
@@ -46,8 +47,8 @@ it('wijzigt de rol van een gebruiker', function () {
 
 it('zet een gebruiker op inactief en terug', function () {
     $user = makeUser('student');
-    $cmp  = Livewire::actingAs(makeUser('admin'))
-        ->test(\App\Livewire\Admin\UserManager::class);
+    $cmp = Livewire::actingAs(makeUser('admin'))
+        ->test(UserManager::class);
 
     $cmp->call('toggleActive', $user->id);
     expect($user->fresh()->is_active)->toBeFalse();
