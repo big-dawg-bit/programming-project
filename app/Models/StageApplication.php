@@ -14,6 +14,12 @@ class StageApplication extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'submitted_at' => 'datetime',
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);
