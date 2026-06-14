@@ -11,6 +11,7 @@
                 <th class="border border-gray-300 p-2 text-left">Bedrijf</th>
                 <th class="border border-gray-300 p-2 text-left">Functie</th>
                 <th class="border border-gray-300 p-2 text-left">Ingediend</th>
+                <th class="border border-gray-300 p-2 text-left">Actie</th>
             </tr>
             </thead>
             <tbody>
@@ -20,6 +21,12 @@
                     <td class="border border-gray-300 p-2">{{ $application->company?->name }}</td>
                     <td class="border border-gray-300 p-2">{{ $application->position_title }}</td>
                     <td class="border border-gray-300 p-2">{{ $application->submitted_at?->format('d-m-Y') }}</td>
+                    <td class="border border-gray-300 p-2">
+                        <button wire:click="approve({{ $application->id }})"
+                                class="rounded bg-[#E2231A] px-3 py-1 text-white">
+                            Goedkeuren
+                        </button>
+                    </td>
                 </tr>
             @endforeach
             </tbody>
