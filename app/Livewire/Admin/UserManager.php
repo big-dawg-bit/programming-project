@@ -12,22 +12,24 @@ class UserManager extends Component
     use WithPagination;
 
     public string $name = '';
+
     public string $email = '';
+
     public string $selectedRole = 'student';
 
     public function createUser(): void
     {
         $data = $this->validate([
-            'name'         => 'required|string|max:255',
-            'email'        => 'required|email|unique:users,email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
             'selectedRole' => 'required|exists:roles,name',
         ]);
 
         User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
+            'name' => $data['name'],
+            'email' => $data['email'],
             'password' => bcrypt(str()->random(32)),
-            'role_id'  => Role::where('name', $data['selectedRole'])->value('id'),
+            'role_id' => Role::where('name', $data['selectedRole'])->value('id'),
         ]);
 
         $this->reset('name', 'email');

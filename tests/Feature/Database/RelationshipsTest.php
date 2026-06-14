@@ -2,6 +2,7 @@
 
 use App\Models\Competency;
 use App\Models\CompetencyFramework;
+use Illuminate\Database\QueryException;
 
 /*
  | Test de Eloquent-relaties en de foreign-key cascades.
@@ -50,4 +51,4 @@ it('weigert een competentie zonder geldig framework (FK-constraint)', function (
         'title' => 'Ongeldig',
         'weight' => 10,
     ]);
-})->throws(Illuminate\Database\QueryException::class);
+})->throws(QueryException::class);
