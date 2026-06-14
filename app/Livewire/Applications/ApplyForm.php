@@ -10,10 +10,15 @@ use Livewire\Component;
 class ApplyForm extends Component
 {
     public ?int $company_id = null;
+
     public string $position_title = '';
+
     public string $description = '';
+
     public ?string $start_date = null;
+
     public ?string $end_date = null;
+
     public string $proposed_mentor_name = '';
 
     public function submit(): void

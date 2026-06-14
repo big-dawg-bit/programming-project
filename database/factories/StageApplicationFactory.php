@@ -8,7 +8,6 @@ use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-
 /** @extends Factory<StageApplication> */
 class StageApplicationFactory extends Factory
 {
