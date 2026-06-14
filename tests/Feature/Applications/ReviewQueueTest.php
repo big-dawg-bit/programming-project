@@ -27,3 +27,17 @@ it('toont enkel ingediende aanvragen', function () {
         ->assertSee('WEL')
         ->assertDontSee('NIET');
 });
+it('keurt een aanvraag goed en maakt een stage aan', function () {
+    $lid = User::factory()->withRole('stagecommissie')->create();
+    $application = StageApplication::factory()->create(['status' => 'submitted']);
+
+    Livewire::actingAs($lid)->test(ReviewQueue::class)
+        ->call('approve', $application->id);
+
+    $application->refresh();
+
+    expect($application->status)->toBe('approved');
+    expect($application->reviews()->count())->toBe(1);
+    expect($application->reviews()->first()->reviewer_id)->toBe($lid->id);
+    expect($application->stage()->count())->toBe(1);
+});
