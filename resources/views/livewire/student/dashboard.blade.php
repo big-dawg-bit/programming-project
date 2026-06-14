@@ -1,107 +1,111 @@
-<div class="mx-auto flex max-w-5xl flex-col gap-6">
+<div class="mx-auto flex max-w-6xl flex-col gap-8">
     @if (! $stage)
         <div class="rounded-xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-900">
             Geen stage gevonden. Draai de seeders (<code>php artisan migrate --seed</code> en
             <code>php artisan db:seed --class=StageSeeder</code>).
         </div>
     @else
-        {{-- Welkom --}}
+        {{-- Begroeting --}}
         <div>
-            <h2 class="text-2xl font-bold">Welkom {{ $stage->student?->user?->first_name ?? $stage->student?->user?->name ?? 'student' }}</h2>
+            <h2 class="text-2xl font-bold">Hallo {{ $stage->student?->user?->first_name ?? $stage->student?->user?->name ?? 'student' }}</h2>
             <p class="text-sm text-neutral-500">
-                Stage bij {{ $stage->company?->name ?? 'onbekend bedrijf' }}
+                @if ($currentWeek && $totalWeeks)
+                    Week {{ $currentWeek }} van {{ $totalWeeks }}
+                @else
+                    Stage bij {{ $stage->company?->name ?? 'onbekend bedrijf' }}
+                @endif
             </p>
         </div>
 
-        {{-- Statistiek-kaarten --}}
-        <div class="grid gap-4 sm:grid-cols-3">
-            {{-- Ingediende weeklogs --}}
+        {{-- Statuskaarten --}}
+        <div class="grid gap-4 md:grid-cols-3">
+            {{-- Huidige stage --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-5">
                 <div class="flex items-center gap-2 text-sm text-neutral-500">
-                    <flux:icon name="book-open" class="size-4" /> Ingediende weeklogs
+                    <flux:icon name="briefcase" class="size-4" /> Huidige stage
                 </div>
-                <p class="mt-3 text-3xl font-semibold">{{ $stage->weeklogs_count }}</p>
+                <p class="mt-3 text-xl font-semibold">{{ $stage->company?->name ?? 'Onbekend' }}</p>
+                <p class="text-sm text-neutral-500">Mentor: {{ $stage->mentor?->user?->name ?? '—' }}</p>
             </div>
 
-            {{-- Stage week --}}
+            {{-- Weeklogs ingediend --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-5">
                 <div class="flex items-center gap-2 text-sm text-neutral-500">
-                    <flux:icon name="clock" class="size-4" /> Stage week
+                    <flux:icon name="document-text" class="size-4" /> Weeklogs ingediend
                 </div>
-                @if ($currentWeek && $totalWeeks)
-                    <p class="mt-3 text-3xl font-semibold">{{ $currentWeek }}/{{ $totalWeeks }}</p>
-                    <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100">
-                        <div class="h-full rounded-full bg-red-500"
-                             style="width: {{ round($currentWeek / $totalWeeks * 100) }}%"></div>
+                <p class="mt-3 text-3xl font-semibold">
+                    {{ $stage->weeklogs_count }}@if ($totalWeeks)<span class="text-xl font-medium text-neutral-400">/{{ $totalWeeks }}</span>@endif
+                </p>
+                @if ($totalWeeks)
+                    <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100">
+                        <div class="h-full rounded-full bg-[#E2231A]"
+                             style="width: {{ min(100, round($stage->weeklogs_count / $totalWeeks * 100)) }}%"></div>
                     </div>
-                @else
-                    <p class="mt-3 text-3xl font-semibold">—</p>
                 @endif
             </div>
 
-            {{-- Eindrapport --}}
+            {{-- Volgende deadline --}}
             <div class="rounded-xl border border-neutral-200 bg-white p-5">
                 <div class="flex items-center gap-2 text-sm text-neutral-500">
-                    <flux:icon name="document-text" class="size-4" /> Eindrapport
+                    <flux:icon name="calendar" class="size-4" /> Volgende deadline
                 </div>
-                <p class="mt-3">
-                    @if ($stage->finalReport)
-                        <span class="rounded-full bg-green-100 px-2.5 py-1 text-sm font-medium text-green-700">Ingediend</span>
-                    @else
-                        <span class="rounded-full bg-neutral-100 px-2.5 py-1 text-sm font-medium text-neutral-600">Nog niet ingediend</span>
-                    @endif
-                </p>
-                <a href="{{ route('final-report.edit') }}" wire:navigate class="mt-3 inline-block text-sm text-red-600 hover:underline">
-                    Naar eindrapport →
-                </a>
+                @if ($nextWeek)
+                    <p class="mt-3 text-lg font-semibold">Weeklog week {{ $nextWeek }}</p>
+                    <p class="text-sm text-neutral-500">Deze week</p>
+                @else
+                    <p class="mt-3 text-lg font-semibold">Geen openstaande deadline</p>
+                @endif
             </div>
         </div>
 
-        {{-- Recente weeklogs --}}
-        <div class="rounded-xl border border-neutral-200 bg-white">
-            <div class="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
-                <h3 class="font-semibold">Recente weeklogs</h3>
-                <a href="{{ route('weeklogs.index') }}" wire:navigate class="text-sm text-red-600 hover:underline">
-                    Alle weeklogs →
-                </a>
-            </div>
+        {{-- Te doen + Recente activiteit --}}
+        <div class="grid gap-8 lg:grid-cols-2">
+            {{-- Te doen --}}
+            {{-- NB: voorlopig statische voorbeeldinhoud; nog niet gekoppeld aan een takenmodel. --}}
+            <section>
+                <h3 class="mb-3 text-lg font-semibold">Te doen</h3>
+                <div class="space-y-3">
+                    <div class="rounded-xl border border-neutral-200 bg-white p-4">
+                        <p class="font-medium">Weeklog week {{ $nextWeek ?? '—' }} invullen</p>
+                        <p class="mt-1 text-sm text-neutral-500">Beschrijf je activiteiten en reflecteer op je ervaringen</p>
+                        <p class="mt-2 flex items-center gap-1.5 text-sm text-amber-600">
+                            <flux:icon name="clock" class="size-4" /> Deze week
+                        </p>
+                    </div>
+                    <div class="rounded-xl border border-neutral-200 bg-white p-4">
+                        <div class="flex items-start justify-between gap-2">
+                            <p class="font-medium">Tussentijdse evaluatie inzien</p>
+                            <span class="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">Nieuw</span>
+                        </div>
+                        <p class="mt-1 text-sm text-neutral-500">Je mentor heeft je tussentijdse evaluatie ingevuld</p>
+                    </div>
+                </div>
+            </section>
 
-            @if ($weeklogs->isEmpty())
-                <p class="px-5 py-6 text-sm text-neutral-500">Nog geen weeklogs ingediend.</p>
-            @else
-                <table class="w-full text-left text-sm">
-                    <thead class="text-neutral-500">
-                        <tr>
-                            <th class="px-5 py-3 font-medium">Week</th>
-                            <th class="px-5 py-3 font-medium">Periode</th>
-                            <th class="px-5 py-3 font-medium">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-100">
-                        @foreach ($weeklogs as $weeklog)
-                            <tr>
-                                <td class="px-5 py-3 font-medium">Week {{ $weeklog->week_number }}</td>
-                                <td class="px-5 py-3 text-neutral-600">
-                                    {{ $weeklog->period_start ?? '—' }} – {{ $weeklog->period_end ?? '—' }}
-                                </td>
-                                <td class="px-5 py-3">
-                                    @php
-                                        $status = $weeklog->status;
-                                        $classes = match ($status) {
-                                            'gevalideerd', 'goedgekeurd' => 'bg-green-100 text-green-700',
-                                            'ingediend' => 'bg-amber-100 text-amber-700',
-                                            default => 'bg-neutral-100 text-neutral-600',
-                                        };
-                                    @endphp
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $classes }}">
-                                        {{ ucfirst($status) }}
-                                    </span>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endif
+            {{-- Recente activiteit --}}
+            {{-- NB: voorlopig statische voorbeeldinhoud; nog geen activiteitenlog in de database. --}}
+            <section>
+                <h3 class="mb-3 text-lg font-semibold">Recente activiteit</h3>
+                <div class="space-y-4">
+                    @php
+                        $activiteiten = [
+                            ['icon' => 'check-circle', 'kleur' => 'text-green-500', 'titel' => 'Weeklog week 6 goedgekeurd', 'tekst' => 'Margaux Schodts heeft je weeklog goedgekeurd', 'tijd' => '2 uur geleden'],
+                            ['icon' => 'document-text', 'kleur' => 'text-blue-500', 'titel' => 'Weeklog week 6 ingediend', 'tekst' => 'Je weeklog is verzonden naar je mentor', 'tijd' => '1 dag geleden'],
+                            ['icon' => 'check-circle', 'kleur' => 'text-green-500', 'titel' => 'Stageaanvraag goedgekeurd', 'tekst' => 'De stagecommissie heeft je aanvraag goedgekeurd', 'tijd' => '1 week geleden'],
+                        ];
+                    @endphp
+                    @foreach ($activiteiten as $a)
+                        <div class="flex gap-3">
+                            <flux:icon :name="$a['icon']" class="mt-0.5 size-5 shrink-0 {{ $a['kleur'] }}" />
+                            <div>
+                                <p class="text-sm font-medium">{{ $a['titel'] }}</p>
+                                <p class="text-sm text-neutral-500">{{ $a['tekst'] }}</p>
+                                <p class="mt-0.5 text-xs text-neutral-400">{{ $a['tijd'] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
         </div>
     @endif
 </div>
