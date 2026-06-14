@@ -22,10 +22,21 @@
                     <td class="border border-gray-300 p-2">{{ $application->position_title }}</td>
                     <td class="border border-gray-300 p-2">{{ $application->submitted_at?->format('d-m-Y') }}</td>
                     <td class="border border-gray-300 p-2">
-                        <button wire:click="approve({{ $application->id }})"
-                                class="rounded bg-[#E2231A] px-3 py-1 text-white">
-                            Goedkeuren
-                        </button>
+                        <div class="flex flex-col gap-2">
+                            <button wire:click="approve({{ $application->id }})"
+                                    class="rounded bg-[#E2231A] px-3 py-1 text-white">
+                                Goedkeuren
+                            </button>
+
+                            <textarea wire:model="feedback.{{ $application->id }}"
+                                      placeholder="Reden van afwijzing"
+                                      class="border border-gray-300 p-1 text-sm"></textarea>
+
+                            <button wire:click="reject({{ $application->id }})"
+                                    class="rounded border border-gray-400 px-3 py-1">
+                                Afwijzen
+                            </button>
+                        </div>
                     </td>
                 </tr>
             @endforeach
