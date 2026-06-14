@@ -41,3 +41,19 @@ it('keurt een aanvraag goed en maakt een stage aan', function () {
     expect($application->reviews()->first()->reviewer_id)->toBe($lid->id);
     expect($application->stage()->count())->toBe(1);
 });
+
+it('wijst een aanvraag af met feedback', function () {
+    $lid = User::factory()->withRole('stagecommissie')->create();
+    $application = StageApplication::factory()->create(['status' => 'submitted']);
+
+    Livewire::actingAs($lid)->test(ReviewQueue::class)
+        ->set("feedback.{$application->id}", 'Bedrijf niet erkend')
+        ->call('reject', $application->id);
+
+    $application->refresh();
+
+    expect($application->status)->toBe('rejected');
+    expect($application->reviews()->first()->decision)->toBe('rejected');
+    expect($application->reviews()->first()->feedback)->toBe('Bedrijf niet erkend');
+    expect($application->stage()->count())->toBe(0);
+});
