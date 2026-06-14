@@ -12,6 +12,8 @@ class ReviewQueue extends Component
 {
     use WithPagination;
 
+    public array $feedback = [];
+
     public function render()
     {
         return view('livewire.applications.review-queue', [
@@ -43,5 +45,21 @@ class ReviewQueue extends Component
             'start_date' => $application->start_date,
             'end_date' => $application->end_date,
         ]);
+    }
+
+    public function reject(int $id): void
+    {
+        $application = StageApplication::findOrFail($id);
+
+        $application->reviews()->create([
+            'reviewer_id' => auth()->id(),
+            'decision' => 'rejected',
+            'feedback' => $this->feedback[$id] ?? null,
+            'reviewed_at' => now(),
+        ]);
+
+        $application->update(['status' => 'rejected']);
+
+        unset($this->feedback[$id]);
     }
 }
