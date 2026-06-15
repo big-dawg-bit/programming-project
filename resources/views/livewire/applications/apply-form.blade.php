@@ -1,57 +1,48 @@
-<div class="max-w-2xl">
-    <h1 class="text-2xl font-bold mb-4">Stage aanvragen</h1>
-
-    @if (session('status'))
-        <div class="mb-4 rounded border border-green-200 bg-green-50 p-3 text-green-800">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    <div class="space-y-4">
-        <div>
-            <label class="mb-1 block text-sm font-medium">Bedrijf</label>
-            <select wire:model="company_id" class="w-full rounded border border-gray-300 p-2">
-                <option value="">— Kies een bedrijf —</option>
-                @foreach ($companies as $company)
-                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                @endforeach
-            </select>
-            @error('company_id') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+<x-layouts.portal title="Stage aanvragen">
+    <div class="mx-auto max-w-2xl">
+        <div class="mb-6">
+            <flux:heading size="xl">Stage aanvragen</flux:heading>
+            <flux:subheading>Vul het formulier in om je stage aan te vragen.</flux:subheading>
         </div>
 
-        <div>
-            <label class="mb-1 block text-sm font-medium">Functietitel</label>
-            <input type="text" wire:model="position_title" class="w-full rounded border border-gray-300 p-2">
-            @error('position_title') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
-        </div>
+        <x-form.success-message :message="session('status')" class="mb-4" />
 
-        <div>
-            <label class="mb-1 block text-sm font-medium">Motivatie</label>
-            <textarea wire:model="description" rows="4" class="w-full rounded border border-gray-300 p-2"></textarea>
-            @error('description') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-2">
+        <div class="space-y-4 rounded-xl border border-neutral-200 bg-white p-6">
             <div>
-                <label class="mb-1 block text-sm font-medium">Startdatum</label>
-                <input type="date" wire:model="start_date" class="w-full rounded border border-gray-300 p-2">
-                @error('start_date') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                <label class="mb-1 block text-sm font-medium">Bedrijf</label>
+                <select wire:model="company_id"
+                        class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:outline-none">
+                    <option value="">— Kies een bedrijf —</option>
+                    @foreach ($companies as $company)
+                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                    @endforeach
+                </select>
+                @error('company_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium">Einddatum</label>
-                <input type="date" wire:model="end_date" class="w-full rounded border border-gray-300 p-2">
-                @error('end_date') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+
+            <flux:input wire:model="position_title" label="Functietitel" />
+            @error('position_title') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+
+            <flux:textarea wire:model="description" label="Motivatie" rows="4" />
+            @error('description') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <flux:input type="date" wire:model="start_date" label="Startdatum" />
+                    @error('start_date') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <flux:input type="date" wire:model="end_date" label="Einddatum" />
+                    @error('end_date') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
             </div>
-        </div>
 
-        <div>
-            <label class="mb-1 block text-sm font-medium">Voorgestelde mentor (optioneel)</label>
-            <input type="text" wire:model="proposed_mentor_name" class="w-full rounded border border-gray-300 p-2">
-            @error('proposed_mentor_name') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
-        </div>
+            <flux:input wire:model="proposed_mentor_name" label="Voorgestelde mentor (optioneel)" />
+            @error('proposed_mentor_name') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
 
-        <button wire:click="submit" class="rounded bg-[#E2231A] px-5 py-2 text-white hover:opacity-90">
-            Aanvraag indienen
-        </button>
+            <flux:button variant="primary" wire:click="submit">
+                Aanvraag indienen
+            </flux:button>
+        </div>
     </div>
-</div>
+</x-layouts.portal>
