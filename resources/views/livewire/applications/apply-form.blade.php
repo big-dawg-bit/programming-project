@@ -9,14 +9,50 @@
 
     <div class="space-y-4">
         <div>
-            <label class="mb-1 block text-sm font-medium">Bedrijf</label>
-            <select wire:model="company_id" class="w-full rounded border border-gray-300 p-2">
-                <option value="">— Kies een bedrijf —</option>
-                @foreach ($companies as $company)
-                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                @endforeach
-            </select>
-            @error('company_id') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+            <label class="mb-2 flex items-center gap-2 text-sm font-medium">
+                <input type="checkbox" wire:model.live="newCompany" class="rounded border-gray-300">
+                Nieuw bedrijf toevoegen
+            </label>
+
+            @if (! $newCompany)
+                <select wire:model="company_id" class="w-full rounded border border-gray-300 p-2">
+                    <option value="">— Kies een bedrijf —</option>
+                    @foreach ($companies as $company)
+                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                    @endforeach
+                </select>
+                @error('company_id') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+            @else
+                <div class="space-y-3 rounded border border-gray-200 p-3">
+                    <div>
+                        <label class="mb-1 block text-sm font-medium">Bedrijfsnaam</label>
+                        <input type="text" wire:model="company_name" class="w-full rounded border border-gray-300 p-2">
+                        @error('company_name') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium">Adres</label>
+                        <input type="text" wire:model="company_address" class="w-full rounded border border-gray-300 p-2">
+                        @error('company_address') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium">Btw-nummer</label>
+                        <input type="text" wire:model="company_vat_number" class="w-full rounded border border-gray-300 p-2">
+                        @error('company_vat_number') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Contact e-mail</label>
+                            <input type="email" wire:model="company_contact_email" class="w-full rounded border border-gray-300 p-2">
+                            @error('company_contact_email') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Contact telefoon</label>
+                            <input type="text" wire:model="company_contact_phone" class="w-full rounded border border-gray-300 p-2">
+                            @error('company_contact_phone') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div>
