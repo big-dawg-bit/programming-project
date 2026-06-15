@@ -1,48 +1,58 @@
-<div>
-    <h1 class="text-2xl font-bold mb-4">Aanvragen ter beoordeling</h1>
+<x-layouts.portal title="Aanvragen ter beoordeling">
+    <div class="mx-auto max-w-5xl">
+        <div class="mb-6">
+            <flux:heading size="xl">Aanvragen ter beoordeling</flux:heading>
+            <flux:subheading>Beoordeel de openstaande stage-aanvragen.</flux:subheading>
+        </div>
 
-    @if ($applications->isEmpty())
-        <p class="text-gray-500">Er zijn geen openstaande aanvragen.</p>
-    @else
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-            <tr class="bg-gray-100">
-                <th class="border border-gray-300 p-2 text-left">Student</th>
-                <th class="border border-gray-300 p-2 text-left">Bedrijf</th>
-                <th class="border border-gray-300 p-2 text-left">Functie</th>
-                <th class="border border-gray-300 p-2 text-left">Ingediend</th>
-                <th class="border border-gray-300 p-2 text-left">Actie</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach ($applications as $application)
-                <tr wire:key="app-{{ $application->id }}">
-                    <td class="border border-gray-300 p-2">{{ $application->student?->user?->name }}</td>
-                    <td class="border border-gray-300 p-2">{{ $application->company?->name }}</td>
-                    <td class="border border-gray-300 p-2">{{ $application->position_title }}</td>
-                    <td class="border border-gray-300 p-2">{{ $application->submitted_at?->format('d-m-Y') }}</td>
-                    <td class="border border-gray-300 p-2">
-                        <div class="flex flex-col gap-2">
-                            <button wire:click="approve({{ $application->id }})"
-                                    class="rounded bg-[#E2231A] px-3 py-1 text-white">
-                                Goedkeuren
-                            </button>
+        <x-form.success-message :message="session('status')" class="mb-4" />
 
-                            <textarea wire:model="feedback.{{ $application->id }}"
-                                      placeholder="Reden van afwijzing"
-                                      class="border border-gray-300 p-1 text-sm"></textarea>
-
-                            <button wire:click="reject({{ $application->id }})"
-                                    class="rounded border border-gray-400 px-3 py-1">
-                                Afwijzen
-                            </button>
+        @if ($applications->isEmpty())
+            <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center">
+                <flux:heading size="lg">Geen openstaande aanvragen</flux:heading>
+                <flux:subheading class="mt-1">Er zijn momenteel geen aanvragen ter beoordeling.</flux:subheading>
+            </div>
+        @else
+            <div class="flex flex-col gap-4">
+                @foreach ($applications as $application)
+                    <div wire:key="app-{{ $application->id }}"
+                         class="rounded-xl border border-neutral-200 bg-white p-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-semibold">{{ $application->student?->user?->name }}</h3>
+                                    <flux:badge size="sm"
+                                                :color="$application->status === 'approved' ? 'green' : ($application->status === 'rejected' ? 'red' : 'yellow')">
+                                        {{ ucfirst($application->status ?? 'pending') }}
+                                    </flux:badge>
+                                </div>
+                                <p class="mt-1 text-sm text-neutral-500">
+                                    {{ $application->company?->name }} · {{ $application->position_title }}
+                                </p>
+                                <p class="mt-0.5 text-xs text-neutral-400">
+                                    Ingediend op {{ $application->submitted_at?->format('d-m-Y') ?? '—' }}
+                                </p>
+                            </div>
                         </div>
-                    </td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
 
-        <div class="mt-4">{{ $applications->links() }}</div>
-    @endif
-</div>
+                        <div class="mt-4 flex flex-col gap-3 border-t border-neutral-100 pt-4">
+                            <flux:textarea wire:model="feedback.{{ $application->id }}"
+                                           placeholder="Reden van afwijzing (optioneel bij goedkeuring)" rows="2" />
+
+                            <div class="flex gap-3">
+                                <flux:button variant="primary" wire:click="approve({{ $application->id }})">
+                                    Goedkeuren
+                                </flux:button>
+                                <flux:button variant="ghost" wire:click="reject({{ $application->id }})">
+                                    Afwijzen
+                                </flux:button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="mt-4">{{ $applications->links() }}</div>
+        @endif
+    </div>
+</x-layouts.portal>
