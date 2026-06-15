@@ -6,7 +6,9 @@ use App\Models\Evaluation;
 use App\Models\EvaluationScore;
 use App\Models\Stage;
 use Livewire\Component;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.portal')]
 class EvaluationForm extends Component
 {
     public Stage $stage;
