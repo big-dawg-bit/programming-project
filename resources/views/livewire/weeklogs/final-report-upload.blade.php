@@ -1,4 +1,3 @@
-<x-layouts.portal title="Eindrapport">
 <div class="flex h-full w-full flex-1 flex-col gap-6">
     <div>
         <flux:heading size="xl">Eindrapport</flux:heading>
@@ -71,5 +70,3 @@
         </form>
     @endif
 </div>
-
-</x-layouts.portal>

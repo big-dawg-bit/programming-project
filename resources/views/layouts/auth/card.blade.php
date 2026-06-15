@@ -2,6 +2,14 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     @include('partials.head')
+
+    {{-- De auth-schermen (login, wachtwoord vergeten/resetten) zijn bewust
+         light-branded: de rode EhB-kaart op een lichte achtergrond. We negeren
+         hier dus een eventuele dark-voorkeur, zodat de kaart altijd leesbaar blijft. --}}
+    <script>
+        document.documentElement.classList.remove('dark');
+        document.addEventListener('livewire:navigated', () => document.documentElement.classList.remove('dark'));
+    </script>
 </head>
 <body class="min-h-screen bg-[#F7F7F8] antialiased">
 <div class="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
