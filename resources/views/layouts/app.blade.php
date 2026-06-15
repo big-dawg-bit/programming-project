@@ -29,7 +29,18 @@
     <flux:dropdown position="top" align="start">
         <flux:sidebar.profile name="Arnaud Raspé" />
         <flux:menu>
-            <flux:menu.item icon="arrow-right-start-on-rectangle" href="/login">Uitloggen</flux:menu.item>
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <flux:menu.item
+                    as="button"
+                    type="submit"
+                    icon="arrow-right-start-on-rectangle"
+                    class="w-full cursor-pointer"
+                    data-test="logout-button"
+                >
+                    Uitloggen
+                </flux:menu.item>
+            </form>
         </flux:menu>
     </flux:dropdown>
 </flux:sidebar>
