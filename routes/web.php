@@ -1,8 +1,10 @@
 <?php
 
+use App\Livewire\Admin\FrameworkManager;
 use App\Livewire\Admin\UserManager;
 use App\Livewire\Applications\ApplyForm;
 use App\Livewire\Applications\ReviewQueue;
+use App\Livewire\Evaluations\EvaluationForm;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Student\DocumentList;
 use App\Livewire\Student\EvaluationList;
@@ -18,11 +20,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/users', UserManager::class)->name('admin.users');
+        Route::get('/admin/framework', FrameworkManager::class)->name('admin.framework');
     });
 
     Route::middleware('role:stagecommissie')->group(function () {
         Route::get('applications/review', ReviewQueue::class)
             ->name('applications.review');
+    });
+
+    Route::middleware('role:docent')->group(function () {
+        Route::get('stages/{stage}/evaluatie', EvaluationForm::class)
+            ->name('evaluations.create');
     });
 
     Route::middleware('role:student')->group(function () {
