@@ -21,7 +21,6 @@
         <flux:sidebar.item icon="briefcase" href="/stage-aanvraag">Stage aanvragen</flux:sidebar.item>
         <flux:sidebar.item icon="document-text" href="/logboeken">Logboeken</flux:sidebar.item>
         <flux:sidebar.item icon="clipboard-document-check" href="/evaluaties">Evaluaties</flux:sidebar.item>
-        <flux:sidebar.item icon="question-mark-circle" href="/faq">FAQ</flux:sidebar.item>
     </flux:sidebar.nav>
 
     <flux:sidebar.spacer />
@@ -29,7 +28,18 @@
     <flux:dropdown position="top" align="start">
         <flux:sidebar.profile name="Arnaud Raspé" />
         <flux:menu>
-            <flux:menu.item icon="arrow-right-start-on-rectangle" href="/login">Uitloggen</flux:menu.item>
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <flux:menu.item
+                    as="button"
+                    type="submit"
+                    icon="arrow-right-start-on-rectangle"
+                    class="w-full cursor-pointer"
+                    data-test="logout-button"
+                >
+                    Uitloggen
+                </flux:menu.item>
+            </form>
         </flux:menu>
     </flux:dropdown>
 </flux:sidebar>
