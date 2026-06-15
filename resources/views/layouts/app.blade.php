@@ -21,7 +21,6 @@
         <flux:sidebar.item icon="briefcase" href="/stage-aanvraag">Stage aanvragen</flux:sidebar.item>
         <flux:sidebar.item icon="document-text" href="/logboeken">Logboeken</flux:sidebar.item>
         <flux:sidebar.item icon="clipboard-document-check" href="/evaluaties">Evaluaties</flux:sidebar.item>
-        <flux:sidebar.item icon="question-mark-circle" href="/faq">FAQ</flux:sidebar.item>
     </flux:sidebar.nav>
 
     <flux:sidebar.spacer />

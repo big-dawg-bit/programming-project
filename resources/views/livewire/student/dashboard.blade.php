@@ -1,4 +1,3 @@
-<x-layouts.portal title="Dashboard">
 <div class="mx-auto flex max-w-6xl flex-col gap-8">
     @if (! $stage)
         <div class="rounded-xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-900">
@@ -110,4 +109,3 @@
         </div>
     @endif
 </div>
-</x-layouts.portal>
