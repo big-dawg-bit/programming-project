@@ -1,5 +1,4 @@
-<x-layouts.portal title="Aanvragen ter beoordeling">
-    <div class="mx-auto max-w-5xl">
+ <div class="mx-auto max-w-5xl">
         <div class="mb-6">
             <flux:heading size="xl">Aanvragen ter beoordeling</flux:heading>
             <flux:subheading>Beoordeel de openstaande stage-aanvragen.</flux:subheading>
@@ -55,4 +54,4 @@
             <div class="mt-4">{{ $applications->links() }}</div>
         @endif
     </div>
-</x-layouts.portal>
+

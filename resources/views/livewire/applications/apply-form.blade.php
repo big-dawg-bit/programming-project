@@ -1,5 +1,4 @@
-<x-layouts.portal title="Stage aanvragen">
-    <div class="mx-auto max-w-2xl">
+ <div class="mx-auto max-w-2xl">
         <div class="mb-6">
             <flux:heading size="xl">Stage aanvragen</flux:heading>
             <flux:subheading>Vul het formulier in om je stage aan te vragen.</flux:subheading>
@@ -45,4 +44,4 @@
             </flux:button>
         </div>
     </div>
-</x-layouts.portal>
+
