@@ -14,7 +14,19 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/login')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    // Na het inloggen komt iedereen op /dashboard uit (Fortify 'home').
+    // Stuur elke rol vandaaruit door naar zijn eigen portaal. Rollen zonder
+    // eigen portaal (docent, mentor) krijgen voorlopig het standaarddashboard.
+    Route::get('dashboard', function () {
+        $user = auth()->user();
+
+        return match (true) {
+            $user->hasRole('student') => redirect()->route('student.dashboard'),
+            $user->hasRole('stagecommissie') => redirect()->route('applications.review'),
+            $user->hasRole('admin') => redirect()->route('admin.users'),
+            default => view('dashboard'),
+        };
+    })->name('dashboard');
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/users', UserManager::class)->name('admin.users');
