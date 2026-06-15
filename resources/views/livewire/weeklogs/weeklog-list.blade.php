@@ -1,3 +1,4 @@
+<x-layouts.portal title="Weeklogboeken">
 <div class="mx-auto flex max-w-5xl flex-col gap-6">
     {{-- Filterpills + nieuwe weeklog --}}
     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -147,3 +148,4 @@
         </div>
     @endif
 </div>
+</x-layouts.portal>
