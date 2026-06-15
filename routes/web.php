@@ -32,20 +32,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/users', UserManager::class)->name('admin.users');
     });
 
+    Route::middleware('role:student')->group(function () {
+        Route::livewire('applications/create', ApplyForm::class)->name('applications.create');
+    });
+
     Route::middleware('role:stagecommissie')->group(function () {
-        Route::get('applications/review', ReviewQueue::class)
+        Route::livewire('applications/review', ReviewQueue::class)
             ->name('applications.review');
     });
 
-    Route::middleware('role:student')->group(function () {
-        Route::get('applications/create', ApplyForm::class)->name('applications.create');
-        Route::get('student', StudentDashboard::class)->name('student.dashboard');
-        Route::get('mijn-stage', StageOverview::class)->name('student.stage');
-        Route::get('weeklogs', WeeklogList::class)->name('weeklogs.index');
-        Route::get('evaluaties', EvaluationList::class)->name('student.evaluaties');
-        Route::get('documenten', DocumentList::class)->name('student.documenten');
-        Route::get('eindrapport', FinalReportUpload::class)->name('final-report.edit');
-    });
+    Route::livewire('student', StudentDashboard::class)->name('student.dashboard');
+    Route::livewire('mijn-stage', StageOverview::class)->name('student.stage');
+    Route::livewire('weeklogs', WeeklogList::class)->name('weeklogs.index');
+    Route::livewire('evaluaties', EvaluationList::class)->name('student.evaluaties');
+    Route::livewire('documenten', DocumentList::class)->name('student.documenten');
+    Route::livewire('eindrapport', FinalReportUpload::class)->name('final-report.edit');
 });
 
 require __DIR__.'/settings.php';
