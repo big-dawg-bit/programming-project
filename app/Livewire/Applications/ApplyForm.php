@@ -3,72 +3,115 @@
 namespace App\Livewire\Applications;
 
 use App\Models\Company;
+use App\Models\StageApplication;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('layouts.portal')]
 class ApplyForm extends Component
 {
+    /** Gevuld bij bewerken/opnieuw indienen; null bij een nieuwe aanvraag. */
+    public ?StageApplication $application = null;
+
     public ?int $company_id = null;
 
-    // Nieuw bedrijf toevoegen i.p.v. een bestaand kiezen.
-    public bool $newCompany = false;
-    public string $company_name = '';
-    public string $company_address = '';
-    public string $company_vat_number = '';
-    public string $company_contact_email = '';
-    public string $company_contact_phone = '';
-
     public string $position_title = '';
+
     public string $description = '';
+
     public ?string $start_date = null;
+
     public ?string $end_date = null;
+
     public string $proposed_mentor_name = '';
+
+    // --- Nieuw bedrijf toevoegen (inline) ---
+    public bool $addingCompany = false;
+
+    public string $new_company_name = '';
+
+    public string $new_company_address = '';
+
+    public string $new_company_vat = '';
+
+    public string $new_company_email = '';
+
+    public function mount(?StageApplication $application = null): void
+    {
+        // Geen route-parameter (= aanmaken) -> Livewire geeft null of een leeg model.
+        if (! $application?->exists) {
+            return;
+        }
+
+        // Scoping: enkel de eigen aanvraag, en enkel na "aanpassingen vereist".
+        abort_unless($application->student_id === auth()->user()->student?->id, 403);
+        abort_unless($application->status === 'changes_requested', 403);
+
+        $this->application = $application;
+        $this->company_id = $application->company_id;
+        $this->position_title = $application->position_title ?? '';
+        $this->description = $application->description ?? '';
+        $this->start_date = optional($application->start_date)->format('Y-m-d');
+        $this->end_date = optional($application->end_date)->format('Y-m-d');
+        $this->proposed_mentor_name = $application->proposed_mentor_name ?? '';
+    }
+
+    /** Maakt een nieuw bedrijf aan en koppelt het meteen aan de aanvraag-in-opbouw. */
+    public function addCompany(): void
+    {
+        $data = $this->validate([
+            'new_company_name' => ['required', 'string', 'max:255'],
+            'new_company_address' => ['nullable', 'string', 'max:255'],
+            'new_company_vat' => ['nullable', 'string', 'max:255'],
+            'new_company_email' => ['nullable', 'email', 'max:255'],
+        ]);
+
+        $company = Company::create([
+            'name' => $data['new_company_name'],
+            'address' => $data['new_company_address'] ?: null,
+            'vat_number' => $data['new_company_vat'] ?: null,
+            'contact_email' => $data['new_company_email'] ?: null,
+        ]);
+
+        $this->company_id = $company->id;
+
+        $this->reset([
+            'addingCompany',
+            'new_company_name',
+            'new_company_address',
+            'new_company_vat',
+            'new_company_email',
+        ]);
+    }
 
     public function submit(): void
     {
-        $rules = [
+        $data = $this->validate([
+            'company_id' => ['required', 'exists:companies,id'],
             'position_title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after:start_date'],
             'proposed_mentor_name' => ['nullable', 'string', 'max:255'],
-        ];
+        ]);
 
-        if ($this->newCompany) {
-            $rules += [
-                'company_name' => ['required', 'string', 'max:255'],
-                'company_address' => ['nullable', 'string', 'max:255'],
-                'company_vat_number' => ['nullable', 'string', 'max:255'],
-                'company_contact_email' => ['nullable', 'email', 'max:255'],
-                'company_contact_phone' => ['nullable', 'string', 'max:255'],
-            ];
-        } else {
-            $rules['company_id'] = ['required', 'exists:companies,id'];
-        }
-
-        $this->validate($rules);
-
-        // Nieuw bedrijf aanmaken en koppelen.
-        if ($this->newCompany) {
-            $company = Company::create([
-                'name' => $this->company_name,
-                'address' => $this->company_address ?: null,
-                'vat_number' => $this->company_vat_number ?: null,
-                'contact_email' => $this->company_contact_email ?: null,
-                'contact_phone' => $this->company_contact_phone ?: null,
+        // --- Opnieuw indienen na "aanpassingen vereist" ---
+        if ($this->application) {
+            $this->application->update([
+                ...$data,
+                'status' => 'submitted',
+                'submitted_at' => now(),
             ]);
 
-            $this->company_id = $company->id;
+            session()->flash('status', 'Aanvraag opnieuw ingediend.');
+            $this->redirectRoute('student.dashboard', navigate: true);
+
+            return;
         }
 
+        // --- Nieuwe aanvraag ---
         auth()->user()->student->applications()->create([
-            'company_id' => $this->company_id,
-            'position_title' => $this->position_title,
-            'description' => $this->description,
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-            'proposed_mentor_name' => $this->proposed_mentor_name ?: null,
+            ...$data,
             'status' => 'submitted',
             'submitted_at' => now(),
         ]);
@@ -81,6 +124,11 @@ class ApplyForm extends Component
     {
         return view('livewire.applications.apply-form', [
             'companies' => Company::orderBy('name')->get(),
+            // Laatste "aanpassingen vereist"-feedback, getoond bij het bewerken.
+            'feedback' => $this->application?->reviews()
+                ->where('decision', 'changes_requested')
+                ->latest('reviewed_at')
+                ->value('feedback'),
         ]);
     }
 }

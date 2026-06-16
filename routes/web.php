@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('role:student')->group(function () {
         Route::get('applications/create', ApplyForm::class)->name('applications.create');
+        Route::get('applications/{application}/edit', ApplyForm::class)->name('applications.edit');
         Route::get('student', StudentDashboard::class)->name('student.dashboard');
         Route::get('mijn-stage', StageOverview::class)->name('student.stage');
         Route::get('weeklogs', WeeklogList::class)->name('weeklogs.index');
