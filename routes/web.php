@@ -1,8 +1,11 @@
 <?php
 
+use App\Livewire\Admin\FrameworkManager;
 use App\Livewire\Admin\UserManager;
 use App\Livewire\Applications\ApplyForm;
 use App\Livewire\Applications\ReviewQueue;
+use App\Livewire\Applications\ReviewDetail;
+use App\Livewire\Evaluations\EvaluationForm;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Student\DocumentList;
 use App\Livewire\Student\EvaluationList;
@@ -14,27 +17,40 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/login')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', function () {
+        $user = auth()->user();
+
+        return match (true) {
+            $user->hasRole('student') => redirect()->route('student.dashboard'),
+            $user->hasRole('stagecommissie') => redirect()->route('applications.review'),
+            $user->hasRole('admin') => redirect()->route('admin.users'),
+            default => view('dashboard'),
+        };
+    })->name('dashboard');
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/users', UserManager::class)->name('admin.users');
-    });
-
-    Route::middleware('role:student')->group(function () {
-        Route::livewire('applications/create', ApplyForm::class)->name('applications.create');
+        Route::get('/admin/framework', FrameworkManager::class)->name('admin.framework');
     });
 
     Route::middleware('role:stagecommissie')->group(function () {
-        Route::livewire('applications/review', ReviewQueue::class)
-            ->name('applications.review');
+        Route::get('applications/review', ReviewQueue::class)->name('applications.review');
+        Route::get('applications/review/{application}', ReviewDetail::class)->name('applications.show');
     });
 
-    Route::livewire('student', StudentDashboard::class)->name('student.dashboard');
-    Route::livewire('mijn-stage', StageOverview::class)->name('student.stage');
-    Route::livewire('weeklogs', WeeklogList::class)->name('weeklogs.index');
-    Route::livewire('evaluaties', EvaluationList::class)->name('student.evaluaties');
-    Route::livewire('documenten', DocumentList::class)->name('student.documenten');
-    Route::livewire('eindrapport', FinalReportUpload::class)->name('final-report.edit');
+    Route::middleware('role:docent')->group(function () {
+        Route::get('stages/{stage}/evaluatie', EvaluationForm::class)->name('evaluations.create');
+    });
+
+    Route::middleware('role:student')->group(function () {
+        Route::get('applications/create', ApplyForm::class)->name('applications.create');
+        Route::get('student', StudentDashboard::class)->name('student.dashboard');
+        Route::get('mijn-stage', StageOverview::class)->name('student.stage');
+        Route::get('weeklogs', WeeklogList::class)->name('weeklogs.index');
+        Route::get('evaluaties', EvaluationList::class)->name('student.evaluaties');
+        Route::get('documenten', DocumentList::class)->name('student.documenten');
+        Route::get('eindrapport', FinalReportUpload::class)->name('final-report.edit');
+    });
 });
 
 require __DIR__.'/settings.php';
