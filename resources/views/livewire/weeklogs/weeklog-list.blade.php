@@ -83,17 +83,6 @@
         <div class="flex flex-col gap-4">
             @foreach ($weeklogs as $weeklog)
                 @php
-                    $badge = match ($weeklog->status) {
-                        'goedgekeurd', 'gevalideerd' => 'bg-green-100 text-green-700',
-                        'ingediend' => 'bg-blue-50 text-blue-600',
-                        'aanpassing', 'aanpassing_gevraagd' => 'bg-amber-100 text-amber-700',
-                        default => 'bg-neutral-100 text-neutral-600',
-                    };
-                    $label = match ($weeklog->status) {
-                        'draft' => 'concept',
-                        'aanpassing_gevraagd' => 'aanpassing',
-                        default => $weeklog->status,
-                    };
                     $periode = collect([$weeklog->period_start, $weeklog->period_end])
                         ->filter()
                         ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->locale('nl')->translatedFormat('j M Y'))
@@ -106,7 +95,7 @@
                             <h3 class="font-semibold">Weeklog week {{ $weeklog->week_number }}</h3>
                             <p class="mt-0.5 text-sm text-neutral-500">{{ $periode ?: 'Geen periode opgegeven' }}</p>
                         </div>
-                        <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium {{ $badge }}">{{ $label }}</span>
+                        <x-status-badge :status="$weeklog->status" />
                     </div>
 
                     <p class="mt-3 line-clamp-2 text-sm text-neutral-600">{{ $weeklog->content }}</p>
