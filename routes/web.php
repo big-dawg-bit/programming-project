@@ -3,8 +3,9 @@
 use App\Livewire\Admin\FrameworkManager;
 use App\Livewire\Admin\UserManager;
 use App\Livewire\Applications\ApplyForm;
-use App\Livewire\Applications\ReviewQueue;
+use App\Livewire\Applications\EditApplication;
 use App\Livewire\Applications\ReviewDetail;
+use App\Livewire\Applications\ReviewQueue;
 use App\Livewire\Evaluations\EvaluationForm;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Student\DocumentList;
@@ -50,6 +51,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('evaluaties', EvaluationList::class)->name('student.evaluaties');
         Route::get('documenten', DocumentList::class)->name('student.documenten');
         Route::get('eindrapport', FinalReportUpload::class)->name('final-report.edit');
+        Route::get('applications/{application}/edit', EditApplication::class)
+            ->name('applications.edit');
     });
 });
 
