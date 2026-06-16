@@ -2,16 +2,21 @@
 
 @php
     $color = match ($status) {
-        'goedgekeurd', 'gevalideerd' => 'green',
-        'ingediend' => 'blue',
+        'goedgekeurd', 'gevalideerd', 'approved' => 'green',
+        'ingediend', 'submitted' => 'blue',
         'aanpassing', 'aanpassing_gevraagd' => 'yellow',
-        'afgekeurd' => 'red',
+        'afgekeurd', 'rejected' => 'red',
+        'pending' => 'yellow',
         default => 'zinc',
     };
     $label = match ($status) {
         'draft' => 'concept',
         'aanpassing_gevraagd' => 'aanpassing',
-        default => $status,
+        'approved' => 'goedgekeurd',
+        'rejected' => 'afgekeurd',
+        'pending' => 'in behandeling',
+        'submitted' => 'ingediend',
+        default => ucfirst($status),
     };
 @endphp
 

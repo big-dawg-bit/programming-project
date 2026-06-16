@@ -20,10 +20,7 @@
                             <div>
                                 <div class="flex items-center gap-2">
                                     <h3 class="font-semibold">{{ $application->student?->user?->name }}</h3>
-                                    <flux:badge size="sm"
-                                                :color="$application->status === 'approved' ? 'green' : ($application->status === 'rejected' ? 'red' : 'yellow')">
-                                        {{ ucfirst($application->status ?? 'pending') }}
-                                    </flux:badge>
+                                    <x-status-badge :status="$application->status ?? 'pending'" />
                                 </div>
                                 <p class="mt-1 text-sm text-neutral-500">
                                     {{ $application->company?->name }} · {{ $application->position_title }}
