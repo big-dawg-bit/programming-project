@@ -89,7 +89,7 @@
                         ->implode(' – ');
                 @endphp
 
-                <div class="rounded-xl border border-neutral-200 bg-white p-5">
+                <div wire:key="{{ $weeklog->id }}" class="rounded-xl border border-neutral-200 bg-white p-5">
                     <div class="flex items-start justify-between gap-3">
                         <div>
                             <h3 class="font-semibold">Weeklog week {{ $weeklog->week_number }}</h3>
@@ -102,7 +102,7 @@
 
                     {{-- Reacties --}}
                     <button type="button" wire:click="toggleComments({{ $weeklog->id }})"
-                        class="mt-3 flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-600">
+                            class="mt-3 flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-600">
                         <flux:icon name="chat-bubble-left-right" class="size-4" />
                         {{ $weeklog->comments->count() }} {{ $weeklog->comments->count() === 1 ? 'reactie' : 'reacties' }}
                     </button>
@@ -122,10 +122,10 @@
                             @endforelse
 
                             <form wire:submit="addComment({{ $weeklog->id }})"
-                                class="flex flex-col gap-2 sm:flex-row sm:items-start">
+                                  class="flex flex-col gap-2 sm:flex-row sm:items-start">
                                 <div class="flex-1">
                                     <flux:textarea wire:model="newComment" rows="2"
-                                        placeholder="Schrijf een reactie…" />
+                                                   placeholder="Schrijf een reactie…" />
                                 </div>
                                 <flux:button type="submit" variant="primary">Reageren</flux:button>
                             </form>
