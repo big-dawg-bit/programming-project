@@ -7,7 +7,7 @@
                     @class([
                         'rounded-full px-4 py-1.5 text-sm font-medium transition',
                         'bg-[#E2231A] text-white' => $filter === $pill,
-                        'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50' => $filter !== $pill,
+                        'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-400 dark:border-neutral-800 dark:hover:bg-neutral-800' => $filter !== $pill,
                     ])>
                     {{ ucfirst($pill) }}
                 </button>
@@ -22,14 +22,14 @@
     </div>
 
     @if (session('weeklog-saved'))
-        <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800">
+        <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900/50 dark:bg-green-950/40 dark:text-green-300">
             {{ session('weeklog-saved') }}
         </div>
     @endif
 
     {{-- Invulformulier --}}
     @if ($stage && $showForm)
-        <form wire:submit="save" class="space-y-4 rounded-xl border border-neutral-200 bg-white p-6">
+        <form wire:submit="save" class="space-y-4 rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <flux:heading size="lg">Nieuwe weeklog</flux:heading>
 
             <div class="grid gap-4 sm:grid-cols-3">
@@ -44,7 +44,7 @@
                     label="Wat heb je deze week gedaan en geleerd?"
                     rows="5"
                     placeholder="Beschrijf je taken, reflectie en eventuele problemen…" />
-                <p class="mt-1 text-xs text-neutral-500">
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
                     <span x-text="count">0</span> tekens (minimaal 5)
                 </p>
             </div>
@@ -60,7 +60,7 @@
 
     {{-- Lijst --}}
     @if (! $stage)
-        <div class="rounded-xl border border-amber-300 bg-amber-50 p-6 text-amber-900">
+        <div class="rounded-xl border border-amber-300 bg-amber-50 p-6 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
             <p class="font-medium">Geen stage gevonden</p>
             <p class="mt-1 text-sm">
                 Draai eerst de seeders:
@@ -69,7 +69,7 @@
             </p>
         </div>
     @elseif ($weeklogs->isEmpty())
-        <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center">
+        <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
             <flux:heading size="lg">Geen weeklogs gevonden</flux:heading>
             <flux:subheading class="mt-1">
                 @if ($filter === 'alle')
@@ -84,10 +84,10 @@
             @foreach ($weeklogs as $weeklog)
                 @php
                     $badge = match ($weeklog->status) {
-                        'goedgekeurd', 'gevalideerd' => 'bg-green-100 text-green-700',
-                        'ingediend' => 'bg-blue-50 text-blue-600',
-                        'aanpassing', 'aanpassing_gevraagd' => 'bg-amber-100 text-amber-700',
-                        default => 'bg-neutral-100 text-neutral-600',
+                        'goedgekeurd', 'gevalideerd' => 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+                        'ingediend' => 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300',
+                        'aanpassing', 'aanpassing_gevraagd' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+                        default => 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300',
                     };
                     $label = match ($weeklog->status) {
                         'draft' => 'concept',
@@ -100,36 +100,36 @@
                         ->implode(' – ');
                 @endphp
 
-                <div class="rounded-xl border border-neutral-200 bg-white p-5">
+                <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
                     <div class="flex items-start justify-between gap-3">
                         <div>
                             <h3 class="font-semibold">Weeklog week {{ $weeklog->week_number }}</h3>
-                            <p class="mt-0.5 text-sm text-neutral-500">{{ $periode ?: 'Geen periode opgegeven' }}</p>
+                            <p class="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">{{ $periode ?: 'Geen periode opgegeven' }}</p>
                         </div>
                         <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium {{ $badge }}">{{ $label }}</span>
                     </div>
 
-                    <p class="mt-3 line-clamp-2 text-sm text-neutral-600">{{ $weeklog->content }}</p>
+                    <p class="mt-3 line-clamp-2 text-sm text-neutral-600 dark:text-neutral-300">{{ $weeklog->content }}</p>
 
                     {{-- Reacties --}}
                     <button type="button" wire:click="toggleComments({{ $weeklog->id }})"
-                        class="mt-3 flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-600">
+                        class="mt-3 flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300">
                         <flux:icon name="chat-bubble-left-right" class="size-4" />
                         {{ $weeklog->comments->count() }} {{ $weeklog->comments->count() === 1 ? 'reactie' : 'reacties' }}
                     </button>
 
                     @if ($openWeeklogId === $weeklog->id)
-                        <div class="mt-3 space-y-3 border-t border-neutral-100 pt-3">
+                        <div class="mt-3 space-y-3 border-t border-neutral-100 pt-3 dark:border-neutral-800">
                             @forelse ($weeklog->comments as $comment)
-                                <div class="rounded-lg bg-neutral-50 p-3">
-                                    <div class="text-xs text-neutral-500">
+                                <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-800/50">
+                                    <div class="text-xs text-neutral-500 dark:text-neutral-400">
                                         {{ $comment->author?->name ?? 'Onbekend' }}
                                         · {{ $comment->created_at?->diffForHumans() }}
                                     </div>
                                     <div class="mt-1 text-sm">{{ $comment->comment }}</div>
                                 </div>
                             @empty
-                                <p class="text-sm text-neutral-500">Nog geen reacties.</p>
+                                <p class="text-sm text-neutral-500 dark:text-neutral-400">Nog geen reacties.</p>
                             @endforelse
 
                             <form wire:submit="addComment({{ $weeklog->id }})"

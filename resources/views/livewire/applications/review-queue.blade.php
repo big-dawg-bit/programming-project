@@ -29,13 +29,27 @@
                             </button>
 
                             <textarea wire:model="feedback.{{ $application->id }}"
-                                      placeholder="Reden van afwijzing"
+                                      placeholder="Reden / feedback"
                                       class="border border-gray-300 p-1 text-sm"></textarea>
+
+                            @error('feedback.'.$application->id)
+                            <span class="text-xs text-red-600">{{ $message }}</span>
+                            @enderror
 
                             <button wire:click="reject({{ $application->id }})"
                                     class="rounded border border-gray-400 px-3 py-1">
                                 Afwijzen
                             </button>
+
+                            <button wire:click="requestChanges({{ $application->id }})"
+                                    class="rounded border border-amber-500 px-3 py-1 text-amber-700">
+                                Aanpassingen vereist
+                            </button>
+
+                            <a href="{{ route('applications.show', $application->id) }}"
+                               class="text-center text-sm text-[#E2231A] underline">
+                                Bekijk details
+                            </a>
                         </div>
                     </td>
                 </tr>
