@@ -57,3 +57,19 @@ it('wijst een aanvraag af met feedback', function () {
         ->and($application->reviews()->first()->feedback)->toBe('Bedrijf niet erkend')
         ->and($application->stage()->count())->toBe(0);
 });
+
+it('zet een aanvraag op aanpassingen vereist en bewaart feedback', function () {
+    $lid = \App\Models\User::factory()->withRole('stagecommissie')->create();
+    $application = \App\Models\StageApplication::factory()->create(['status' => 'submitted']);
+
+    \Livewire\Livewire::actingAs($lid)->test(\App\Livewire\Applications\ReviewQueue::class)
+        ->set("feedback.{$application->id}", 'Periode aanpassen aub')
+        ->call('requestChanges', $application->id);
+
+    $application->refresh();
+
+    expect($application->status)->toBe('changes_requested');
+    expect($application->reviews()->first()->decision)->toBe('changes_requested');
+    expect($application->reviews()->first()->feedback)->toBe('Periode aanpassen aub');
+    expect($application->stage()->count())->toBe(0);
+});
