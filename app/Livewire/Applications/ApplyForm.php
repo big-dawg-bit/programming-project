@@ -3,12 +3,16 @@
 namespace App\Livewire\Applications;
 
 use App\Models\Company;
+use App\Models\StageApplication;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('layouts.portal')]
 class ApplyForm extends Component
 {
+    /** Gevuld bij bewerken/opnieuw indienen; null bij een nieuwe aanvraag. */
+    public ?StageApplication $application = null;
+
     public ?int $company_id = null;
 
     public string $position_title = '';
@@ -21,6 +25,65 @@ class ApplyForm extends Component
 
     public string $proposed_mentor_name = '';
 
+    // --- Nieuw bedrijf toevoegen (inline) ---
+    public bool $addingCompany = false;
+
+    public string $new_company_name = '';
+
+    public string $new_company_address = '';
+
+    public string $new_company_vat = '';
+
+    public string $new_company_email = '';
+
+    public function mount(?StageApplication $application = null): void
+    {
+        // Geen route-parameter (= aanmaken) -> Livewire geeft null of een leeg model.
+        if (! $application?->exists) {
+            return;
+        }
+
+        // Scoping: enkel de eigen aanvraag, en enkel na "aanpassingen vereist".
+        abort_unless($application->student_id === auth()->user()->student?->id, 403);
+        abort_unless($application->status === 'changes_requested', 403);
+
+        $this->application = $application;
+        $this->company_id = $application->company_id;
+        $this->position_title = $application->position_title ?? '';
+        $this->description = $application->description ?? '';
+        $this->start_date = optional($application->start_date)->format('Y-m-d');
+        $this->end_date = optional($application->end_date)->format('Y-m-d');
+        $this->proposed_mentor_name = $application->proposed_mentor_name ?? '';
+    }
+
+    /** Maakt een nieuw bedrijf aan en koppelt het meteen aan de aanvraag-in-opbouw. */
+    public function addCompany(): void
+    {
+        $data = $this->validate([
+            'new_company_name' => ['required', 'string', 'max:255'],
+            'new_company_address' => ['nullable', 'string', 'max:255'],
+            'new_company_vat' => ['nullable', 'string', 'max:255'],
+            'new_company_email' => ['nullable', 'email', 'max:255'],
+        ]);
+
+        $company = Company::create([
+            'name' => $data['new_company_name'],
+            'address' => $data['new_company_address'] ?: null,
+            'vat_number' => $data['new_company_vat'] ?: null,
+            'contact_email' => $data['new_company_email'] ?: null,
+        ]);
+
+        $this->company_id = $company->id;
+
+        $this->reset([
+            'addingCompany',
+            'new_company_name',
+            'new_company_address',
+            'new_company_vat',
+            'new_company_email',
+        ]);
+    }
+
     public function submit(): void
     {
         $data = $this->validate([
@@ -32,6 +95,21 @@ class ApplyForm extends Component
             'proposed_mentor_name' => ['nullable', 'string', 'max:255'],
         ]);
 
+        // --- Opnieuw indienen na "aanpassingen vereist" ---
+        if ($this->application) {
+            $this->application->update([
+                ...$data,
+                'status' => 'submitted',
+                'submitted_at' => now(),
+            ]);
+
+            session()->flash('status', 'Aanvraag opnieuw ingediend.');
+            $this->redirectRoute('student.dashboard', navigate: true);
+
+            return;
+        }
+
+        // --- Nieuwe aanvraag ---
         auth()->user()->student->applications()->create([
             ...$data,
             'status' => 'submitted',
@@ -46,6 +124,11 @@ class ApplyForm extends Component
     {
         return view('livewire.applications.apply-form', [
             'companies' => Company::orderBy('name')->get(),
+            // Laatste "aanpassingen vereist"-feedback, getoond bij het bewerken.
+            'feedback' => $this->application?->reviews()
+                ->where('decision', 'changes_requested')
+                ->latest('reviewed_at')
+                ->value('feedback'),
         ]);
     }
 }
