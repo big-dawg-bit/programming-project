@@ -4,6 +4,7 @@ use App\Livewire\Admin\FrameworkManager;
 use App\Livewire\Admin\UserManager;
 use App\Livewire\Applications\ApplyForm;
 use App\Livewire\Applications\ReviewQueue;
+use App\Livewire\Applications\ReviewDetail;
 use App\Livewire\Evaluations\EvaluationForm;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Student\DocumentList;
@@ -16,7 +17,16 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/login')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', function () {
+        $user = auth()->user();
+
+        return match (true) {
+            $user->hasRole('student') => redirect()->route('student.dashboard'),
+            $user->hasRole('stagecommissie') => redirect()->route('applications.review'),
+            $user->hasRole('admin') => redirect()->route('admin.users'),
+            default => view('dashboard'),
+        };
+    })->name('dashboard');
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/users', UserManager::class)->name('admin.users');
@@ -24,13 +34,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware('role:stagecommissie')->group(function () {
-        Route::get('applications/review', ReviewQueue::class)
-            ->name('applications.review');
+        Route::get('applications/review', ReviewQueue::class)->name('applications.review');
+        Route::get('applications/review/{application}', ReviewDetail::class)->name('applications.show');
     });
 
     Route::middleware('role:docent')->group(function () {
-        Route::get('stages/{stage}/evaluatie', EvaluationForm::class)
-            ->name('evaluations.create');
+        Route::get('stages/{stage}/evaluatie', EvaluationForm::class)->name('evaluations.create');
     });
 
     Route::middleware('role:student')->group(function () {

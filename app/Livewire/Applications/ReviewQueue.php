@@ -47,6 +47,30 @@ class ReviewQueue extends Component
         ]);
     }
 
+    public function requestChanges(int $id): void
+    {
+        $feedback = trim($this->feedback[$id] ?? '');
+
+        // feedback is verplicht bij "aanpassingen vereist"
+        if ($feedback === '') {
+            $this->addError("feedback.{$id}", 'Geef feedback mee voor de student.');
+            return;
+        }
+
+        $application = StageApplication::findOrFail($id);
+
+        $application->reviews()->create([
+            'reviewer_id' => auth()->id(),
+            'decision' => 'changes_requested',
+            'feedback' => $feedback,
+            'reviewed_at' => now(),
+        ]);
+
+        $application->update(['status' => 'changes_requested']);
+
+        unset($this->feedback[$id]);
+    }
+
     public function reject(int $id): void
     {
         $application = StageApplication::findOrFail($id);
