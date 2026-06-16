@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    {{-- De auth-kaart is ontworpen voor lichte modus. Op basis van het systeemthema zou
+         Flux 'dark' op <html> zetten, waardoor de accentkleur wit wordt en tekst wit-op-wit
+         valt. Door de voorkeur op 'light' te zetten vóór Flux initialiseert, kiest Flux
+         zelf lichte modus en komt 'dark' er nooit op. --}}
+    <script>try { localStorage.setItem('flux.appearance', 'light'); } catch (e) {}</script>
     @include('partials.head')
 
     {{-- De auth-schermen (login, wachtwoord vergeten/resetten) zijn bewust
