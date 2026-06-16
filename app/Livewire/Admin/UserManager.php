@@ -6,6 +6,8 @@ use App\Models\Role;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
+#[Layout('layouts.portal')]
 
 class UserManager extends Component
 {

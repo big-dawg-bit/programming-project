@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Stage Monitor' }}</title>
+    <title>{{ $title ?? 'EhB Stage' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
 </head>
@@ -12,22 +12,18 @@
               class="bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700">
 
     <flux:sidebar.header>
-        <flux:sidebar.brand href="/" name="Stage Monitor" />
+        <flux:sidebar.brand :href="route('dashboard')" name="EhB Stage" />
         <flux:sidebar.collapse class="lg:hidden" />
     </flux:sidebar.header>
 
     <flux:sidebar.nav>
-        <flux:sidebar.item icon="home" href="/dashboard/student" current>Dashboard</flux:sidebar.item>
-        <flux:sidebar.item icon="briefcase" href="/stage-aanvraag">Stage aanvragen</flux:sidebar.item>
-        <flux:sidebar.item icon="document-text" href="/logboeken">Logboeken</flux:sidebar.item>
-        <flux:sidebar.item icon="clipboard-document-check" href="/evaluaties">Evaluaties</flux:sidebar.item>
-        <flux:sidebar.item icon="question-mark-circle" href="/faq">FAQ</flux:sidebar.item>
+        <flux:sidebar.item icon="home" :href="route('dashboard')" current>Dashboard</flux:sidebar.item>
     </flux:sidebar.nav>
 
     <flux:sidebar.spacer />
 
     <flux:dropdown position="top" align="start">
-        <flux:sidebar.profile name="Arnaud Raspé" />
+        <flux:sidebar.profile :name="auth()->user()?->name ?? 'Gebruiker'" />
         <flux:menu>
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf

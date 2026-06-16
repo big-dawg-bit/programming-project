@@ -11,7 +11,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.portal')]
 #[Title('Eindrapport')]
 class FinalReportUpload extends Component
 {
