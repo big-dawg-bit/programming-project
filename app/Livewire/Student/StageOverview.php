@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Student;
 
-use App\Models\Stage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -13,8 +12,12 @@ class StageOverview extends Component
 {
     public function render()
     {
-        // Voorlopig de eerste stage (testdata). Later: stage van de ingelogde student.
-        $stage = Stage::with('company')->first();
+        // Scoping: de (laatste) stage van de ingelogde student. Student A ziet nooit die van B.
+        $student = auth()->user()?->student;
+
+        $stage = $student
+            ? $student->stages()->with('company')->latest()->first()
+            : null;
 
         return view('livewire.student.stage', [
             'stage' => $stage,
