@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('stages/{stage}/evaluatie', EvaluationForm::class)->name('evaluations.create');
     });
     Route::middleware('role:mentor')->group(function () {
+        Route::get('mentor/studenten', \App\Livewire\Mentor\StudentList::class)->name('mentor.studenten');
         Route::get('mentor/weeklogs', \App\Livewire\Weeklogs\MentorWeeklogList::class)->name('mentor.weeklogs');
     });
 

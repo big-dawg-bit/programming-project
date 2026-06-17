@@ -23,7 +23,7 @@
                     if ($user?->hasRole('mentor')) {
                         $items = [
                             ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'dashboard'],
-                            ['label' => 'Studenten',    'icon' => 'users',         'route' => null],
+                            ['label' => 'Studenten',    'icon' => 'users',         'route' => 'mentor.studenten'],
                             ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'mentor.weeklogs'],
                             ['label' => 'Evaluaties',   'icon' => 'star',          'route' => null],
                             ['label' => 'Documenten',   'icon' => 'folder',        'route' => null],
