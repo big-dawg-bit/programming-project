@@ -84,8 +84,10 @@
                             <td class="px-5 py-4 text-right">
                                 @if ($tab === 'afgerond')
                                     <a href="{{ route('docent.student.show', ['naam' => $r['student']]) }}" wire:navigate class="text-sm font-medium text-neutral-700 hover:text-[#E2231A] dark:text-neutral-300">Bekijken</a>
+                                @elseif ($evaluatieStage)
+                                    <a href="{{ route('evaluations.create', $evaluatieStage) }}" wire:navigate class="text-sm font-semibold text-[#E2231A] hover:underline">Invullen</a>
                                 @else
-                                    <a href="#" class="text-sm font-semibold text-[#E2231A] hover:underline">Invullen</a>
+                                    <span class="text-sm font-semibold text-neutral-300 dark:text-neutral-600" title="Nog geen stage gekoppeld">Invullen</span>
                                 @endif
                             </td>
                         </tr>
