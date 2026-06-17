@@ -4,6 +4,7 @@ use App\Models\CompetencyFramework;
 use App\Models\Role;
 use App\Models\Stage;
 use App\Models\Student;
+use App\Models\User;
 use Database\Seeders\StageSeeder;
 
 /*
@@ -25,6 +26,15 @@ it('seedt een student met subtype', function () {
     $student = Student::first();
     expect($student)->not->toBeNull()
         ->and($student->user->email)->toBe('student@ehb.be');
+});
+
+it('seedt een admin-user die naar het admin-portaal kan inloggen', function () {
+    $this->seed();
+
+    $admin = User::where('email', 'admin@ehb.be')->first();
+
+    expect($admin)->not->toBeNull()
+        ->and($admin->hasRole('admin'))->toBeTrue();
 });
 
 it('seedt competenties waarvan de gewichten optellen tot 100', function () {
