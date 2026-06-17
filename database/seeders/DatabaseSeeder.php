@@ -88,6 +88,16 @@ class DatabaseSeeder extends Seeder
             'role_id' => $roles['stagecommissie']->id,
         ]);
 
+        // --- Admin user ---
+        $adminUser = User::create([
+            'name' => 'Admin EhB',
+            'first_name' => 'Admin',
+            'last_name' => 'EhB',
+            'email' => 'admin@ehb.be',
+            'password' => Hash::make('password'),
+            'role_id' => $roles['admin']->id,
+        ]);
+
         // --- Configurable competency framework (versioned) ---
         $framework = CompetencyFramework::create([
             'name' => 'TI Stage Framework',
