@@ -182,7 +182,8 @@ class StageSeeder extends Seeder
     /** Maakt $aantal weeklogs aan, verspreid over de weken en met wisselende statussen. */
     private function weeklogs(Stage $stage, int $aantal): void
     {
-        $statussen = ['approved', 'approved', 'submitted', 'draft'];
+        // Nederlandse statussen, consistent met de weeklog-schermen (ingediend/goedgekeurd/draft).
+        $statussen = ['goedgekeurd', 'goedgekeurd', 'ingediend', 'draft'];
 
         for ($w = 1; $w <= $aantal; $w++) {
             $status = $statussen[($w - 1) % count($statussen)];
