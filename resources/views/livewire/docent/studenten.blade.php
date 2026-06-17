@@ -66,7 +66,10 @@
             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
                 @forelse ($zichtbaar as $s)
                     <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40">
-                        <td class="px-5 py-4 font-medium">{{ $s['naam'] }}</td>
+                        <td class="px-5 py-4 font-medium">
+                            <a href="{{ route('docent.student.show', ['naam' => $s['naam']]) }}" wire:navigate
+                               class="transition hover:text-[#E2231A] hover:underline">{{ $s['naam'] }}</a>
+                        </td>
                         <td class="px-5 py-4 text-neutral-500 dark:text-neutral-400">{{ $s['opleiding'] }}</td>
                         <td class="px-5 py-4 text-neutral-500 dark:text-neutral-400">{{ $s['bedrijf'] }}</td>
                         <td class="px-5 py-4 text-neutral-500 dark:text-neutral-400">Week {{ $s['week'] }}</td>
