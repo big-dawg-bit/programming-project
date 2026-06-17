@@ -6,6 +6,7 @@ use App\Livewire\Applications\ApplyForm;
 use App\Livewire\Applications\ReviewQueue;
 use App\Livewire\Applications\ReviewDetail;
 use App\Livewire\Docent\Dashboard as DocentDashboard;
+use App\Livewire\Docent\Evaluaties as DocentEvaluaties;
 use App\Livewire\Docent\StudentDetail as DocentStudentDetail;
 use App\Livewire\Docent\Studenten as DocentStudenten;
 use App\Livewire\Docent\Weeklogs as DocentWeeklogs;
@@ -50,6 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('docent/studenten', DocentStudenten::class)->name('docent.studenten');
         Route::get('docent/studenten/{naam}', DocentStudentDetail::class)->name('docent.student.show');
         Route::get('docent/weeklogs', DocentWeeklogs::class)->name('docent.weeklogs');
+        Route::get('docent/evaluaties', DocentEvaluaties::class)->name('docent.evaluaties');
         Route::get('stages/{stage}/evaluatie', EvaluationForm::class)->name('evaluations.create');
     });
 
