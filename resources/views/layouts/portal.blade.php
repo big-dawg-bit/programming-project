@@ -17,16 +17,28 @@
 
             <nav class="flex-1 space-y-1 px-3 py-4">
                 @php
-                    // Navigatie van de studenten-portal. Routes die nog niet bestaan
-                    // vallen netjes terug op '#' tot de bijhorende pagina gebouwd is.
-                    $items = [
-                        ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'student.dashboard'],
-                        ['label' => 'Mijn stage',   'icon' => 'briefcase',     'route' => 'student.stage'],
-                        ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'weeklogs.index'],
-                        ['label' => 'Evaluaties',   'icon' => 'star',          'route' => 'student.evaluaties'],
-                        ['label' => 'Documenten',   'icon' => 'folder',        'route' => 'student.documenten'],
-                        ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
-                    ];
+                    $user = auth()->user();
+
+                    // Menu per rol. De mentor ziet zijn eigen weeklog-overzicht.
+                    if ($user?->hasRole('mentor')) {
+                        $items = [
+                            ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'dashboard'],
+                            ['label' => 'Studenten',    'icon' => 'users',         'route' => null],
+                            ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'mentor.weeklogs'],
+                            ['label' => 'Evaluaties',   'icon' => 'star',          'route' => null],
+                            ['label' => 'Documenten',   'icon' => 'folder',        'route' => null],
+                            ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
+                        ];
+                    } else {
+                        $items = [
+                            ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'student.dashboard'],
+                            ['label' => 'Mijn stage',   'icon' => 'briefcase',     'route' => 'student.stage'],
+                            ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'weeklogs.index'],
+                            ['label' => 'Evaluaties',   'icon' => 'star',          'route' => 'student.evaluaties'],
+                            ['label' => 'Documenten',   'icon' => 'folder',        'route' => 'student.documenten'],
+                            ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
+                        ];
+                    }
                 @endphp
 
                 @foreach ($items as $item)

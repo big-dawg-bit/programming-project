@@ -11,11 +11,11 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.portal')]
-#[Title('Weeklogs stagiair')]
+#[Title('Weeklogs')]
 class MentorWeeklogList extends Component
 {
     // Actieve statusfilter (alle | ingediend | goedgekeurd | aanpassing).
-    public string $filter = 'alle';
+    public string $filter = 'te beoordelen';
 
     // Welk logboek zijn comment-thread open heeft staan (null = geen).
     public ?int $openWeeklogId = null;
@@ -88,10 +88,9 @@ class MentorWeeklogList extends Component
      * Welke databasestatussen onder elke filterpill vallen.
      */
     public const FILTERS = [
-        'alle' => null,
-        'ingediend' => ['ingediend'],
+        'te beoordelen' => ['ingediend'],
         'goedgekeurd' => ['goedgekeurd', 'gevalideerd'],
-        'aanpassing' => ['aanpassing', 'aanpassing_gevraagd'],
+        'alle weken' => null,
     ];
 
     public function render()
@@ -102,6 +101,11 @@ class MentorWeeklogList extends Component
             ? $stage->weeklogs()->with('comments.author')->orderByDesc('week_number')
             : null;
 
+        // Aantal weeklogs dat nog beoordeeld moet worden (voor de teller op de tab).
+        $teBeoordelenCount = $stage
+            ? $stage->weeklogs()->where('status', 'ingediend')->count()
+            : 0;
+
         if ($query && ($statuses = self::FILTERS[$this->filter] ?? null)) {
             $query->whereIn('status', $statuses);
         }
@@ -109,6 +113,7 @@ class MentorWeeklogList extends Component
         return view('livewire.weeklogs.mentor-weeklog-list', [
             'stage' => $stage,
             'weeklogs' => $query ? $query->get() : collect(),
+            'teBeoordelenCount' => $teBeoordelenCount,
         ]);
     }
 }
