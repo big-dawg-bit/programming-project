@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-6">
     {{-- Zoek + filterpills --}}
     <div class="flex flex-wrap items-center gap-3">
-        <input type="text" placeholder="Zoek student…"
+        <input type="text" wire:model.live.debounce.300ms="zoek" placeholder="Zoek student…"
             class="w-full max-w-sm rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm focus:border-[#E2231A] focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder-neutral-500" />
 
         <div class="flex flex-wrap gap-2">
@@ -33,6 +33,10 @@
         $zichtbaar = $filter === 'alle'
             ? $studenten
             : array_values(array_filter($studenten, fn ($s) => $s['weeklog'] === $filter));
+
+        if (trim($zoek) !== '') {
+            $zichtbaar = array_values(array_filter($zichtbaar, fn ($s) => str_contains(mb_strtolower($s['naam']), mb_strtolower(trim($zoek)))));
+        }
 
         $weeklogBadge = [
             'goedgekeurd'   => 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',

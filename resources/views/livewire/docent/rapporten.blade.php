@@ -1,7 +1,7 @@
 <div class="mx-auto flex max-w-4xl flex-col gap-6">
     {{-- Zoek + export --}}
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <input type="text" placeholder="Zoek student…"
+        <input type="text" wire:model.live.debounce.300ms="zoek" placeholder="Zoek student…"
             class="w-full max-w-sm rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm focus:border-[#E2231A] focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder-neutral-500" />
         <button type="button"
             class="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm font-medium transition hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
@@ -20,7 +20,18 @@
             'Cijfer ingediend'              => 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
             'Wacht op goedkeuring commissie'=> 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
         ];
+
+        if (trim($zoek) !== '') {
+            $rapporten = array_values(array_filter($rapporten, fn ($r) => str_contains(mb_strtolower($r['naam']), mb_strtolower(trim($zoek)))));
+        }
     @endphp
+
+    @if (empty($rapporten))
+        <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
+            <flux:heading size="lg">Geen rapporten gevonden</flux:heading>
+            <flux:subheading class="mt-1">Geen student die overeenkomt met "{{ $zoek }}".</flux:subheading>
+        </div>
+    @endif
 
     <div class="flex flex-col gap-5">
         @foreach ($rapporten as $r)

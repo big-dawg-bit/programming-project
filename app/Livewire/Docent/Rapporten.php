@@ -10,6 +10,9 @@ use Livewire\Component;
 #[Title('Mijn studentrapporten')]
 class Rapporten extends Component
 {
+    // Zoekterm op studentnaam.
+    public string $zoek = '';
+
     public function render()
     {
         return view('livewire.docent.rapporten');
