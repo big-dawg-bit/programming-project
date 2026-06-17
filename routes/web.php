@@ -2,6 +2,8 @@
 
 use App\Livewire\Admin\FrameworkManager;
 use App\Livewire\Admin\UserManager;
+use App\Livewire\Docent\Dashboard as DocentDashboard;
+use App\Livewire\Mentor\Dashboard as MentorDashboard;
 use App\Livewire\Applications\ApplyForm;
 use App\Livewire\Applications\EditApplication;
 use App\Livewire\Applications\ReviewDetail;
@@ -40,6 +42,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware('role:docent')->group(function () {
+        Route::get('docent', DocentDashboard::class)->name('docent.dashboard');
+
+    });
+
+    Route::middleware('role:mentor')->group(function () {
+        Route::get('mentor', MentorDashboard::class)->name('mentor.dashboard');
+    });
+
+    Route::middleware('role:docent,mentor')->group(function () {
         Route::get('stages/{stage}/evaluatie', EvaluationForm::class)->name('evaluations.create');
     });
 
