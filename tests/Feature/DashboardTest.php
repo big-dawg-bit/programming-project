@@ -43,11 +43,11 @@ test('mentoren are redirected from the dashboard to their portal', function () {
     $this->get(route('dashboard'))->assertRedirect(route('mentor.dashboard'));
 });
 
-test('admins are redirected from the dashboard to user management', function () {
+test('admins are redirected from the dashboard to the admin dashboard', function () {
     $user = User::factory()->withRole('admin')->create();
     $this->actingAs($user);
 
-    $this->get(route('dashboard'))->assertRedirect(route('admin.users'));
+    $this->get(route('dashboard'))->assertRedirect(route('admin.dashboard'));
 });
 
 test('the docent dashboard renders for a docent', function () {
