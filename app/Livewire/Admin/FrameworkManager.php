@@ -84,6 +84,15 @@ class FrameworkManager extends Component
     /** Activeer een versie; alle andere worden inactief (er is er altijd maar één actief). */
     public function activate(int $frameworkId): void
     {
+        // Een evaluatiekader mag pas actief worden als de gewichten samen exact 100 zijn.
+        $total = (int) Competency::where('framework_id', $frameworkId)->sum('weight');
+
+        if ($total !== 100) {
+            session()->flash('error', "Activeren kan niet: de gewichten moeten samen 100 zijn (nu {$total}).");
+
+            return;
+        }
+
         CompetencyFramework::query()->update(['is_active' => false]);
         CompetencyFramework::whereKey($frameworkId)->update(['is_active' => true]);
 

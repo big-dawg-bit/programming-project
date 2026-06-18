@@ -20,6 +20,12 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+            {{ session('error') }}
+        </div>
+    @endif
+
     {{-- Versiebeheer --}}
     <div class="rounded-xl border border-neutral-200 bg-white p-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
@@ -38,10 +44,16 @@
             </div>
             <div class="flex items-center gap-2">
                 @if (! $framework?->is_active)
-                    <button wire:click="activate({{ $framework?->id }})"
-                            class="rounded-lg bg-[#E2231A] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#c41e16]">
-                        Deze versie activeren
-                    </button>
+                    @if ($gewichtOk)
+                        <button wire:click="activate({{ $framework?->id }})"
+                                class="rounded-lg bg-[#E2231A] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#c41e16]">
+                            Deze versie activeren
+                        </button>
+                    @else
+                        <span class="rounded-lg bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
+                            Activeren kan pas bij totaal 100
+                        </span>
+                    @endif
                 @else
                     <span class="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-200">
                         Actieve versie

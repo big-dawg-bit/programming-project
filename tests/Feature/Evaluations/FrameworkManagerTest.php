@@ -99,6 +99,7 @@ it('maakt een nieuwe versie als kopie van het actieve kader', function () {
 it('activeert exact één versie tegelijk', function () {
     $oud = CompetencyFramework::where('is_active', true)->first();
     $nieuw = CompetencyFramework::create(['name' => 'Kader v2', 'version' => 2, 'is_active' => false]);
+    $nieuw->competencies()->create(['title' => 'Comp', 'weight' => 100, 'sort_order' => 1]);
 
     Livewire::actingAs(makeFrameworkUser('admin'))
         ->test(FrameworkManager::class)
@@ -107,4 +108,15 @@ it('activeert exact één versie tegelijk', function () {
     expect((bool) $nieuw->fresh()->is_active)->toBeTrue()
         ->and((bool) $oud->fresh()->is_active)->toBeFalse()
         ->and(CompetencyFramework::where('is_active', true)->count())->toBe(1);
+});
+
+it('weigert een versie te activeren als de gewichten niet op 100 staan', function () {
+    $nieuw = CompetencyFramework::create(['name' => 'Onvolledig kader', 'version' => 2, 'is_active' => false]);
+    $nieuw->competencies()->create(['title' => 'Comp', 'weight' => 40, 'sort_order' => 1]);
+
+    Livewire::actingAs(makeFrameworkUser('admin'))
+        ->test(FrameworkManager::class)
+        ->call('activate', $nieuw->id);
+
+    expect((bool) $nieuw->fresh()->is_active)->toBeFalse();
 });
