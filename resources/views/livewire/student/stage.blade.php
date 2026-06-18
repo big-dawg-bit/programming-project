@@ -51,13 +51,15 @@
         <div class="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <h3 class="mb-5 text-lg font-semibold">Checklist</h3>
             @php
+                // Echte status uit het StageAgreement-model i.p.v. hardgecodeerd.
+                $agreementBevestigd = $stage?->application?->agreement?->status === 'bevestigd';
                 $checklist = [
                     ['label' => 'Motivatiebrief geüpload', 'done' => true],
                     ['label' => 'CV geüpload', 'done' => true],
-                    ['label' => 'Stageovereenkomst ondertekend', 'done' => true],
+                    ['label' => 'Stageovereenkomst ondertekend', 'done' => $agreementBevestigd],
                     ['label' => 'Bedrijfsgegevens ingevoerd', 'done' => true],
-                    ['label' => 'Goedkeuring stagecommissie', 'done' => false],
-                    ['label' => 'Handtekening bedrijf', 'done' => false],
+                    ['label' => 'Goedkeuring stagecommissie', 'done' => $stage !== null],
+                    ['label' => 'Handtekening bedrijf', 'done' => $agreementBevestigd],
                 ];
             @endphp
             <ul class="space-y-3">
@@ -73,6 +75,11 @@
                     </li>
                 @endforeach
             </ul>
+
+            <a href="{{ route('student.agreement') }}" wire:navigate
+               class="mt-4 inline-flex text-sm font-medium text-[#E2231A] hover:underline">
+                Overeenkomst beheren →
+            </a>
         </div>
     </div>
 

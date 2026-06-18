@@ -1,23 +1,26 @@
 @props(['status'])
 
 @php
-    $color = match ($status) {
-        'goedgekeurd', 'gevalideerd', 'approved' => 'green',
-        'ingediend', 'submitted' => 'blue',
-        'aanpassing', 'aanpassing_gevraagd' => 'yellow',
-        'afgekeurd', 'rejected' => 'red',
-        'pending' => 'yellow',
-        default => 'zinc',
-    };
-    $label = match ($status) {
-        'draft' => 'concept',
-        'aanpassing_gevraagd' => 'aanpassing',
-        'approved' => 'goedgekeurd',
-        'rejected' => 'afgekeurd',
-        'pending' => 'in behandeling',
-        'submitted' => 'ingediend',
-        default => ucfirst($status),
-    };
+    $map = [
+        // Engelse statussen
+        'submitted' => ['label' => 'Ingediend', 'color' => 'blue'],
+        'approved' => ['label' => 'Goedgekeurd', 'color' => 'green'],
+        'rejected' => ['label' => 'Afgekeurd', 'color' => 'red'],
+        'changes_requested' => ['label' => 'Aanpassingen vereist', 'color' => 'amber'],
+        'active' => ['label' => 'Actief', 'color' => 'green'],
+        'pending' => ['label' => 'In afwachting', 'color' => 'zinc'],
+        // Nederlandse statussen
+        'ingediend' => ['label' => 'Ingediend', 'color' => 'blue'],
+        'goedgekeurd' => ['label' => 'Goedgekeurd', 'color' => 'green'],
+        'gevalideerd' => ['label' => 'Goedgekeurd', 'color' => 'green'],
+        'afgekeurd' => ['label' => 'Afgekeurd', 'color' => 'red'],
+        'aanpassing' => ['label' => 'Aanpassing', 'color' => 'amber'],
+        'aanpassing_gevraagd' => ['label' => 'Aanpassing', 'color' => 'amber'],
+        'concept' => ['label' => 'Concept', 'color' => 'zinc'],
+        'draft' => ['label' => 'Concept', 'color' => 'zinc'],
+    ];
+
+    $badge = $map[$status] ?? ['label' => ucfirst(str_replace('_', ' ', $status)), 'color' => 'zinc'];
 @endphp
 
-<flux:badge size="sm" :color="$color">{{ $label }}</flux:badge>
+<flux:badge :color="$badge['color']" size="sm">{{ $badge['label'] }}</flux:badge>

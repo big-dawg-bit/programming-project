@@ -3,6 +3,7 @@
 use App\Livewire\Admin\FrameworkManager;
 use App\Livewire\Admin\UserManager;
 use App\Livewire\Applications\ApplyForm;
+use App\Livewire\Applications\EditApplication;
 use App\Livewire\Applications\ReviewQueue;
 use App\Livewire\Applications\ReviewDetail;
 use App\Livewire\Docent\Dashboard as DocentDashboard;
@@ -45,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:stagecommissie')->group(function () {
         Route::get('applications/review', ReviewQueue::class)->name('applications.review');
         Route::get('applications/review/{application}', ReviewDetail::class)->name('applications.show');
+        Route::get('overeenkomsten', \App\Livewire\Applications\AgreementReview::class)->name('applications.agreements');
     });
 
     Route::middleware('role:docent')->group(function () {
@@ -54,7 +56,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('docent/weeklogs', DocentWeeklogs::class)->name('docent.weeklogs');
         Route::get('docent/evaluaties', DocentEvaluaties::class)->name('docent.evaluaties');
         Route::get('docent/rapporten', DocentRapporten::class)->name('docent.rapporten');
-        Route::get('stages/{stage}/evaluatie', EvaluationForm::class)->name('evaluations.create');
     });
     Route::middleware('role:mentor')->group(function () {
         Route::get('mentor/studenten', \App\Livewire\Mentor\StudentList::class)->name('mentor.studenten');
@@ -66,11 +67,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('mentor', MentorDashboard::class)->name('mentor.dashboard');
     });
 
+    // Gedeeld: docent én mentor evalueren via hetzelfde formulier (scoping zit in EvaluationForm::mount()).
+    Route::middleware('role:docent,mentor')->group(function () {
+        Route::get('stages/{stage}/evaluatie', EvaluationForm::class)->name('evaluations.create');
+    });
+
     Route::middleware('role:student')->group(function () {
         Route::get('applications/create', ApplyForm::class)->name('applications.create');
-        Route::get('applications/{application}/edit', ApplyForm::class)->name('applications.edit');
+        Route::get('applications/{application}/edit', EditApplication::class)->name('applications.edit');
         Route::get('student', StudentDashboard::class)->name('student.dashboard');
         Route::get('mijn-stage', StageOverview::class)->name('student.stage');
+        Route::get('overeenkomst', \App\Livewire\Student\AgreementUpload::class)->name('student.agreement');
         Route::get('weeklogs', WeeklogList::class)->name('weeklogs.index');
         Route::get('evaluaties', EvaluationList::class)->name('student.evaluaties');
         Route::get('documenten', DocumentList::class)->name('student.documenten');
