@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Applications;
 
+use App\Models\CompetencyFramework;
 use App\Models\StageApplication;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -38,10 +39,12 @@ class ReviewQueue extends Component
         // 2. zet de status op goedgekeurd
         $application->update(['status' => 'approved']);
 
-        // 3. maak de échte stage aan (firstOrCreate = nooit dubbel)
+        // 3. maak de échte stage aan (firstOrCreate = nooit dubbel),
+        //    gekoppeld aan het actieve evaluatiekader op dit moment.
         $application->stage()->firstOrCreate([], [
             'student_id' => $application->student_id,
             'company_id' => $application->company_id,
+            'framework_id' => CompetencyFramework::where('is_active', true)->value('id'),
             'start_date' => $application->start_date,
             'end_date' => $application->end_date,
         ]);
