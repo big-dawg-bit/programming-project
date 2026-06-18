@@ -40,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:stagecommissie')->group(function () {
         Route::get('applications/review', ReviewQueue::class)->name('applications.review');
         Route::get('applications/review/{application}', ReviewDetail::class)->name('applications.show');
+        Route::get('overeenkomsten', \App\Livewire\Applications\AgreementReview::class)->name('applications.agreements');
     });
 
     Route::middleware('role:docent')->group(function () {
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('applications/{application}/edit', ApplyForm::class)->name('applications.edit');
         Route::get('student', StudentDashboard::class)->name('student.dashboard');
         Route::get('mijn-stage', StageOverview::class)->name('student.stage');
+        Route::get('overeenkomst', \App\Livewire\Student\AgreementUpload::class)->name('student.agreement');
         Route::get('weeklogs', WeeklogList::class)->name('weeklogs.index');
         Route::get('evaluaties', EvaluationList::class)->name('student.evaluaties');
         Route::get('documenten', DocumentList::class)->name('student.documenten');
