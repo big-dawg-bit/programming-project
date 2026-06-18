@@ -36,6 +36,7 @@ class EvaluationForm extends Component
             'stage_id' => $this->stage->id,
             'framework_id' => $this->stage->framework_id,
             'type' => $this->type,
+            'evaluator_role' => auth()->user()->hasRole('mentor') ? 'mentor' : 'docent',
             'status' => 'submitted',
             'submitted_at' => now(),
         ]);
