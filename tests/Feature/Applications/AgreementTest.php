@@ -53,10 +53,11 @@ it('laat een student de overeenkomst ondertekenen op de trackpad', function () {
 
     $agreement = StageAgreement::where('application_id', $application->id)->first();
 
+    // Alleen de student tekende: nog niet 'ingediend' (de docent moet ook tekenen).
     expect($agreement)->not->toBeNull()
         ->and($agreement->student_signature)->toBe($handtekening)
         ->and($agreement->student_signed_at)->not->toBeNull()
-        ->and($agreement->status)->toBe('ingediend');
+        ->and($agreement->status)->toBe('te_ondertekenen');
 });
 
 it('weigert een handtekening die geen geldige PNG-dataURL is', function () {

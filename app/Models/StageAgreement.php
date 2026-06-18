@@ -33,4 +33,22 @@ class StageAgreement extends Model
     {
         return $this->belongsTo(User::class, 'uploaded_by');
     }
+
+    /**
+     * Werkt de status bij op basis van de handtekeningen: pas wanneer zowel de
+     * student als de docent getekend heeft, gaat de overeenkomst naar 'ingediend'
+     * (klaar voor de stagecommissie). Een al bevestigde overeenkomst blijft staan.
+     */
+    public function syncSignatureStatus(): void
+    {
+        if ($this->status === 'bevestigd') {
+            return;
+        }
+
+        $this->status = ($this->student_signature && $this->docent_signature)
+            ? 'ingediend'
+            : 'te_ondertekenen';
+
+        $this->save();
+    }
 }

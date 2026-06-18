@@ -98,10 +98,12 @@ class AgreementUpload extends Component
             'student_signature' => $signature,
             'student_signed_at' => now(),
             'uploaded_by' => Auth::id(),
-            'status' => 'ingediend',
         ])->save();
 
-        session()->flash('success', 'Je handtekening is opgeslagen. De stagecommissie bevestigt de ondertekening.');
+        // Status volgt uit beide handtekeningen (student + docent).
+        $agreement->syncSignatureStatus();
+
+        session()->flash('success', 'Je handtekening is opgeslagen. Zodra de docent ook tekent, gaat de overeenkomst naar de stagecommissie.');
     }
 
     /**
