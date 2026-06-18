@@ -120,13 +120,10 @@ class Dashboard extends Component
             }
         }
 
-        // Weeklogs: ingediend + goedgekeurd + reacties van de begeleider.
+        // Weeklogs: ingediend + reacties van de docent (de docent keurt niet goed/af).
         foreach ($stage->weeklogs as $log) {
             if ($log->submitted_at) {
                 $events->push(['icon' => 'document-text', 'kleur' => 'text-blue-500', 'titel' => "Weeklog week {$log->week_number} ingediend", 'tekst' => 'Je weeklog is verzonden naar je begeleider', 'tijd' => $log->submitted_at]);
-            }
-            if (in_array($log->status, ['goedgekeurd', 'gevalideerd'], true)) {
-                $events->push(['icon' => 'check-circle', 'kleur' => 'text-green-500', 'titel' => "Weeklog week {$log->week_number} goedgekeurd", 'tekst' => 'Je begeleider heeft je weeklog goedgekeurd', 'tijd' => $log->updated_at]);
             }
             foreach ($log->comments as $comment) {
                 $events->push(['icon' => 'chat-bubble-left-right', 'kleur' => 'text-blue-500', 'titel' => "Reactie op weeklog week {$log->week_number}", 'tekst' => ($comment->author?->name ?? 'Je begeleider') . ' gaf een reactie', 'tijd' => $comment->created_at]);
