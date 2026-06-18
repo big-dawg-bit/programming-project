@@ -2,13 +2,14 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Company;
 use App\Models\Role;
 use App\Models\User;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Layout;
-#[Layout('layouts.portal')]
 
+#[Layout('layouts.portal')]
 class UserManager extends Component
 {
     use WithPagination;
@@ -19,23 +20,42 @@ class UserManager extends Component
 
     public string $selectedRole = 'student';
 
+    // Enkel relevant wanneer de rol 'mentor' is.
+    public ?int $companyId = null;
+
     public function createUser(): void
     {
         $data = $this->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'selectedRole' => 'required|exists:roles,name',
+            'companyId' => 'nullable|exists:companies,id',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt(str()->random(32)),
             'role_id' => Role::where('name', $data['selectedRole'])->value('id'),
         ]);
 
-        $this->reset('name', 'email');
+        // Maak het bijhorende subtype-record aan, zodat de gebruiker echt
+        // in zijn portaal terechtkan (anders is auth()->user()->student/... null).
+        match ($data['selectedRole']) {
+            'student' => $user->student()->create([
+                'student_number' => 'EHB'.now()->format('Y').str_pad((string) $user->id, 4, '0', STR_PAD_LEFT),
+                'study_program' => 'Toegepaste Informatica',
+                'academic_year' => now()->format('Y').'-'.now()->addYear()->format('Y'),
+            ]),
+            'docent' => $user->docent()->create([]),
+            'mentor' => $user->mentor()->create(['company_id' => $data['companyId'] ?? null]),
+            default => null, // stagecommissie / admin: geen subtype nodig
+        };
+
+        $this->reset('name', 'email', 'companyId');
         $this->selectedRole = 'student';
+
+        session()->flash('success', 'Gebruiker aangemaakt.');
     }
 
     public function changeRole(int $userId, int $roleId): void
@@ -54,6 +74,7 @@ class UserManager extends Component
         return view('livewire.admin.user-manager', [
             'users' => User::with('role')->orderBy('name')->paginate(15),
             'roles' => Role::orderBy('name')->get(),
+            'companies' => Company::orderBy('name')->get(),
         ]);
     }
 }

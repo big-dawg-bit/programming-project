@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Admin\UserManager;
+use App\Models\Company;
 use App\Models\Role;
 use App\Models\User;
 use Livewire\Livewire;
@@ -55,4 +56,36 @@ it('zet een gebruiker op inactief en terug', function () {
 
     $cmp->call('toggleActive', $user->id);
     expect($user->fresh()->is_active)->toBeTrue();
+});
+
+it('maakt een student-subtype aan zodat de student in zijn portaal kan', function () {
+    Livewire::actingAs(makeUser('admin'))
+        ->test(UserManager::class)
+        ->set('name', 'Nieuwe Student')
+        ->set('email', 'nieuw@student.ehb.be')
+        ->set('selectedRole', 'student')
+        ->call('createUser')
+        ->assertHasNoErrors();
+
+    $user = User::where('email', 'nieuw@student.ehb.be')->first();
+
+    expect($user->student)->not->toBeNull();
+});
+
+it('maakt een mentor-subtype aan en koppelt het bedrijf', function () {
+    $company = Company::first();
+
+    Livewire::actingAs(makeUser('admin'))
+        ->test(UserManager::class)
+        ->set('name', 'Nieuwe Mentor')
+        ->set('email', 'nieuw@easi.net')
+        ->set('selectedRole', 'mentor')
+        ->set('companyId', $company->id)
+        ->call('createUser')
+        ->assertHasNoErrors();
+
+    $user = User::where('email', 'nieuw@easi.net')->first();
+
+    expect($user->mentor)->not->toBeNull()
+        ->and($user->mentor->company_id)->toBe($company->id);
 });
