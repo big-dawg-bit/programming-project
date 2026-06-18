@@ -26,7 +26,7 @@
                             ['label' => 'Studenten',    'icon' => 'users',         'route' => 'mentor.studenten'],
                             ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'mentor.weeklogs'],
                             ['label' => 'Evaluaties',   'icon' => 'star',          'route' => null],
-                            ['label' => 'Documenten',   'icon' => 'folder',        'route' => null],
+                            ['label' => 'Documenten',   'icon' => 'folder',        'route' => 'mentor.documenten'],
                             ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
                         ];
                     } else {
