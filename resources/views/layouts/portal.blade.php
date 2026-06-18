@@ -49,7 +49,21 @@
                         ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
                     ];
 
+                    $adminNav = [
+                        ['label' => 'Gebruikers',     'icon' => 'users',       'route' => 'admin.users'],
+                        ['label' => 'Evaluatiekader', 'icon' => 'star',        'route' => 'admin.framework'],
+                        ['label' => 'Instellingen',   'icon' => 'cog-6-tooth', 'route' => 'profile.edit'],
+                    ];
+
+                    $commissieNav = [
+                        ['label' => 'Aanvragen',      'icon' => 'document-text', 'route' => 'applications.review'],
+                        ['label' => 'Overeenkomsten', 'icon' => 'folder',        'route' => 'applications.agreements'],
+                        ['label' => 'Instellingen',   'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
+                    ];
+
                     $items = match (true) {
+                        $user?->hasRole('admin') => $adminNav,
+                        $user?->hasRole('stagecommissie') => $commissieNav,
                         $user?->hasRole('docent') => $docentNav,
                         $user?->hasRole('mentor') => $mentorNav,
                         default => $studentNav,
