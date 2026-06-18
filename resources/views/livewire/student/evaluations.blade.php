@@ -30,9 +30,10 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-4">
+                    {{-- Cijfer op /20 (Belgisch). overall_score wordt geacht op 0–20 te staan. --}}
                     <p class="text-right">
                         <span class="text-3xl font-bold">{{ number_format((float) $evaluation->overall_score, 1) }}</span>
-                        <span class="block text-sm text-neutral-400 dark:text-neutral-500">/100</span>
+                        <span class="block text-sm text-neutral-400 dark:text-neutral-500">/20</span>
                     </p>
                     <span class="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">
                         Ingediend
@@ -48,7 +49,7 @@
                         <tr>
                             <th class="px-4 py-2 font-medium">Competentie</th>
                             <th class="px-4 py-2 font-medium">Gewicht</th>
-                            <th class="px-4 py-2 font-medium">Score /100</th>
+                            <th class="px-4 py-2 font-medium">Score /20</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
