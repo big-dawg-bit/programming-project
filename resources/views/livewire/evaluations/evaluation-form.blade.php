@@ -25,8 +25,9 @@
                             type="number"
                             wire:model="scores.{{ $competency->id }}"
                             min="0"
-                            max="100"
-                            placeholder="0–100" />
+                            max="20"
+                            step="0.5"
+                            placeholder="0–20" />
                     </div>
                 </div>
                 @error("scores.{$competency->id}")

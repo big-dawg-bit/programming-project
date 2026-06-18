@@ -222,7 +222,8 @@ class StageSeeder extends Seeder
         $weighted = 0;
 
         foreach ($competencies as $competency) {
-            $score = $type === 'final' ? rand(70, 95) : rand(60, 85);
+            // Scores op /20 (Belgisch puntensysteem).
+            $score = $type === 'final' ? rand(14, 19) : rand(12, 17);
 
             $evaluation->scores()->create([
                 'competency_id' => $competency->id,

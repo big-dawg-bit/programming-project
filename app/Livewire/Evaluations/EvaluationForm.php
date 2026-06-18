@@ -43,6 +43,11 @@ class EvaluationForm extends Component
 
     public function submit(): void
     {
+        // Scores op /20 (Belgisch puntensysteem).
+        $this->validate([
+            'scores.*' => 'nullable|numeric|min:0|max:20',
+        ]);
+
         $evaluation = Evaluation::create([
             'stage_id' => $this->stage->id,
             'framework_id' => $this->stage->framework_id,

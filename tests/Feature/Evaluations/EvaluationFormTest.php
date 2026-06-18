@@ -90,7 +90,7 @@ it('legt het gewicht vast bij indienen en blijft onveranderd als het gewicht lat
 
     Livewire::actingAs($stage->docent->user)
         ->test(EvaluationForm::class, ['stage' => $stage])
-        ->set("scores.{$competentieA->id}", 80)
+        ->set("scores.{$competentieA->id}", 16)
         ->call('submit');
 
     $score = EvaluationScore::where('competency_id', $competentieA->id)->first();
@@ -109,14 +109,14 @@ it('berekent het gewogen eindcijfer uit de snapshots', function () {
 
     Livewire::actingAs($stage->docent->user)
         ->test(EvaluationForm::class, ['stage' => $stage])
-        ->set("scores.{$a->id}", 80)
-        ->set("scores.{$b->id}", 60)
+        ->set("scores.{$a->id}", 16)
+        ->set("scores.{$b->id}", 12)
         ->call('submit');
 
     $evaluation = Evaluation::first();
 
-    // (80*50 + 60*50) / 100 = 70
-    expect((float) $evaluation->overall_score)->toBe(70.0);
+    // (16*50 + 12*50) / 100 = 14
+    expect((float) $evaluation->overall_score)->toBe(14.0);
 });
 
 it('ondersteunt een mid-term en final evaluatie onafhankelijk op dezelfde stage', function () {
@@ -125,20 +125,20 @@ it('ondersteunt een mid-term en final evaluatie onafhankelijk op dezelfde stage'
     $a = Competency::where('code', 'A')->first();
     $b = Competency::where('code', 'B')->first();
 
-    // mid-term: 80 en 60 -> 70
+    // mid-term: 16 en 12 -> 14
     Livewire::actingAs($docentUser)
         ->test(EvaluationForm::class, ['stage' => $stage])
         ->set('type', 'mid-term')
-        ->set("scores.{$a->id}", 80)
-        ->set("scores.{$b->id}", 60)
+        ->set("scores.{$a->id}", 16)
+        ->set("scores.{$b->id}", 12)
         ->call('submit');
 
-    // final: 90 en 100 -> 95
+    // final: 18 en 20 -> 19
     Livewire::actingAs($docentUser)
         ->test(EvaluationForm::class, ['stage' => $stage])
         ->set('type', 'final')
-        ->set("scores.{$a->id}", 90)
-        ->set("scores.{$b->id}", 100)
+        ->set("scores.{$a->id}", 18)
+        ->set("scores.{$b->id}", 20)
         ->call('submit');
 
     expect(Evaluation::where('stage_id', $stage->id)->count())->toBe(2);
@@ -146,6 +146,6 @@ it('ondersteunt een mid-term en final evaluatie onafhankelijk op dezelfde stage'
     $midterm = Evaluation::where('stage_id', $stage->id)->where('type', 'mid-term')->first();
     $final = Evaluation::where('stage_id', $stage->id)->where('type', 'final')->first();
 
-    expect((float) $midterm->overall_score)->toBe(70.0)
-        ->and((float) $final->overall_score)->toBe(95.0);
+    expect((float) $midterm->overall_score)->toBe(14.0)
+        ->and((float) $final->overall_score)->toBe(19.0);
 });

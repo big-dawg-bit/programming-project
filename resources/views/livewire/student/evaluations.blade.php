@@ -23,13 +23,14 @@
                         {{ $tab === 'eind' ? 'Eindevaluatie' : 'Tussentijdse evaluatie' }}
                     </h3>
                     <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                        {{ optional($evaluation->submitted_at)->format('d/m/Y') ?? '—' }}
+                        {{ $evaluation->submitted_at ? \Illuminate\Support\Carbon::parse($evaluation->submitted_at)->format('d/m/Y') : '—' }}
                         @if ($evaluation->stage?->company)
                             · {{ $evaluation->stage->company->name }}
                         @endif
                     </p>
                 </div>
                 <div class="flex items-center gap-4">
+                    {{-- Cijfer op /20 (Belgisch). overall_score wordt geacht op 0–20 te staan. --}}
                     <p class="text-right">
                         <span class="text-3xl font-bold">{{ number_format((float) $evaluation->overall_score, 1) }}</span>
                         <span class="block text-sm text-neutral-400 dark:text-neutral-500">/20</span>
@@ -48,7 +49,7 @@
                         <tr>
                             <th class="px-4 py-2 font-medium">Competentie</th>
                             <th class="px-4 py-2 font-medium">Gewicht</th>
-                            <th class="px-4 py-2 font-medium">Score</th>
+                            <th class="px-4 py-2 font-medium">Score /20</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
