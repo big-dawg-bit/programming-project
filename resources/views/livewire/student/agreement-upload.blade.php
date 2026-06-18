@@ -48,8 +48,17 @@
             </div>
         @endif
 
+        {{-- Wachten op mentor-akkoord: zonder overeenkomst kan de student nog niet tekenen --}}
+        @if (! $agreement)
+            <div class="rounded-xl border border-dashed border-neutral-300 bg-white p-10 text-center text-sm text-neutral-500">
+                <flux:icon name="clock" class="mx-auto size-8 text-neutral-300" />
+                <p class="mt-3 font-medium text-neutral-700">Wacht op goedkeuring van je mentor</p>
+                <p class="mt-1">Zodra je mentor akkoord geeft, verschijnt hier de overeenkomst om te ondertekenen.</p>
+            </div>
+        @endif
+
         {{-- Onderteken op de trackpad --}}
-        @if (! $agreement || $agreement->status !== 'bevestigd')
+        @if ($agreement && $agreement->status !== 'bevestigd')
             <div class="rounded-xl border border-neutral-200 bg-white p-6">
                 <h2 class="text-sm font-medium text-neutral-700">Onderteken je overeenkomst</h2>
                 <p class="mt-1 text-xs text-neutral-400">Teken hieronder met je muis, trackpad of vinger.</p>
@@ -91,7 +100,7 @@
         @endif
 
         {{-- Of: laad een getekende overeenkomst op (zolang nog niet bevestigd) --}}
-        @if (! $agreement || $agreement->status !== 'bevestigd')
+        @if ($agreement && $agreement->status !== 'bevestigd')
             <form wire:submit="save" class="flex flex-col gap-5 rounded-xl border border-neutral-200 bg-white p-6">
                 <div>
                     <label class="mb-2 block text-sm font-medium text-neutral-700">
