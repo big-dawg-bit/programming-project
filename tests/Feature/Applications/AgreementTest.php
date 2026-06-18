@@ -42,6 +42,33 @@ it('laat een student de getekende overeenkomst opladen', function () {
         ->and((bool) $agreement->insurance_confirmed)->toBeTrue();
 });
 
+it('laat een student de overeenkomst ondertekenen op de trackpad', function () {
+    [$user, $application] = studentMetGoedgekeurdeAanvraag();
+
+    $handtekening = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQAY3Y2wAAAAAElFTkSuQmCC';
+
+    Livewire::actingAs($user)->test(AgreementUpload::class)
+        ->call('signStudent', $handtekening)
+        ->assertHasNoErrors();
+
+    $agreement = StageAgreement::where('application_id', $application->id)->first();
+
+    expect($agreement)->not->toBeNull()
+        ->and($agreement->student_signature)->toBe($handtekening)
+        ->and($agreement->student_signed_at)->not->toBeNull()
+        ->and($agreement->status)->toBe('ingediend');
+});
+
+it('weigert een handtekening die geen geldige PNG-dataURL is', function () {
+    [$user, $application] = studentMetGoedgekeurdeAanvraag();
+
+    Livewire::actingAs($user)->test(AgreementUpload::class)
+        ->call('signStudent', 'gewoon-wat-tekst')
+        ->assertHasErrors('signature');
+
+    expect(StageAgreement::where('application_id', $application->id)->exists())->toBeFalse();
+});
+
 it('weigert opladen zonder bevestigde verzekering', function () {
     Storage::fake('local');
     [$user] = studentMetGoedgekeurdeAanvraag();

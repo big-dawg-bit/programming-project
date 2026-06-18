@@ -9,6 +9,15 @@ class StageAgreement extends Model
 {
     protected $guarded = [];
 
+    protected function casts(): array
+    {
+        return [
+            'uploaded_at' => 'datetime',
+            'student_signed_at' => 'datetime',
+            'docent_signed_at' => 'datetime',
+        ];
+    }
+
     public function application(): BelongsTo
     {
         return $this->belongsTo(StageApplication::class);
