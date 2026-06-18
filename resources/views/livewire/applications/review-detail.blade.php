@@ -4,7 +4,7 @@
     </a>
 
     <h1 class="mt-2 text-2xl font-bold">Aanvraag van {{ $application->student?->user?->name }}</h1>
-    <p class="mb-4 text-sm text-gray-500">Status: {{ $application->status }}</p>
+    <p class="mb-4 text-sm text-gray-500">Status: <x-status-badge :status="$application->status" /></p>
 
     <dl class="grid grid-cols-3 gap-2 rounded border border-gray-200 p-4 text-sm">
         <dt class="font-semibold">Student</dt>

@@ -1,0 +1,58 @@
+<div class="max-w-xl">
+    <h1 class="text-2xl font-bold mb-4">Aanvraag aanpassen</h1>
+
+    @if ($feedback)
+        <div class="mb-4 rounded border border-amber-400 bg-amber-50 p-3 text-sm text-amber-800">
+            <p class="font-semibold">Feedback van de stagecommissie:</p>
+            <p class="mt-1 whitespace-pre-line">{{ $feedback }}</p>
+        </div>
+    @endif
+
+    <form wire:submit="resubmit" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium">Bedrijf</label>
+            <select wire:model="company_id" class="w-full border border-gray-300 p-2">
+                <option value="">— Kies een bedrijf —</option>
+                @foreach ($companies as $company)
+                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                @endforeach
+            </select>
+            @error('company_id') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium">Functie</label>
+            <input type="text" wire:model="position_title" class="w-full border border-gray-300 p-2">
+            @error('position_title') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium">Omschrijving</label>
+            <textarea wire:model="description" class="w-full border border-gray-300 p-2"></textarea>
+            @error('description') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="flex gap-4">
+            <div class="flex-1">
+                <label class="block text-sm font-medium">Startdatum</label>
+                <input type="date" wire:model="start_date" class="w-full border border-gray-300 p-2">
+                @error('start_date') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+            </div>
+            <div class="flex-1">
+                <label class="block text-sm font-medium">Einddatum</label>
+                <input type="date" wire:model="end_date" class="w-full border border-gray-300 p-2">
+                @error('end_date') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium">Voorgestelde mentor</label>
+            <input type="text" wire:model="proposed_mentor_name" class="w-full border border-gray-300 p-2">
+            @error('proposed_mentor_name') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+        </div>
+
+        <button type="submit" class="rounded bg-[#E2231A] px-4 py-2 text-white">
+            Opnieuw indienen
+        </button>
+    </form>
+</div>

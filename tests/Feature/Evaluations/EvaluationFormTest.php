@@ -3,6 +3,7 @@
 use App\Livewire\Evaluations\EvaluationForm;
 use App\Models\Competency;
 use App\Models\CompetencyFramework;
+use App\Models\Docent;
 use App\Models\Evaluation;
 use App\Models\EvaluationScore;
 use App\Models\Stage;
@@ -36,8 +37,17 @@ function makeStageWithFramework(): Stage {
         'study_program' => 'Toegepaste Informatica',
     ]);
 
+    // Toegewezen docent: submit() leest de ingelogde gebruiker (evaluator_role),
+    // en de scoping in mount() laat enkel de eigen docent/mentor toe.
+    $docentUser = User::factory()->withRole('docent')->create();
+    $docent = Docent::create([
+        'user_id' => $docentUser->id,
+        'department' => 'Toegepaste Informatica',
+    ]);
+
     return Stage::create([
         'student_id' => $student->id,
+        'docent_id' => $docent->id,
         'framework_id' => $framework->id,
         'status' => 'active',
     ]);
@@ -46,15 +56,18 @@ function makeStageWithFramework(): Stage {
 it('rendert een veld per competentie van het framework', function () {
     $stage = makeStageWithFramework();
 
-    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+    Livewire::actingAs($stage->docent->user)
+        ->test(EvaluationForm::class, ['stage' => $stage])
         ->assertSee('Competentie A')
         ->assertSee('Competentie B');
 });
 
 it('toont een extra veld wanneer een competentie wordt toegevoegd', function () {
     $stage = makeStageWithFramework();
+    $docentUser = $stage->docent->user;
 
-    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+    Livewire::actingAs($docentUser)
+        ->test(EvaluationForm::class, ['stage' => $stage])
         ->assertSee('Competentie A')
         ->assertSee('Competentie B')
         ->assertDontSee('Competentie C');
@@ -66,7 +79,8 @@ it('toont een extra veld wanneer een competentie wordt toegevoegd', function () 
         'weight' => 0,
     ]);
 
-    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+    Livewire::actingAs($docentUser)
+        ->test(EvaluationForm::class, ['stage' => $stage])
         ->assertSee('Competentie C');
 });
 
@@ -74,7 +88,8 @@ it('legt het gewicht vast bij indienen en blijft onveranderd als het gewicht lat
     $stage = makeStageWithFramework();
     $competentieA = Competency::where('code', 'A')->first();
 
-    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+    Livewire::actingAs($stage->docent->user)
+        ->test(EvaluationForm::class, ['stage' => $stage])
         ->set("scores.{$competentieA->id}", 80)
         ->call('submit');
 
@@ -92,7 +107,8 @@ it('berekent het gewogen eindcijfer uit de snapshots', function () {
     $a = Competency::where('code', 'A')->first();
     $b = Competency::where('code', 'B')->first();
 
-    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+    Livewire::actingAs($stage->docent->user)
+        ->test(EvaluationForm::class, ['stage' => $stage])
         ->set("scores.{$a->id}", 80)
         ->set("scores.{$b->id}", 60)
         ->call('submit');
@@ -105,18 +121,21 @@ it('berekent het gewogen eindcijfer uit de snapshots', function () {
 
 it('ondersteunt een mid-term en final evaluatie onafhankelijk op dezelfde stage', function () {
     $stage = makeStageWithFramework();
+    $docentUser = $stage->docent->user;
     $a = Competency::where('code', 'A')->first();
     $b = Competency::where('code', 'B')->first();
 
     // mid-term: 80 en 60 -> 70
-    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+    Livewire::actingAs($docentUser)
+        ->test(EvaluationForm::class, ['stage' => $stage])
         ->set('type', 'mid-term')
         ->set("scores.{$a->id}", 80)
         ->set("scores.{$b->id}", 60)
         ->call('submit');
 
     // final: 90 en 100 -> 95
-    Livewire::test(EvaluationForm::class, ['stage' => $stage])
+    Livewire::actingAs($docentUser)
+        ->test(EvaluationForm::class, ['stage' => $stage])
         ->set('type', 'final')
         ->set("scores.{$a->id}", 90)
         ->set("scores.{$b->id}", 100)
