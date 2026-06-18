@@ -14,13 +14,13 @@ class EvaluationForm extends Component
     public Stage $stage;
     public string $type = 'mid-term';
     public array $scores = [];
+    public array $feedback = [];
 
     public function mount(Stage $stage): void
     {
         $this->stage = $stage;
 
         // Scoping: enkel de TOEGEWEZEN docent of mentor van deze stage mag evalueren.
-        // Een docent/mentor van een andere student wordt geweigerd.
         $user = auth()->user();
         abort_unless(
             ($user->hasRole('docent') && $stage->docent_id === $user->docent?->id)
@@ -30,6 +30,7 @@ class EvaluationForm extends Component
 
         foreach ($this->competencies() as $competency) {
             $this->scores[$competency->id] = null;
+            $this->feedback[$competency->id] = '';
         }
     }
 
@@ -43,9 +44,9 @@ class EvaluationForm extends Component
 
     public function submit(): void
     {
-        // Scores op /20 (Belgisch puntensysteem).
         $this->validate([
             'scores.*' => 'nullable|numeric|min:0|max:20',
+            'feedback.*' => 'nullable|string|max:2000',
         ]);
 
         $evaluation = Evaluation::create([
@@ -63,10 +64,11 @@ class EvaluationForm extends Component
                 'competency_id' => $competency->id,
                 'weight_snapshot' => $competency->weight,
                 'score' => $this->scores[$competency->id] ?? null,
+                'feedback' => $this->feedback[$competency->id] ?: null,
             ]);
         }
 
-        // bereken het gewogen eindcijfer uit de snapshots
+        // gewogen eindcijfer uit de snapshots
         $scores = $evaluation->scores()->get();
         $totalWeight = $scores->sum('weight_snapshot');
 
@@ -75,6 +77,8 @@ class EvaluationForm extends Component
             : 0;
 
         $evaluation->update(['overall_score' => round($overall, 2)]);
+
+        session()->flash('status', 'Evaluatie opgeslagen.');
     }
 
     public function render()
