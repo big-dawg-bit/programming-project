@@ -3,6 +3,8 @@
 namespace App\Livewire\Applications;
 
 use App\Models\CompetencyFramework;
+use App\Models\Docent;
+use App\Models\Mentor;
 use App\Models\StageApplication;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -15,6 +17,11 @@ class ReviewQueue extends Component
 
     public array $feedback = [];
 
+    // Per-rij toewijzing bij goedkeuring (key = application id).
+    public array $docentId = [];
+    public array $mentorId = [];
+    public array $frameworkId = [];
+
     public function render()
     {
         return view('livewire.applications.review-queue', [
@@ -22,12 +29,38 @@ class ReviewQueue extends Component
                 ->with(['student.user', 'company'])
                 ->latest('submitted_at')
                 ->paginate(15),
+            'docenten' => Docent::with('user')->get(),
+            'frameworks' => CompetencyFramework::where('is_active', true)->orderBy('name')->get(),
+            // Gegroepeerd per bedrijf zodat we enkel mentors van het juiste bedrijf tonen.
+            'mentorsByCompany' => Mentor::with('user')->get()->groupBy('company_id'),
         ]);
     }
 
     public function approve(int $id): void
     {
         $application = StageApplication::findOrFail($id);
+
+        $docentId = $this->docentId[$id] ?? null;
+        $mentorId = $this->mentorId[$id] ?? null;
+        $frameworkId = $this->frameworkId[$id] ?? null;
+
+        // Alle drie zijn verplicht: de stage moet meteen evalueerbaar zijn.
+        $missing = false;
+        if (! $docentId) {
+            $this->addError("docentId.{$id}", 'Kies een docent.');
+            $missing = true;
+        }
+        if (! $mentorId) {
+            $this->addError("mentorId.{$id}", 'Kies een mentor.');
+            $missing = true;
+        }
+        if (! $frameworkId) {
+            $this->addError("frameworkId.{$id}", 'Kies een evaluatiekader.');
+            $missing = true;
+        }
+        if ($missing) {
+            return;
+        }
 
         // 1. leg vast wie goedkeurde en wanneer
         $application->reviews()->create([
@@ -39,15 +72,18 @@ class ReviewQueue extends Component
         // 2. zet de status op goedgekeurd
         $application->update(['status' => 'approved']);
 
-        // 3. maak de échte stage aan (firstOrCreate = nooit dubbel),
-        //    gekoppeld aan het actieve evaluatiekader op dit moment.
+        // 3. maak de échte stage aan (firstOrCreate = nooit dubbel) met de toewijzing
         $application->stage()->firstOrCreate([], [
             'student_id' => $application->student_id,
             'company_id' => $application->company_id,
-            'framework_id' => CompetencyFramework::where('is_active', true)->value('id'),
+            'docent_id' => (int) $docentId,
+            'mentor_id' => (int) $mentorId,
+            'framework_id' => (int) $frameworkId,
             'start_date' => $application->start_date,
             'end_date' => $application->end_date,
         ]);
+
+        unset($this->docentId[$id], $this->mentorId[$id], $this->frameworkId[$id]);
     }
 
     public function requestChanges(int $id): void
