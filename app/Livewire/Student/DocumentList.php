@@ -4,6 +4,7 @@ namespace App\Livewire\Student;
 
 use App\Models\File;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
@@ -22,8 +23,8 @@ class DocumentList extends Component
     // Of de upload-modal open staat.
     public bool $showUpload = false;
 
-    // Het gekozen bestand (PDF of DOCX, max 10 MB zoals in het ontwerp).
-    #[Validate('required|file|mimes:pdf,docx|max:10240')]
+    // Het gekozen bestand: documenten (PDF/DOCX) of foto's voor de logboeken, max 10 MB.
+    #[Validate('required|file|mimes:pdf,docx,jpg,jpeg,png,webp|max:10240')]
     public $upload = null;
 
     // Categorie waaronder het bestand wordt opgeslagen.
@@ -35,10 +36,8 @@ class DocumentList extends Component
 
     public const CATEGORIEEN = [
         'Stage-aanvraag',
-        'Overeenkomst',
+        'Stageovereenkomst',
         'Logboeken',
-        'Evaluaties',
-        'Anders',
     ];
 
     /**
@@ -96,9 +95,21 @@ class DocumentList extends Component
         session()->flash('document-uploaded', 'Document geüpload.');
     }
 
+    /**
+     * Download een eigen bestand. Een student kan enkel zijn eigen uploads ophalen.
+     */
+    public function download(int $fileId)
+    {
+        $file = File::where('uploaded_by', Auth::id())->findOrFail($fileId);
+
+        return Storage::download($file->storage_path, $file->original_name);
+    }
+
     public function render()
     {
-        $files = File::where('category', $this->categorie)
+        // Enkel de eigen documenten van de ingelogde student; student A ziet nooit die van B.
+        $files = File::where('uploaded_by', Auth::id())
+            ->where('category', $this->categorie)
             ->orderByDesc('uploaded_at')
             ->get();
 

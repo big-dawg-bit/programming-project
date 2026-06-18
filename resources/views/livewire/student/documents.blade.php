@@ -31,22 +31,20 @@
             </div>
         @endif
 
-        {{-- NB: de voorbeelddocumenten hieronder zijn statisch; geüploade bestanden komen uit de files-tabel. --}}
-        @php
-            $voorbeelden = [
-                'Stage-aanvraag' => [
-                    ['naam' => 'Motivatiebrief.pdf', 'grootte' => '245 KB', 'datum' => '15 jan 2026'],
-                    ['naam' => 'CV_LinaJanssens.pdf', 'grootte' => '189 KB', 'datum' => '15 jan 2026'],
-                    ['naam' => 'Bedrijfsinfo_Easi.pdf', 'grootte' => '312 KB', 'datum' => '15 jan 2026'],
-                ],
-                'Overeenkomst' => [
-                    ['naam' => 'Stageovereenkomst_v2.docx', 'grootte' => '312 KB', 'datum' => '22 jan 2026'],
-                ],
-            ];
-            $items = $voorbeelden[$categorie] ?? [];
-        @endphp
+        {{-- Uitleg per categorie --}}
+        @if ($categorie === 'Logboeken')
+            <div class="mb-4 flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600 dark:border-neutral-800 dark:bg-neutral-800/40 dark:text-neutral-300">
+                <flux:icon name="camera" class="mt-0.5 size-4 shrink-0" />
+                <span>Upload hier foto's van je stage. Deze zijn zichtbaar voor je docent, mentor en de stagecommissie.</span>
+            </div>
+        @elseif ($categorie === 'Stageovereenkomst')
+            <div class="mb-4 flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600 dark:border-neutral-800 dark:bg-neutral-800/40 dark:text-neutral-300">
+                <flux:icon name="document-check" class="mt-0.5 size-4 shrink-0" />
+                <span>De stageovereenkomst beheer je onder <a href="{{ route('student.stage') }}" wire:navigate class="font-medium text-[#E2231A] hover:underline">Mijn stage</a>. Eventuele extra exemplaren kun je hier bewaren.</span>
+            </div>
+        @endif
 
-        @if ($files->isEmpty() && empty($items))
+        @if ($files->isEmpty())
             <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
                 <flux:heading size="lg">Geen documenten</flux:heading>
                 <flux:subheading class="mt-1">
@@ -57,8 +55,9 @@
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {{-- Geüploade bestanden (uit de database) --}}
                 @foreach ($files as $file)
-                    <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900" title="{{ $file->description }}">
-                        <flux:icon name="document-text" class="size-8 text-[#E2231A]" />
+                    @php $isFoto = str_starts_with((string) $file->mime_type, 'image/'); @endphp
+                    <div class="flex flex-col rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900" title="{{ $file->description }}">
+                        <flux:icon :name="$isFoto ? 'photo' : 'document-text'" class="size-8 text-[#E2231A]" />
                         <p class="mt-3 truncate text-sm font-medium">{{ $file->original_name }}</p>
                         <p class="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
                             {{ $file->size_bytes ? number_format($file->size_bytes / 1024, 0) . ' KB' : '—' }}
@@ -66,16 +65,10 @@
                         <p class="text-xs text-neutral-400 dark:text-neutral-500">
                             {{ $file->uploaded_at?->locale('nl')->translatedFormat('j M Y') ?? '—' }}
                         </p>
-                    </div>
-                @endforeach
-
-                {{-- Statische voorbeelddocumenten --}}
-                @foreach ($items as $doc)
-                    <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
-                        <flux:icon name="document-text" class="size-8 text-[#E2231A]" />
-                        <p class="mt-3 truncate text-sm font-medium">{{ $doc['naam'] }}</p>
-                        <p class="mt-1 text-xs text-neutral-400 dark:text-neutral-500">{{ $doc['grootte'] }}</p>
-                        <p class="text-xs text-neutral-400 dark:text-neutral-500">{{ $doc['datum'] }}</p>
+                        <button type="button" wire:click="download({{ $file->id }})"
+                            class="mt-3 inline-flex items-center gap-1.5 self-start text-sm font-medium text-[#E2231A] hover:underline">
+                            <flux:icon name="arrow-down-tray" class="size-4" /> Downloaden
+                        </button>
                     </div>
                 @endforeach
             </div>
@@ -112,9 +105,9 @@
                             <span class="text-xs text-neutral-400 dark:text-neutral-500">Klik om een ander bestand te kiezen</span>
                         @else
                             <span class="text-sm text-neutral-600 dark:text-neutral-300">Sleep bestand hier of klik om te bladeren</span>
-                            <span class="text-xs text-neutral-400 dark:text-neutral-500">PDF, DOCX, max 10MB</span>
+                            <span class="text-xs text-neutral-400 dark:text-neutral-500">PDF, DOCX of foto (JPG, PNG), max 10MB</span>
                         @endif
-                        <input type="file" class="hidden" x-ref="bestand" wire:model="upload" accept=".pdf,.docx" />
+                        <input type="file" class="hidden" x-ref="bestand" wire:model="upload" accept=".pdf,.docx,.jpg,.jpeg,.png,.webp" />
                     </label>
                     <div wire:loading wire:target="upload" class="text-sm text-neutral-500 dark:text-neutral-400">Bestand wordt klaargezet…</div>
                     @error('upload') <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
