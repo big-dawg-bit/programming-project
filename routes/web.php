@@ -57,6 +57,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('docent/evaluaties', DocentEvaluaties::class)->name('docent.evaluaties');
         Route::get('docent/rapporten', DocentRapporten::class)->name('docent.rapporten');
     });
+    Route::middleware('role:mentor')->group(function () {
+        Route::get('mentor/studenten', \App\Livewire\Mentor\StudentList::class)->name('mentor.studenten');
+        Route::get('mentor/weeklogs', \App\Livewire\Weeklogs\MentorWeeklogList::class)->name('mentor.weeklogs');
+        Route::get('mentor/documenten', \App\Livewire\Mentor\DocumentList::class)->name('mentor.documenten');
+    });
 
     Route::middleware('role:mentor')->group(function () {
         Route::get('mentor', MentorDashboard::class)->name('mentor.dashboard');
