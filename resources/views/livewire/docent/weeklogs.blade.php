@@ -1,94 +1,64 @@
 <div class="mx-auto flex max-w-5xl flex-col gap-6">
-    {{-- NB: voorlopig statische voorbeelddata; later koppelen aan de weeklogs van de begeleide stages. --}}
-    @php
-        $data = [
-            'te bevestigen' => [
-                ['student' => 'Emma Claes',   'week' => 5, 'mentor_op' => '4 mei 2026'],
-                ['student' => 'Sofie Peeters', 'week' => 4, 'mentor_op' => '27 april 2026'],
-            ],
-            'bevestigd' => [
-                ['student' => 'Lina Janssens', 'week' => 4, 'mentor_op' => '20 april 2026'],
-                ['student' => 'Maxime Verhulst', 'week' => 5, 'mentor_op' => '3 mei 2026'],
-                ['student' => 'Jan Vermeulen', 'week' => 6, 'mentor_op' => '10 mei 2026'],
-            ],
-            'geescaleerd' => [
-                ['student' => 'Lucas Maes', 'week' => 3, 'mentor_op' => '13 april 2026'],
-            ],
-        ];
-        $pills = ['te bevestigen' => 'Te bevestigen', 'bevestigd' => 'Bevestigd', 'geescaleerd' => 'Geëscaleerd'];
-        $rijen = $data[$filter] ?? [];
-    @endphp
-
-    {{-- Filterpills --}}
-    <div class="flex flex-wrap gap-2">
-        @foreach ($pills as $key => $label)
-            <button type="button" wire:click="$set('filter', '{{ $key }}')"
-                @class([
-                    'flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition',
-                    'bg-[#E2231A] text-white' => $filter === $key,
-                    'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-400 dark:border-neutral-800 dark:hover:bg-neutral-800' => $filter !== $key,
-                ])>
-                {{ $label }}
-                @if ($key === 'te bevestigen' && count($data['te bevestigen']))
-                    <span @class([
-                        'grid h-5 min-w-5 place-items-center rounded-full px-1 text-xs font-semibold',
-                        'bg-white/25 text-white' => $filter === $key,
-                        'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300' => $filter !== $key,
-                    ])>{{ count($data['te bevestigen']) }}</span>
-                @endif
-            </button>
-        @endforeach
+    <div>
+        <h2 class="text-lg font-semibold">Weeklogs van mijn studenten</h2>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">Lees de weeklogs en geef feedback via een reactie.</p>
     </div>
 
-    @if (session('weeklog-bevestigd'))
-        <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900/50 dark:bg-green-950/40 dark:text-green-300">
-            {{ session('weeklog-bevestigd') }}
-        </div>
-    @endif
+    @forelse ($weeklogs as $weeklog)
+        @php
+            $periode = collect([$weeklog->period_start, $weeklog->period_end])
+                ->filter()
+                ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->locale('nl')->translatedFormat('j M Y'))
+                ->implode(' – ');
+        @endphp
 
-    {{-- Lijst --}}
-    @if (empty($rijen))
+        <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <h3 class="font-semibold">{{ $weeklog->stage?->student?->user?->name ?? 'Onbekende student' }}</h3>
+                    <p class="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">
+                        Week {{ $weeklog->week_number }}@if ($periode) · {{ $periode }}@endif
+                    </p>
+                </div>
+                <span class="shrink-0 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 dark:bg-blue-950/50 dark:text-blue-300">Ingediend</span>
+            </div>
+
+            <p class="mt-3 text-sm text-neutral-600 dark:text-neutral-300">{{ $weeklog->content }}</p>
+
+            {{-- Reacties --}}
+            <button type="button" wire:click="toggleComments({{ $weeklog->id }})"
+                class="mt-3 flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300">
+                <flux:icon name="chat-bubble-left-right" class="size-4" />
+                {{ $weeklog->comments->count() }} {{ $weeklog->comments->count() === 1 ? 'reactie' : 'reacties' }}
+            </button>
+
+            @if ($openWeeklogId === $weeklog->id)
+                <div class="mt-3 space-y-3 border-t border-neutral-100 pt-3 dark:border-neutral-800">
+                    @forelse ($weeklog->comments as $comment)
+                        <div class="rounded-lg bg-neutral-50 p-3 dark:bg-neutral-800/50">
+                            <div class="text-xs text-neutral-500 dark:text-neutral-400">
+                                {{ $comment->author?->name ?? 'Onbekend' }} · {{ $comment->created_at?->diffForHumans() }}
+                            </div>
+                            <div class="mt-1 text-sm">{{ $comment->comment }}</div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Nog geen reacties.</p>
+                    @endforelse
+
+                    <form wire:submit="addComment({{ $weeklog->id }})" class="flex flex-col gap-2 sm:flex-row sm:items-start">
+                        <div class="flex-1">
+                            <flux:textarea wire:model="newComment" rows="2" placeholder="Schrijf feedback…" />
+                            @error('newComment') <p class="mt-1 text-sm text-[#E2231A]">{{ $message }}</p> @enderror
+                        </div>
+                        <flux:button type="submit" variant="primary">Reageren</flux:button>
+                    </form>
+                </div>
+            @endif
+        </div>
+    @empty
         <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
-            <flux:heading size="lg">Niets in "{{ $pills[$filter] }}"</flux:heading>
-            <flux:subheading class="mt-1">Er zijn geen weeklogs met deze status.</flux:subheading>
+            <flux:heading size="lg">Nog geen weeklogs</flux:heading>
+            <flux:subheading class="mt-1">Zodra je studenten weeklogs indienen, verschijnen ze hier.</flux:subheading>
         </div>
-    @else
-        <div class="overflow-x-auto rounded-xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
-            <table class="w-full min-w-[640px] text-left text-sm">
-                <thead class="border-b border-neutral-200 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-800/50 dark:text-neutral-400">
-                    <tr>
-                        <th class="px-5 py-3 font-medium">Student</th>
-                        <th class="px-5 py-3 font-medium">Week</th>
-                        <th class="px-5 py-3 font-medium">Mentor goedgekeurd op</th>
-                        <th class="px-5 py-3"></th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
-                    @foreach ($rijen as $r)
-                        <tr>
-                            <td class="px-5 py-4 font-medium">{{ $r['student'] }}</td>
-                            <td class="px-5 py-4">Week {{ $r['week'] }}</td>
-                            <td class="px-5 py-4 text-neutral-500 dark:text-neutral-400">{{ $r['mentor_op'] }}</td>
-                            <td class="px-5 py-4">
-                                <div class="flex items-center justify-end gap-4">
-                                    <a href="{{ route('docent.student.show', ['naam' => $r['student']]) }}" wire:navigate
-                                       class="text-sm font-medium text-neutral-700 hover:text-[#E2231A] dark:text-neutral-300">Bekijken</a>
-                                    @if ($filter === 'te bevestigen')
-                                        <flux:button size="sm" variant="primary"
-                                            wire:click="bevestig('{{ $r['student'] }}', {{ $r['week'] }})">
-                                            Bevestigen
-                                        </flux:button>
-                                    @elseif ($filter === 'bevestigd')
-                                        <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">bevestigd</span>
-                                    @else
-                                        <span class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700 dark:bg-red-900/40 dark:text-red-300">geëscaleerd</span>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @endif
+    @endforelse
 </div>
