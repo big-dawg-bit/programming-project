@@ -14,7 +14,7 @@ use Livewire\Component;
 #[Title('Mijn weeklogs')]
 class WeeklogList extends Component
 {
-    // Actieve statusfilter (alle | concept | ingediend | goedgekeurd | aanpassing).
+    // Actieve statusfilter (alle | ingediend | goedgekeurd).
     public string $filter = 'alle';
 
     // Of het invulformulier zichtbaar is.
@@ -43,15 +43,27 @@ class WeeklogList extends Component
     public $hours_worked = null;
 
     /**
-     * Voorlopig de eerste stage (testdata). Later: stage van de ingelogde student.
+     * De (laatste) stage van de ingelogde student. Student A ziet nooit die van B.
      */
     private function currentStage(): ?Stage
     {
-        return Stage::with('student.user')->first();
+        return Auth::user()?->student?->stages()->with('student.user')->latest()->first();
     }
 
     /**
-     * Sla een nieuw weeklogboek op voor de stage.
+     * Stel bij het openen het eerstvolgende, nog niet ingevulde weeknummer voor.
+     */
+    public function mount(): void
+    {
+        $stage = $this->currentStage();
+
+        if ($stage) {
+            $this->week_number = max(1, (int) $stage->weeklogs()->max('week_number') + 1);
+        }
+    }
+
+    /**
+     * Sla een nieuw weeklogboek op voor de stage. Maximaal één logboek per week.
      */
     public function save(): void
     {
@@ -62,6 +74,13 @@ class WeeklogList extends Component
         }
 
         $validated = $this->validate();
+
+        // Eén weeklog per week: dubbele weeknummers blokkeren.
+        if ($stage->weeklogs()->where('week_number', $validated['week_number'])->exists()) {
+            $this->addError('week_number', "Er bestaat al een weeklog voor week {$validated['week_number']}.");
+
+            return;
+        }
 
         $stage->weeklogs()->create([
             ...$validated,
@@ -105,14 +124,13 @@ class WeeklogList extends Component
 
     /**
      * Welke databasestatussen onder elke filterpill vallen.
-     * (De status is een vrije string; 'draft' komt uit de migration-default.)
+     * Een weeklog wordt meteen ingediend (geen concept); de docent reageert,
+     * maar keurt niet goed/af — vandaar enkel 'ingediend' en 'goedgekeurd'.
      */
     public const FILTERS = [
         'alle' => null,
-        'concept' => ['draft', 'concept'],
         'ingediend' => ['ingediend'],
         'goedgekeurd' => ['goedgekeurd', 'gevalideerd'],
-        'aanpassing' => ['aanpassing', 'aanpassing_gevraagd'],
     ];
 
     public function render()

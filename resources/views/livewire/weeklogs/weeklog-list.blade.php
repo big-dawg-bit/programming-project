@@ -60,13 +60,10 @@
 
     {{-- Lijst --}}
     @if (! $stage)
-        <div class="rounded-xl border border-amber-300 bg-amber-50 p-6 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
-            <p class="font-medium">Geen stage gevonden</p>
-            <p class="mt-1 text-sm">
-                Draai eerst de seeders:
-                <code>php artisan migrate:fresh --seed</code> en daarna
-                <code>php artisan db:seed --class=StageSeeder</code>.
-            </p>
+        <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
+            <flux:heading size="lg">Nog geen actieve stage</flux:heading>
+            <flux:subheading class="mt-1">Zodra je stage is goedgekeurd, kun je hier je weeklogs bijhouden.</flux:subheading>
+            <flux:button href="{{ route('student.stage') }}" wire:navigate variant="primary" class="mt-5">Naar Mijn stage</flux:button>
         </div>
     @elseif ($weeklogs->isEmpty())
         <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
@@ -89,11 +86,7 @@
                         'aanpassing', 'aanpassing_gevraagd' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
                         default => 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300',
                     };
-                    $label = match ($weeklog->status) {
-                        'draft' => 'concept',
-                        'aanpassing_gevraagd' => 'aanpassing',
-                        default => $weeklog->status,
-                    };
+                    $label = $weeklog->status;
                     $periode = collect([$weeklog->period_start, $weeklog->period_end])
                         ->filter()
                         ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->locale('nl')->translatedFormat('j M Y'))
