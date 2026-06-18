@@ -61,7 +61,7 @@
                         <p class="text-sm text-neutral-500">{{ $stage->company?->name ?? '—' }}</p>
                         <p class="mt-1 text-sm text-neutral-700">{{ \App\Livewire\Mentor\EvaluationList::TYPES[$evaluatie->type] ?? $evaluatie->type }}</p>
                         <p class="mt-1 text-xs text-neutral-400">
-                            Ingediend op {{ $evaluatie->submitted_at?->locale('nl')->translatedFormat('j F Y') ?? '—' }}
+                            Ingediend op {{ $evaluatie->submitted_at ? \Carbon\Carbon::parse($evaluatie->submitted_at)->locale('nl')->translatedFormat('j F Y') : '—' }}
                         </p>
                     </div>
                     <a href="{{ route('mentor.evaluatie.bekijken', ['evaluation' => $evaluatie->id]) }}" wire:navigate
