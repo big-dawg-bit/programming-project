@@ -1,0 +1,64 @@
+services:
+    # PHP-FPM applicatiecontainer
+    app:
+        build:
+            context: .
+            target: app
+        restart: unless-stopped
+        depends_on:
+            db:
+                condition: service_healthy
+        environment:
+            APP_ENV: production
+            APP_DEBUG: "true"
+            DB_CONNECTION: mysql
+            DB_HOST: db
+            DB_PORT: 3306
+            DB_DATABASE: programming_project
+            DB_USERNAME: root
+            DB_PASSWORD: secret
+        volumes:
+            - storage-data:/var/www/html/storage
+            # public/ delen met nginx zodat die de Vite-assets kan serveren
+            - app-public:/var/www/html/public
+        networks:
+            - app-net
+
+    # Nginx webserver (serveert public/, proxy naar php-fpm)
+    web:
+        image: nginx:1.27-alpine
+        restart: unless-stopped
+        depends_on:
+            - app
+        ports:
+            - "8080:80"
+        volumes:
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+            - app-public:/var/www/html/public:ro
+        networks:
+            - app-net
+
+    # MySQL database
+    db:
+        image: mysql:8.4
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: programming_project
+        volumes:
+            - db-data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-psecret"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+        networks:
+            - app-net
+
+volumes:
+    db-data:
+    storage-data:
+    app-public:
+
+networks:
+    app-net:
