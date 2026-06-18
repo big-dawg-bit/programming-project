@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\AuditLog;
 use App\Models\Competency;
 use App\Models\CompetencyFramework;
 use Livewire\Attributes\Layout;
@@ -78,6 +79,13 @@ class FrameworkManager extends Component
         $this->frameworkId = $new->id;
         $this->cancelEdit();
 
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => "Nieuwe kaderversie (v{$new->version}) aangemaakt",
+            'entity_type' => 'CompetencyFramework',
+            'entity_id' => $new->id,
+        ]);
+
         session()->flash('success', "Versie {$new->version} aangemaakt als concept. Activeer ze wanneer ze klaar is.");
     }
 
@@ -98,6 +106,13 @@ class FrameworkManager extends Component
 
         $this->frameworkId = $frameworkId;
 
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Evaluatiekader geactiveerd',
+            'entity_type' => 'CompetencyFramework',
+            'entity_id' => $frameworkId,
+        ]);
+
         session()->flash('success', 'Deze versie is nu het actieve evaluatiekader.');
     }
 
@@ -112,13 +127,20 @@ class FrameworkManager extends Component
             'weight' => 'required|integer|min:0|max:100',
         ]);
 
-        Competency::create([
+        $competency = Competency::create([
             'framework_id' => $this->frameworkId,
             'code' => $data['code'],
             'title' => $data['title'],
             'description' => $data['description'] ?: null,
             'weight' => $data['weight'],
             'sort_order' => Competency::where('framework_id', $this->frameworkId)->count() + 1,
+        ]);
+
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Competentie toegevoegd: '.$competency->title,
+            'entity_type' => 'Competency',
+            'entity_id' => $competency->id,
         ]);
 
         $this->reset('code', 'title', 'description', 'weight');
@@ -145,11 +167,19 @@ class FrameworkManager extends Component
             'editWeight' => 'required|integer|min:0|max:100',
         ]);
 
-        Competency::findOrFail($this->editId)->update([
+        $competency = Competency::findOrFail($this->editId);
+        $competency->update([
             'code' => $data['editCode'] ?: null,
             'title' => $data['editTitle'],
             'description' => $data['editDescription'] ?: null,
             'weight' => $data['editWeight'],
+        ]);
+
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Competentie bewerkt: '.$competency->title,
+            'entity_type' => 'Competency',
+            'entity_id' => $competency->id,
         ]);
 
         $this->cancelEdit();
@@ -163,7 +193,16 @@ class FrameworkManager extends Component
 
     public function deleteCompetency(int $competencyId): void
     {
-        Competency::findOrFail($competencyId)->delete();
+        $competency = Competency::findOrFail($competencyId);
+        $title = $competency->title;
+        $competency->delete();
+
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Competentie verwijderd: '.$title,
+            'entity_type' => 'Competency',
+            'entity_id' => $competencyId,
+        ]);
 
         if ($this->editId === $competencyId) {
             $this->cancelEdit();

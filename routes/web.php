@@ -33,14 +33,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             $user->hasRole('stagecommissie') => redirect()->route('applications.review'),
             $user->hasRole('docent') => redirect()->route('docent.dashboard'),
             $user->hasRole('mentor') => redirect()->route('mentor.dashboard'),
-            $user->hasRole('admin') => redirect()->route('admin.users'),
+            $user->hasRole('admin') => redirect()->route('admin.dashboard'),
             default => view('dashboard'),
         };
     })->name('dashboard');
 
     Route::middleware('role:admin')->group(function () {
+        Route::get('/admin', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
         Route::get('/admin/users', UserManager::class)->name('admin.users');
         Route::get('/admin/framework', FrameworkManager::class)->name('admin.framework');
+        Route::get('/admin/logboek', \App\Livewire\Admin\AuditLogViewer::class)->name('admin.audit');
     });
 
     Route::middleware('role:stagecommissie')->group(function () {
