@@ -1,6 +1,10 @@
 <?php
 
 use App\Livewire\Applications\ReviewQueue;
+use App\Models\Company;
+use App\Models\CompetencyFramework;
+use App\Models\Docent;
+use App\Models\Mentor;
 use App\Models\StageApplication;
 use App\Models\User;
 use Livewire\Livewire;
@@ -27,11 +31,20 @@ it('toont enkel ingediende aanvragen', function () {
         ->assertSee('WEL')
         ->assertDontSee('NIET');
 });
+
 it('keurt een aanvraag goed en maakt een stage aan', function () {
+    $this->seed();
+
     $lid = User::factory()->withRole('stagecommissie')->create();
-    $application = StageApplication::factory()->create(['status' => 'submitted']);
+    $application = StageApplication::factory()->create([
+        'company_id' => Company::first()->id,
+        'status' => 'submitted',
+    ]);
 
     Livewire::actingAs($lid)->test(ReviewQueue::class)
+        ->set("docentId.{$application->id}", Docent::first()->id)
+        ->set("mentorId.{$application->id}", Mentor::first()->id)
+        ->set("frameworkId.{$application->id}", CompetencyFramework::first()->id)
         ->call('approve', $application->id);
 
     $application->refresh();
@@ -59,10 +72,10 @@ it('wijst een aanvraag af met feedback', function () {
 });
 
 it('zet een aanvraag op aanpassingen vereist en bewaart feedback', function () {
-    $lid = \App\Models\User::factory()->withRole('stagecommissie')->create();
-    $application = \App\Models\StageApplication::factory()->create(['status' => 'submitted']);
+    $lid = User::factory()->withRole('stagecommissie')->create();
+    $application = StageApplication::factory()->create(['status' => 'submitted']);
 
-    \Livewire\Livewire::actingAs($lid)->test(\App\Livewire\Applications\ReviewQueue::class)
+    Livewire::actingAs($lid)->test(ReviewQueue::class)
         ->set("feedback.{$application->id}", 'Periode aanpassen aub')
         ->call('requestChanges', $application->id);
 
