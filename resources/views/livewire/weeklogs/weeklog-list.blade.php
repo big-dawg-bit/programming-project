@@ -1,17 +1,9 @@
 <div class="mx-auto flex max-w-5xl flex-col gap-6">
-    {{-- Filterpills + nieuwe weeklog --}}
+    {{-- Titel + nieuwe weeklog --}}
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap gap-2">
-            @foreach (array_keys(\App\Livewire\Weeklogs\WeeklogList::FILTERS) as $pill)
-                <button type="button" wire:click="$set('filter', '{{ $pill }}')"
-                    @class([
-                        'rounded-full px-4 py-1.5 text-sm font-medium transition',
-                        'bg-[#E2231A] text-white' => $filter === $pill,
-                        'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-400 dark:border-neutral-800 dark:hover:bg-neutral-800' => $filter !== $pill,
-                    ])>
-                    {{ ucfirst($pill) }}
-                </button>
-            @endforeach
+        <div>
+            <h2 class="text-lg font-semibold">Mijn weeklogs</h2>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">Je docent leest je weeklogs en kan erop reageren.</p>
         </div>
 
         @if ($stage)
@@ -60,40 +52,23 @@
 
     {{-- Lijst --}}
     @if (! $stage)
-        <div class="rounded-xl border border-amber-300 bg-amber-50 p-6 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
-            <p class="font-medium">Geen stage gevonden</p>
-            <p class="mt-1 text-sm">
-                Draai eerst de seeders:
-                <code>php artisan migrate:fresh --seed</code> en daarna
-                <code>php artisan db:seed --class=StageSeeder</code>.
-            </p>
+        <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
+            <flux:heading size="lg">Nog geen actieve stage</flux:heading>
+            <flux:subheading class="mt-1">Zodra je stage is goedgekeurd, kun je hier je weeklogs bijhouden.</flux:subheading>
+            <flux:button href="{{ route('student.stage') }}" wire:navigate variant="primary" class="mt-5">Naar Mijn stage</flux:button>
         </div>
     @elseif ($weeklogs->isEmpty())
         <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
-            <flux:heading size="lg">Geen weeklogs gevonden</flux:heading>
+            <flux:heading size="lg">Nog geen weeklogs</flux:heading>
             <flux:subheading class="mt-1">
-                @if ($filter === 'alle')
-                    Klik op "Nieuwe weeklog" om je eerste week toe te voegen.
-                @else
-                    Geen weeklogs met status "{{ $filter }}".
-                @endif
+                Klik op "Nieuwe weeklog" om je eerste week toe te voegen.
             </flux:subheading>
         </div>
     @else
         <div class="flex flex-col gap-4">
             @foreach ($weeklogs as $weeklog)
                 @php
-                    $badge = match ($weeklog->status) {
-                        'goedgekeurd', 'gevalideerd' => 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
-                        'ingediend' => 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300',
-                        'aanpassing', 'aanpassing_gevraagd' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-                        default => 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300',
-                    };
-                    $label = match ($weeklog->status) {
-                        'draft' => 'concept',
-                        'aanpassing_gevraagd' => 'aanpassing',
-                        default => $weeklog->status,
-                    };
+                    // De docent reageert maar keurt niet goed/af: elke weeklog is simpelweg 'Ingediend'.
                     $periode = collect([$weeklog->period_start, $weeklog->period_end])
                         ->filter()
                         ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->locale('nl')->translatedFormat('j M Y'))
@@ -106,7 +81,7 @@
                             <h3 class="font-semibold">Weeklog week {{ $weeklog->week_number }}</h3>
                             <p class="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">{{ $periode ?: 'Geen periode opgegeven' }}</p>
                         </div>
-                        <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium {{ $badge }}">{{ $label }}</span>
+                        <span class="shrink-0 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 dark:bg-blue-950/50 dark:text-blue-300">Ingediend</span>
                     </div>
 
                     <p class="mt-3 line-clamp-2 text-sm text-neutral-600 dark:text-neutral-300">{{ $weeklog->content }}</p>
