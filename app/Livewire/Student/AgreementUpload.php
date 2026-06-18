@@ -75,6 +75,47 @@ class AgreementUpload extends Component
         session()->flash('success', 'Stageovereenkomst opgeladen. De stagecommissie bevestigt de ondertekening.');
     }
 
+    /**
+     * Sla de op de trackpad getekende handtekening op (base64 PNG-dataURL).
+     */
+    public function signStudent(string $signature): void
+    {
+        $application = $this->application();
+        abort_unless($application !== null, 403);
+
+        validator(['signature' => $signature], [
+            'signature' => 'required|string|starts_with:data:image/png;base64,|max:500000',
+        ])->validate();
+
+        $agreement = StageAgreement::firstOrNew(['application_id' => $application->id]);
+
+        // Na bevestiging door de commissie kan er niet meer (her)tekend worden.
+        if ($agreement->status === 'bevestigd') {
+            return;
+        }
+
+        $agreement->fill([
+            'student_signature' => $signature,
+            'student_signed_at' => now(),
+            'uploaded_by' => Auth::id(),
+            'status' => 'ingediend',
+        ])->save();
+
+        session()->flash('success', 'Je handtekening is opgeslagen. De stagecommissie bevestigt de ondertekening.');
+    }
+
+    /**
+     * Wis een eerder gezette handtekening, zodat de student opnieuw kan tekenen.
+     */
+    public function clearStudentSignature(): void
+    {
+        $agreement = $this->application()?->agreement;
+
+        if ($agreement && $agreement->status !== 'bevestigd') {
+            $agreement->update(['student_signature' => null, 'student_signed_at' => null]);
+        }
+    }
+
     public function render()
     {
         $application = $this->application();
