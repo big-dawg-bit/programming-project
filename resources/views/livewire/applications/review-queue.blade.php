@@ -1,64 +1,78 @@
-<div class="mx-auto max-w-5xl">
-    <div class="mb-6">
-        <flux:heading size="xl">Aanvragen ter beoordeling</flux:heading>
-        <flux:subheading>Beoordeel de openstaande stage-aanvragen.</flux:subheading>
+<div class="mx-auto flex max-w-5xl flex-col gap-6">
+
+    <div>
+        <h1 class="text-2xl font-bold text-neutral-900">Aanvragen ter beoordeling</h1>
+        <p class="mt-1 text-sm text-neutral-500">
+            Beoordeel ingediende stageaanvragen: goedkeuren, afwijzen of aanpassingen vragen.
+        </p>
     </div>
 
-    <x-form.success-message :message="session('status')" class="mb-4" />
+    @forelse ($applications as $application)
+        <div wire:key="app-{{ $application->id }}"
+             class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
 
-    @if ($applications->isEmpty())
-        <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center">
-            <flux:heading size="lg">Geen openstaande aanvragen</flux:heading>
-            <flux:subheading class="mt-1">Er zijn momenteel geen aanvragen ter beoordeling.</flux:subheading>
-        </div>
-    @else
-        <div class="flex flex-col gap-4">
-            @foreach ($applications as $application)
-                <div wire:key="app-{{ $application->id }}"
-                     class="rounded-xl border border-neutral-200 bg-white p-5">
-                    <div class="flex items-start justify-between gap-4">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-semibold">{{ $application->student?->user?->name }}</h3>
-                                <x-status-badge :status="$application->status ?? 'pending'" />
-                            </div>
-                            <p class="mt-1 text-sm text-neutral-500">
-                                {{ $application->company?->name }} · {{ $application->position_title }}
-                            </p>
-                            <p class="mt-0.5 text-xs text-neutral-400">
-                                Ingediend op {{ $application->submitted_at?->format('d-m-Y') ?? '—' }}
-                            </p>
-                        </div>
-
-                        <a href="{{ route('applications.show', $application->id) }}"
-                           class="shrink-0 text-sm font-medium text-[#E2231A] hover:underline">
-                            Bekijk details
-                        </a>
+                {{-- Aanvraag-info --}}
+                <div class="flex items-start gap-4">
+                    <div class="grid size-11 shrink-0 place-items-center rounded-full bg-[#E2231A]/10 text-[#E2231A]">
+                        <flux:icon.user class="size-5" />
                     </div>
-
-                    <div class="mt-4 flex flex-col gap-3 border-t border-neutral-100 pt-4">
-                        <flux:textarea wire:model="feedback.{{ $application->id }}"
-                                       placeholder="Reden van afwijzing of feedback bij aanpassingen" rows="2" />
-                        @error('feedback.'.$application->id)
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-
-                        <div class="flex flex-wrap gap-3">
-                            <flux:button variant="primary" wire:click="approve({{ $application->id }})">
-                                Goedkeuren
-                            </flux:button>
-                            <flux:button variant="ghost" wire:click="reject({{ $application->id }})">
-                                Afwijzen
-                            </flux:button>
-                            <flux:button variant="ghost" wire:click="requestChanges({{ $application->id }})">
-                                Aanpassingen vereist
-                            </flux:button>
+                    <div>
+                        <p class="font-semibold text-neutral-900">
+                            {{ $application->student?->user?->name ?? 'Onbekende student' }}
+                        </p>
+                        <p class="text-sm text-neutral-600">{{ $application->position_title }}</p>
+                        <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500">
+                            <span class="inline-flex items-center gap-1">
+                                <flux:icon.briefcase class="size-4" /> {{ $application->company?->name ?? '—' }}
+                            </span>
+                            <span class="inline-flex items-center gap-1">
+                                <flux:icon.calendar class="size-4" />
+                                Ingediend {{ $application->submitted_at?->format('d/m/Y') ?? '—' }}
+                            </span>
                         </div>
                     </div>
                 </div>
-            @endforeach
-        </div>
 
-        <div class="mt-4">{{ $applications->links() }}</div>
+                {{-- Acties --}}
+                <div class="flex w-full shrink-0 flex-col gap-2 lg:w-72">
+                    <button wire:click="approve({{ $application->id }})"
+                            class="rounded-lg bg-[#E2231A] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#c41e16] focus:ring-2 focus:ring-[#E2231A]/40 focus:outline-none">
+                        Goedkeuren
+                    </button>
+
+                    <textarea wire:model="feedback.{{ $application->id }}" rows="2"
+                              placeholder="Reden / feedback (bij afwijzen of aanpassingen)"
+                              class="w-full resize-none rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
+                    @error('feedback.'.$application->id)
+                        <span class="text-xs text-[#E2231A]">{{ $message }}</span>
+                    @enderror
+
+                    <div class="flex gap-2">
+                        <button wire:click="reject({{ $application->id }})"
+                                class="flex-1 rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50">
+                            Afwijzen
+                        </button>
+                        <button wire:click="requestChanges({{ $application->id }})"
+                                class="flex-1 rounded-lg border border-amber-400 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50">
+                            Aanpassingen
+                        </button>
+                    </div>
+
+                    <a href="{{ route('applications.show', $application->id) }}" wire:navigate
+                       class="mt-1 text-center text-sm font-medium text-[#E2231A] hover:underline">
+                        Bekijk details
+                    </a>
+                </div>
+            </div>
+        </div>
+    @empty
+        <div class="rounded-xl border border-dashed border-neutral-300 bg-white p-10 text-center">
+            <p class="text-sm text-neutral-500">Er zijn geen openstaande aanvragen.</p>
+        </div>
+    @endforelse
+
+    @if ($applications->hasPages())
+        <div>{{ $applications->links() }}</div>
     @endif
 </div>

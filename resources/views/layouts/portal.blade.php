@@ -17,28 +17,43 @@
 
             <nav class="flex-1 space-y-1 px-3 py-4">
                 @php
+                    // Rol-bewuste navigatie: elke rol toont zijn eigen menu.
+                    // Routes die nog niet bestaan vallen via Route::has() netjes
+                    // terug op '#' tot de bijhorende pagina gebouwd is.
                     $user = auth()->user();
 
-                    // Menu per rol. De mentor ziet zijn eigen weeklog-overzicht.
-                    if ($user?->hasRole('mentor')) {
-                        $items = [
-                            ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'dashboard'],
-                            ['label' => 'Studenten',    'icon' => 'users',         'route' => 'mentor.studenten'],
-                            ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'mentor.weeklogs'],
-                            ['label' => 'Evaluaties',   'icon' => 'star',          'route' => null],
-                            ['label' => 'Documenten',   'icon' => 'folder',        'route' => 'mentor.documenten'],
-                            ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
-                        ];
-                    } else {
-                        $items = [
-                            ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'student.dashboard'],
-                            ['label' => 'Mijn stage',   'icon' => 'briefcase',     'route' => 'student.stage'],
-                            ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'weeklogs.index'],
-                            ['label' => 'Evaluaties',   'icon' => 'star',          'route' => 'student.evaluaties'],
-                            ['label' => 'Documenten',   'icon' => 'folder',        'route' => 'student.documenten'],
-                            ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
-                        ];
-                    }
+                    $studentNav = [
+                        ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'student.dashboard'],
+                        ['label' => 'Mijn stage',   'icon' => 'briefcase',     'route' => 'student.stage'],
+                        ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'weeklogs.index'],
+                        ['label' => 'Evaluaties',   'icon' => 'star',          'route' => 'student.evaluaties'],
+                        ['label' => 'Documenten',   'icon' => 'folder',        'route' => 'student.documenten'],
+                        ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
+                    ];
+
+                    $docentNav = [
+                        ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'docent.dashboard'],
+                        ['label' => 'Studenten',    'icon' => 'users',         'route' => 'docent.studenten'],
+                        ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'docent.weeklogs'],
+                        ['label' => 'Evaluaties',   'icon' => 'star',          'route' => 'docent.evaluaties'],
+                        ['label' => 'Rapporten',    'icon' => 'chart-bar',     'route' => 'docent.rapporten'],
+                        ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
+                    ];
+
+                    $mentorNav = [
+                        ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'mentor.dashboard'],
+                        ['label' => 'Studenten',    'icon' => 'users',         'route' => 'mentor.studenten'],
+                        ['label' => 'Weeklogs',     'icon' => 'document-text', 'route' => 'mentor.weeklogs'],
+                        ['label' => 'Evaluaties',   'icon' => 'star',          'route' => 'mentor.evaluaties'],
+                        ['label' => 'Documenten',   'icon' => 'folder',        'route' => 'mentor.documenten'],
+                        ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
+                    ];
+
+                    $items = match (true) {
+                        $user?->hasRole('docent') => $docentNav,
+                        $user?->hasRole('mentor') => $mentorNav,
+                        default => $studentNav,
+                    };
                 @endphp
 
                 @foreach ($items as $item)

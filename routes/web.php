@@ -5,7 +5,14 @@ use App\Livewire\Admin\UserManager;
 use App\Livewire\Applications\ApplyForm;
 use App\Livewire\Applications\ReviewQueue;
 use App\Livewire\Applications\ReviewDetail;
+use App\Livewire\Docent\Dashboard as DocentDashboard;
+use App\Livewire\Docent\Evaluaties as DocentEvaluaties;
+use App\Livewire\Docent\Rapporten as DocentRapporten;
+use App\Livewire\Docent\StudentDetail as DocentStudentDetail;
+use App\Livewire\Docent\Studenten as DocentStudenten;
+use App\Livewire\Docent\Weeklogs as DocentWeeklogs;
 use App\Livewire\Evaluations\EvaluationForm;
+use App\Livewire\Mentor\Dashboard as MentorDashboard;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Student\DocumentList;
 use App\Livewire\Student\EvaluationList;
@@ -23,6 +30,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return match (true) {
             $user->hasRole('student') => redirect()->route('student.dashboard'),
             $user->hasRole('stagecommissie') => redirect()->route('applications.review'),
+            $user->hasRole('docent') => redirect()->route('docent.dashboard'),
+            $user->hasRole('mentor') => redirect()->route('mentor.dashboard'),
             $user->hasRole('admin') => redirect()->route('admin.users'),
             default => view('dashboard'),
         };
@@ -39,12 +48,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware('role:docent')->group(function () {
+        Route::get('docent', DocentDashboard::class)->name('docent.dashboard');
+        Route::get('docent/studenten', DocentStudenten::class)->name('docent.studenten');
+        Route::get('docent/studenten/{naam}', DocentStudentDetail::class)->name('docent.student.show');
+        Route::get('docent/weeklogs', DocentWeeklogs::class)->name('docent.weeklogs');
+        Route::get('docent/evaluaties', DocentEvaluaties::class)->name('docent.evaluaties');
+        Route::get('docent/rapporten', DocentRapporten::class)->name('docent.rapporten');
         Route::get('stages/{stage}/evaluatie', EvaluationForm::class)->name('evaluations.create');
     });
     Route::middleware('role:mentor')->group(function () {
         Route::get('mentor/studenten', \App\Livewire\Mentor\StudentList::class)->name('mentor.studenten');
         Route::get('mentor/weeklogs', \App\Livewire\Weeklogs\MentorWeeklogList::class)->name('mentor.weeklogs');
         Route::get('mentor/documenten', \App\Livewire\Mentor\DocumentList::class)->name('mentor.documenten');
+    });
+
+    Route::middleware('role:mentor')->group(function () {
+        Route::get('mentor', MentorDashboard::class)->name('mentor.dashboard');
     });
 
     Route::middleware('role:student')->group(function () {
