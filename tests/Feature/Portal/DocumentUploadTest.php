@@ -17,7 +17,7 @@ it('uploadt een document naar de gekozen categorie', function () {
         ->test(DocumentList::class)
         ->call('openUpload')
         ->set('upload', UploadedFile::fake()->create('verslag.pdf', 120, 'application/pdf'))
-        ->set('uploadCategorie', 'Overeenkomst')
+        ->set('uploadCategorie', 'Stageovereenkomst')
         ->set('beschrijving', 'Ondertekende overeenkomst')
         ->call('save')
         ->assertHasNoErrors()
@@ -26,7 +26,7 @@ it('uploadt een document naar de gekozen categorie', function () {
     $file = File::first();
     expect($file)->not->toBeNull()
         ->and($file->original_name)->toBe('verslag.pdf')
-        ->and($file->category)->toBe('Overeenkomst')
+        ->and($file->category)->toBe('Stageovereenkomst')
         ->and($file->description)->toBe('Ondertekende overeenkomst')
         ->and($file->uploaded_by)->toBe($user->id);
 
