@@ -65,13 +65,16 @@ class MentorWeeklogList extends Component
     /**
      * Keur een weeklog goed.
      */
-    public function approve(int $weeklogId): void
+        public function approve(int $weeklogId): void
     {
         $weeklog = Weeklog::findOrFail($weeklogId);
         $weeklog->update(['status' => 'goedgekeurd']);
 
+        $this->openWeeklogId = null;
+
         session()->flash('weeklog-saved', 'Weeklog goedgekeurd.');
     }
+
 
     /**
      * Vraag aanpassingen aan de student.
@@ -80,6 +83,8 @@ class MentorWeeklogList extends Component
     {
         $weeklog = Weeklog::findOrFail($weeklogId);
         $weeklog->update(['status' => 'aanpassing_gevraagd']);
+
+        $this->openWeeklogId = null;
 
         session()->flash('weeklog-saved', 'Aanpassing gevraagd aan de student.');
     }
