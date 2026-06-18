@@ -13,6 +13,7 @@ class StageAgreement extends Model
     {
         return [
             'uploaded_at' => 'datetime',
+            'mentor_approved_at' => 'datetime',
             'student_signed_at' => 'datetime',
             'docent_signed_at' => 'datetime',
         ];
