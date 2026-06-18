@@ -2,9 +2,6 @@
 
 namespace App\Livewire\Applications;
 
-use App\Models\CompetencyFramework;
-use App\Models\Docent;
-use App\Models\Mentor;
 use App\Models\StageApplication;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -47,9 +44,6 @@ class ReviewQueue extends Component
             'company_id' => $application->company_id,
             'start_date' => $application->start_date,
             'end_date' => $application->end_date,
-            'docent_id' => Docent::first()?->id,
-            'mentor_id' => Mentor::first()?->id,
-            'framework_id' => CompetencyFramework::first()?->id,
         ]);
     }
 
@@ -60,7 +54,6 @@ class ReviewQueue extends Component
         // feedback is verplicht bij "aanpassingen vereist"
         if ($feedback === '') {
             $this->addError("feedback.{$id}", 'Geef feedback mee voor de student.');
-
             return;
         }
 
