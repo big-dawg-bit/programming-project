@@ -12,11 +12,13 @@ class StageOverview extends Component
 {
     public function render()
     {
-        $stage = auth()->user()->student
-            ?->stages()
-            ->with('company')
-            ->latest()
-            ->first();
+        // Scoping: de (laatste) stage van de ingelogde student. Student A ziet nooit die van B.
+        $student = auth()->user()?->student;
+
+        $stage = $student
+            ? $student->stages()->with('company')->latest()->first()
+            : null;
+
         return view('livewire.student.stage', [
             'stage' => $stage,
         ]);

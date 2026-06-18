@@ -6,7 +6,9 @@ use App\Models\Evaluation;
 use App\Models\EvaluationScore;
 use App\Models\Stage;
 use Livewire\Component;
+use Livewire\Attributes\Layout;
 
+#[Layout('layouts.portal')]
 class EvaluationForm extends Component
 {
     public Stage $stage;
@@ -16,6 +18,15 @@ class EvaluationForm extends Component
     public function mount(Stage $stage): void
     {
         $this->stage = $stage;
+
+        // Scoping: enkel de TOEGEWEZEN docent of mentor van deze stage mag evalueren.
+        // Een docent/mentor van een andere student wordt geweigerd.
+        $user = auth()->user();
+        abort_unless(
+            ($user->hasRole('docent') && $stage->docent_id === $user->docent?->id)
+            || ($user->hasRole('mentor') && $stage->mentor_id === $user->mentor?->id),
+            403
+        );
 
         foreach ($this->competencies() as $competency) {
             $this->scores[$competency->id] = null;
