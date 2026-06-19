@@ -3,7 +3,7 @@
         <flux:heading size="xl">Evaluatie</flux:heading>
         <flux:subheading>
             {{ $type === 'final' ? 'Eindevaluatie' : 'Tussentijdse evaluatie' }} —
-            vul een score in voor elke competentie.
+            vul een score en feedback in voor elke competentie.
         </flux:subheading>
     </div>
 
@@ -33,6 +33,18 @@
                 @error("scores.{$competency->id}")
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
+
+                {{-- Feedback per competentie (docent/mentor) --}}
+                <div class="mt-4">
+                    <label class="mb-1 block text-sm font-medium">Feedback</label>
+                    <flux:textarea
+                        wire:model="feedback.{{ $competency->id }}"
+                        rows="2"
+                        placeholder="Bv. sterke punten, aandachtspunten…" />
+                    @error("feedback.{$competency->id}")
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
         @endforeach
     </div>
