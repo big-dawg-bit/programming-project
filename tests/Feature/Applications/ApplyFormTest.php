@@ -19,7 +19,8 @@ it('laat een student een aanvraag indienen', function () {
         ->set('start_date', '2026-09-01')
         ->set('end_date', '2026-12-20')
         ->call('submit')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertRedirect(route('student.stage'));
 
     expect(StageApplication::where('status', 'submitted')->count())->toBe(1);
 });
@@ -77,7 +78,8 @@ it('zet de status terug op ingediend na opnieuw indienen', function () {
     Livewire::actingAs($user)->test(ApplyForm::class, ['application' => $application])
         ->set('position_title', 'Aangepaste titel')
         ->call('submit')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertRedirect(route('student.stage'));
 
     $application->refresh();
 

@@ -91,7 +91,7 @@ class ApplyForm extends Component
         ]);
     }
 
-    public function submit(): void
+    public function submit()
     {
         $data = $this->validate([
             'company_id' => ['required', 'exists:companies,id'],
@@ -110,10 +110,10 @@ class ApplyForm extends Component
                 'submitted_at' => now(),
             ]);
 
-            session()->flash('status', 'Aanvraag opnieuw ingediend.');
-            $this->redirectRoute('student.dashboard', navigate: true);
+            // Terug naar "Mijn stages" met een bevestigingsmelding.
+            session()->flash('stage-melding', 'Je stageaanvraag is opnieuw ingediend.');
 
-            return;
+            return $this->redirectRoute('student.stage', navigate: true);
         }
 
         // --- Nieuwe aanvraag ---
@@ -123,8 +123,10 @@ class ApplyForm extends Component
             'submitted_at' => now(),
         ]);
 
-        session()->flash('status', 'Aanvraag ingediend.');
-        $this->reset();
+        // Terug naar "Mijn stages" met een bevestigingsmelding.
+        session()->flash('stage-melding', 'Je stageaanvraag is ingediend.');
+
+        return $this->redirectRoute('student.stage', navigate: true);
     }
 
     public function render()
