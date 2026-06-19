@@ -18,7 +18,7 @@ class ReviewQueue extends Component
     public array $feedback = [];
 
     // Per-rij toewijzing bij goedkeuring (key = application id).
-    public array $docentId = [];
+
     public array $mentorId = [];
     public array $frameworkId = [];
 
@@ -40,16 +40,11 @@ class ReviewQueue extends Component
     {
         $application = StageApplication::findOrFail($id);
 
-        $docentId = $this->docentId[$id] ?? null;
         $mentorId = $this->mentorId[$id] ?? null;
         $frameworkId = $this->frameworkId[$id] ?? null;
 
         // Alle drie zijn verplicht: de stage moet meteen evalueerbaar zijn.
         $missing = false;
-        if (! $docentId) {
-            $this->addError("docentId.{$id}", 'Kies een docent.');
-            $missing = true;
-        }
         if (! $mentorId) {
             $this->addError("mentorId.{$id}", 'Kies een mentor.');
             $missing = true;
@@ -76,14 +71,13 @@ class ReviewQueue extends Component
         $application->stage()->firstOrCreate([], [
             'student_id' => $application->student_id,
             'company_id' => $application->company_id,
-            'docent_id' => (int) $docentId,
             'mentor_id' => (int) $mentorId,
             'framework_id' => (int) $frameworkId,
             'start_date' => $application->start_date,
             'end_date' => $application->end_date,
         ]);
 
-        unset($this->docentId[$id], $this->mentorId[$id], $this->frameworkId[$id]);
+        unset($this->mentorId[$id], $this->frameworkId[$id]);
     }
 
     public function requestChanges(int $id): void
