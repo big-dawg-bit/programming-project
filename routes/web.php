@@ -82,6 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('applications/{application}/edit', EditApplication::class)->name('applications.edit');
         Route::get('student', StudentDashboard::class)->name('student.dashboard');
         Route::get('mijn-stage', StageOverview::class)->name('student.stage');
+        Route::get('mijn-stage/{application}', \App\Livewire\Student\StageApplicationDetail::class)->name('student.stage.show');
         Route::get('overeenkomst', \App\Livewire\Student\AgreementUpload::class)->name('student.agreement');
         Route::get('weeklogs', WeeklogList::class)->name('weeklogs.index');
         Route::get('evaluaties', EvaluationList::class)->name('student.evaluaties');
