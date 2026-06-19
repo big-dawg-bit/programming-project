@@ -63,6 +63,9 @@ class UserManager extends Component
         $this->reset('name', 'email', 'companyId');
         $this->selectedRole = 'student';
 
+        // Spring naar pagina 1 zodat de net aangemaakte gebruiker (nieuwste eerst) zichtbaar is.
+        $this->resetPage();
+
         session()->flash('success', 'Gebruiker aangemaakt.');
     }
 
@@ -95,7 +98,7 @@ class UserManager extends Component
     public function render()
     {
         return view('livewire.admin.user-manager', [
-            'users' => User::with('role')->orderBy('name')->paginate(15),
+            'users' => User::with('role')->latest('id')->paginate(15),
             'roles' => Role::orderBy('name')->get(),
             'companies' => Company::orderBy('name')->get(),
         ]);
