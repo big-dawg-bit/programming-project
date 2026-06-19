@@ -170,4 +170,19 @@
             </div>
         </div>
     @endif
+
+    {{-- Aanvraag annuleren (enkel zolang ze nog niet is goedgekeurd) --}}
+    @if ($this->kanAnnuleren)
+        <div class="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white px-5 py-4 dark:border-neutral-800 dark:bg-neutral-900">
+            <div>
+                <p class="text-sm font-medium">Aanvraag annuleren</p>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Je trekt deze stageaanvraag in. Dit kan niet ongedaan gemaakt worden.</p>
+            </div>
+            <flux:button variant="danger" icon="trash"
+                wire:click="annuleer"
+                wire:confirm="Weet je zeker dat je deze stageaanvraag wil annuleren?">
+                Annuleren
+            </flux:button>
+        </div>
+    @endif
 </div>
