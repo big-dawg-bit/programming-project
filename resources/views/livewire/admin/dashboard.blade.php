@@ -38,7 +38,6 @@
 
             {{-- Snelkoppelingen --}}
             <div class="mt-4 flex flex-wrap gap-2">
-                <flux:button href="{{ route('admin.users') }}" wire:navigate size="sm" variant="primary" icon="users">Gebruikers beheren</flux:button>
                 <flux:button href="{{ route('admin.framework') }}" wire:navigate size="sm" variant="ghost" icon="star">Evaluatiekader</flux:button>
                 <flux:button href="{{ route('admin.audit') }}" wire:navigate size="sm" variant="ghost" icon="document-text">Logboek</flux:button>
             </div>

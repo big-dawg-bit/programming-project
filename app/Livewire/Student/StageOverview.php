@@ -2,32 +2,29 @@
 
 namespace App\Livewire\Student;
 
-use App\Models\StageApplication;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.portal')]
-#[Title('Mijn stage')]
+#[Title('Mijn stages')]
 class StageOverview extends Component
 {
     public function render()
     {
         $student = auth()->user()?->student;
 
-        // De (laatste) stageaanvraag van de ingelogde student. Alles op dit
-        // scherm wordt hieruit afgeleid: de status, de overeenkomst en de stage.
-        $application = $student
+        // Alle stageaanvragen van de ingelogde student. Per aanvraag klikt de
+        // student door naar het detail (status, overeenkomst, checklist).
+        $applications = $student
             ? $student->applications()
-                ->with(['company', 'agreement', 'reviews', 'stage.company'])
+                ->with(['company', 'agreement', 'stage'])
                 ->latest()
-                ->first()
-            : null;
+                ->get()
+            : collect();
 
         return view('livewire.student.stage', [
-            'application' => $application,
-            'stage' => $application?->stage,
-            'laatsteReview' => $application?->reviews->sortByDesc('reviewed_at')->first(),
+            'applications' => $applications,
         ]);
     }
 }
