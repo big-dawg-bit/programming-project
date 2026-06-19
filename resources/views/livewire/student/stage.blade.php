@@ -7,6 +7,12 @@
         </flux:button>
     </div>
 
+    @if (session('stage-melding'))
+        <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900/50 dark:bg-green-950/40 dark:text-green-300">
+            {{ session('stage-melding') }}
+        </div>
+    @endif
+
     @forelse ($applications as $application)
         @php
             $statusPill = match ($application->status) {
