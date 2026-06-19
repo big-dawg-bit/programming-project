@@ -31,8 +31,11 @@ class ReviewQueue extends Component
                 ->paginate(15),
             'docenten' => Docent::with('user')->get(),
             'frameworks' => CompetencyFramework::where('is_active', true)->orderBy('name')->get(),
-            // Gegroepeerd per bedrijf zodat we enkel mentors van het juiste bedrijf tonen.
-            'mentorsByCompany' => Mentor::with('user')->get()->groupBy('company_id'),
+            // Alle mentors zijn toewijsbaar (met hun bedrijf in het label), zodat de
+            // commissie ook een mentor kan kiezen voor een bedrijf zonder eigen mentor.
+            'mentors' => Mentor::with(['user', 'company'])->get()
+                ->sortBy(fn ($m) => $m->user?->name)
+                ->values(),
         ]);
     }
 

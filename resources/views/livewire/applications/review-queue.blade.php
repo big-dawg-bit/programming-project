@@ -8,7 +8,6 @@
     </div>
 
     @forelse ($applications as $application)
-        @php $mentors = $mentorsByCompany[$application->company_id] ?? collect(); @endphp
         <div wire:key="app-{{ $application->id }}"
              class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -54,9 +53,11 @@
                             class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
                         <option value="">— Kies mentor —</option>
                         @forelse ($mentors as $mentor)
-                            <option value="{{ $mentor->id }}">{{ $mentor->user?->name ?? 'Mentor #'.$mentor->id }}</option>
+                            <option value="{{ $mentor->id }}">
+                                {{ $mentor->user?->name ?? 'Mentor #'.$mentor->id }}@if ($mentor->company) — {{ $mentor->company->name }}@endif
+                            </option>
                         @empty
-                            <option value="" disabled>Geen mentor voor dit bedrijf</option>
+                            <option value="" disabled>Nog geen mentors beschikbaar</option>
                         @endforelse
                     </select>
                     @error('mentorId.'.$application->id)

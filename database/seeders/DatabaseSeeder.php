@@ -78,6 +78,22 @@ class DatabaseSeeder extends Seeder
             'phone' => '+32 470 00 00 00',
         ]);
 
+        // --- Extra mentor (bedrijf) — handig om de mentor-/ondertekenflow te testen ---
+        $mentorBedrijfUser = User::create([
+            'name' => 'Mentor Bedrijf',
+            'first_name' => 'Mentor',
+            'last_name' => 'Bedrijf',
+            'email' => 'mentor-bedrijf@bedrijf.be',
+            'password' => Hash::make('password'),
+            'role_id' => $roles['mentor']->id,
+        ]);
+        Mentor::create([
+            'user_id' => $mentorBedrijfUser->id,
+            'company_id' => $easi->id,
+            'job_title' => 'Stagementor',
+            'phone' => '+32 470 11 11 11',
+        ]);
+
         // --- Stagecommissie user ---
         $commissieUser = User::create([
             'name' => 'Stagecommissie',
