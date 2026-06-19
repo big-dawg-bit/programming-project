@@ -10,18 +10,18 @@ use Livewire\Component;
 #[Title('Evaluaties')]
 class Evaluaties extends Component
 {
-    // Actieve tab (te doen | verlopen | afgerond).
-    public string $tab = 'te doen';
-
     public function render()
     {
-        // Stage van de docent waarvoor het evaluatie-formulier geopend kan worden.
-        // (Visueel-eerst: de voorbeeldrijen linken naar deze echte stage; met
-        // gekoppelde data zou elke rij naar zijn eigen stage verwijzen.)
-        $evaluatieStage = auth()->user()?->docent?->stages()->first();
+        $docent = auth()->user()?->docent;
+
+        $stages = $docent
+            ? $docent->stages()
+                ->with(['student.user', 'company', 'evaluations'])
+                ->get()
+            : collect();
 
         return view('livewire.docent.evaluaties', [
-            'evaluatieStage' => $evaluatieStage,
+            'stages' => $stages,
         ]);
     }
 }
