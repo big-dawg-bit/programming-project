@@ -66,6 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('mentor/evaluaties', \App\Livewire\Mentor\EvaluationList::class)->name('mentor.evaluaties');
         Route::get('mentor/evaluaties/{stage}/invullen/{type}', \App\Livewire\Mentor\EvaluationForm::class)->name('mentor.evaluatie.invullen');
         Route::get('mentor/evaluaties/bekijken/{evaluation}', \App\Livewire\Mentor\EvaluationDetail::class)->name('mentor.evaluatie.bekijken');
+        Route::get('mentor/studenten/{stage}', \App\Livewire\Mentor\StudentDetail::class)->name('mentor.student.detail');
     });
 
     Route::middleware('role:mentor')->group(function () {
