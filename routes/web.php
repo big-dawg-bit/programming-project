@@ -42,7 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
         Route::get('/admin/users', UserManager::class)->name('admin.users');
         Route::get('/admin/framework', FrameworkManager::class)->name('admin.framework');
-        Route::get('/admin/logboek', \App\Livewire\Admin\AuditLogViewer::class)->name('admin.audit');
+        Route::get('/admin/toewijzingen', \App\Livewire\Admin\StudentAssignment::class)->name('admin.assignments');
     });
 
     Route::middleware('role:stagecommissie')->group(function () {
