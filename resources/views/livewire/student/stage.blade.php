@@ -1,15 +1,20 @@
 <div class="mx-auto flex max-w-5xl flex-col gap-6">
+    {{-- Kop met aanvraag-knop (altijd bereikbaar) --}}
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-xl font-semibold">Mijn stage</h2>
+        <flux:button href="{{ route('applications.create') }}" wire:navigate variant="primary" icon="plus">
+            Stage aanvragen
+        </flux:button>
+    </div>
+
     @if (! $application)
         {{-- Geen aanvraag: hier vraagt de student zijn stage aan --}}
         <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
             <flux:icon name="briefcase" class="mx-auto size-10 text-neutral-300 dark:text-neutral-600" />
             <flux:heading size="lg" class="mt-3">Nog geen stage aangevraagd</flux:heading>
             <flux:subheading class="mt-1">
-                Dien je stageaanvraag in: kies een bedrijf, periode en je voorgestelde mentor.
+                Dien je stageaanvraag in via de knop hierboven: kies een bedrijf, periode en je voorgestelde mentor.
             </flux:subheading>
-            <flux:button href="{{ route('applications.create') }}" wire:navigate variant="primary" icon="plus" class="mt-5">
-                Stage aanvragen
-            </flux:button>
         </div>
     @else
         @php
