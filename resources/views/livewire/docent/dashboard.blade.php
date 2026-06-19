@@ -70,9 +70,6 @@
                     @elseif ($overeenkomstChip)
                         <span class="rounded-full px-3 py-1 text-xs font-medium {{ $overeenkomstChip[1] }}">{{ $overeenkomstChip[0] }}</span>
                     @endif
-                    <flux:button href="{{ route('evaluations.create', $stage) }}" size="sm" variant="primary" wire:navigate>
-                        Evalueren
-                    </flux:button>
                 </div>
             </div>
         @empty
