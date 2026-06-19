@@ -19,6 +19,22 @@
         </div>
     @endif
 
+    {{-- Statusfilter --}}
+    @if ($stage)
+        <div class="flex flex-wrap gap-2">
+            @foreach (array_keys(\App\Livewire\Weeklogs\WeeklogList::FILTERS) as $pill)
+                <button type="button" wire:click="$set('filter', '{{ $pill }}')"
+                    @class([
+                        'rounded-full px-4 py-1.5 text-sm font-medium transition',
+                        'bg-[#E2231A] text-white' => $filter === $pill,
+                        'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-400 dark:border-neutral-800 dark:hover:bg-neutral-800' => $filter !== $pill,
+                    ])>
+                    {{ ucfirst($pill) }}
+                </button>
+            @endforeach
+        </div>
+    @endif
+
     {{-- Invulformulier --}}
     @if ($stage && $showForm)
         <form wire:submit="save" class="space-y-4 rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
@@ -59,20 +75,24 @@
         </div>
     @elseif ($weeklogs->isEmpty())
         <div class="rounded-xl border border-neutral-200 bg-white p-10 text-center dark:border-neutral-800 dark:bg-neutral-900">
-            <flux:heading size="lg">Nog geen weeklogs</flux:heading>
+            <flux:heading size="lg">Geen weeklogs gevonden</flux:heading>
             <flux:subheading class="mt-1">
-                Klik op "Nieuwe weeklog" om je eerste week toe te voegen.
+                @if ($filter === 'alle')
+                    Klik op "Nieuwe weeklog" om je eerste week toe te voegen.
+                @else
+                    Geen weeklogs met status "{{ $filter }}".
+                @endif
             </flux:subheading>
         </div>
     @else
         <div class="flex flex-col gap-4">
             @foreach ($weeklogs as $weeklog)
                 @php
-                    // De docent reageert maar keurt niet goed/af: elke weeklog is simpelweg 'Ingediend'.
                     $periode = collect([$weeklog->period_start, $weeklog->period_end])
                         ->filter()
                         ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->locale('nl')->translatedFormat('j M Y'))
                         ->implode(' – ');
+                    $isGoedgekeurd = in_array($weeklog->status, ['goedgekeurd', 'gevalideerd'], true);
                 @endphp
 
                 <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
@@ -81,7 +101,9 @@
                             <h3 class="font-semibold">Weeklog week {{ $weeklog->week_number }}</h3>
                             <p class="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">{{ $periode ?: 'Geen periode opgegeven' }}</p>
                         </div>
-                        <span class="shrink-0 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 dark:bg-blue-950/50 dark:text-blue-300">Ingediend</span>
+                        <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium {{ $isGoedgekeurd ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300' }}">
+                            {{ $isGoedgekeurd ? 'Goedgekeurd' : 'Ingediend' }}
+                        </span>
                     </div>
 
                     <p class="mt-3 line-clamp-2 text-sm text-neutral-600 dark:text-neutral-300">{{ $weeklog->content }}</p>
