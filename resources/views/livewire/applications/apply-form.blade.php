@@ -60,9 +60,10 @@
 
                 <div class="grid gap-3 sm:grid-cols-2">
                     <div>
-                        <label class="mb-1 block text-sm">Btw-nummer</label>
-                        <input type="text" wire:model="new_company_vat"
+                        <label class="mb-1 block text-sm">Btw-nummer <span class="text-[#E2231A]">*</span></label>
+                        <input type="text" wire:model="new_company_vat" placeholder="BE0123456789"
                                class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:outline-none">
+                        <p class="mt-1 text-xs text-neutral-400">Begint met BE, gevolgd door 10 cijfers.</p>
                         @error('new_company_vat') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div>

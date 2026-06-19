@@ -59,17 +59,24 @@ class ApplyForm extends Component
     /** Maakt een nieuw bedrijf aan en koppelt het meteen aan de aanvraag-in-opbouw. */
     public function addCompany(): void
     {
+        // Btw normaliseren: spaties/punten/streepjes weg en hoofdletters, zodat
+        // "be 0123.456.789" ook als "BE0123456789" wordt gevalideerd.
+        $this->new_company_vat = strtoupper(str_replace([' ', '.', '-'], '', $this->new_company_vat));
+
         $data = $this->validate([
             'new_company_name' => ['required', 'string', 'max:255'],
             'new_company_address' => ['nullable', 'string', 'max:255'],
-            'new_company_vat' => ['nullable', 'string', 'max:255'],
+            'new_company_vat' => ['required', 'regex:/^BE[0-9]{10}$/'],
             'new_company_email' => ['nullable', 'email', 'max:255'],
+        ], [
+            'new_company_vat.required' => 'Vul het btw-nummer in.',
+            'new_company_vat.regex' => 'Het btw-nummer moet beginnen met BE, gevolgd door 10 cijfers (bv. BE0123456789).',
         ]);
 
         $company = Company::create([
             'name' => $data['new_company_name'],
             'address' => $data['new_company_address'] ?: null,
-            'vat_number' => $data['new_company_vat'] ?: null,
+            'vat_number' => $data['new_company_vat'],
             'contact_email' => $data['new_company_email'] ?: null,
         ]);
 
@@ -84,7 +91,7 @@ class ApplyForm extends Component
         ]);
     }
 
-    public function submit(): void
+    public function submit()
     {
         $data = $this->validate([
             'company_id' => ['required', 'exists:companies,id'],
@@ -103,10 +110,10 @@ class ApplyForm extends Component
                 'submitted_at' => now(),
             ]);
 
-            session()->flash('status', 'Aanvraag opnieuw ingediend.');
-            $this->redirectRoute('student.dashboard', navigate: true);
+            // Terug naar "Mijn stages" met een bevestigingsmelding.
+            session()->flash('stage-melding', 'Je stageaanvraag is opnieuw ingediend.');
 
-            return;
+            return $this->redirectRoute('student.stage', navigate: true);
         }
 
         // --- Nieuwe aanvraag ---
@@ -116,8 +123,10 @@ class ApplyForm extends Component
             'submitted_at' => now(),
         ]);
 
-        session()->flash('status', 'Aanvraag ingediend.');
-        $this->reset();
+        // Terug naar "Mijn stages" met een bevestigingsmelding.
+        session()->flash('stage-melding', 'Je stageaanvraag is ingediend.');
+
+        return $this->redirectRoute('student.stage', navigate: true);
     }
 
     public function render()
