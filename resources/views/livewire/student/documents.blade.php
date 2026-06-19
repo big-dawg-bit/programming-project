@@ -90,8 +90,10 @@
                 </div>
 
                 <form wire:submit="save" class="flex flex-col gap-4">
-                    {{-- Sleepzone / bestandskeuze --}}
-                    <label
+                    {{-- Sleepzone / bestandskeuze. De input is sr-only (niet display:none)
+                         met een expliciete for/id-koppeling, zodat de bestandskiezer in
+                         élke browser (ook Safari) opent — zonder JS. --}}
+                    <label for="document-upload"
                         class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-neutral-300 px-6 py-10 text-center transition hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-600"
                         x-data="{ dragging: false }"
                         x-on:dragover.prevent="dragging = true"
@@ -107,7 +109,7 @@
                             <span class="text-sm text-neutral-600 dark:text-neutral-300">Sleep bestand hier of klik om te bladeren</span>
                             <span class="text-xs text-neutral-400 dark:text-neutral-500">PDF, DOCX of foto (JPG, PNG), max 10MB</span>
                         @endif
-                        <input type="file" class="hidden" x-ref="bestand" wire:model="upload" accept=".pdf,.docx,.jpg,.jpeg,.png,.webp" />
+                        <input type="file" id="document-upload" class="sr-only" x-ref="bestand" wire:model="upload" accept=".pdf,.docx,.jpg,.jpeg,.png,.webp" />
                     </label>
                     <div wire:loading wire:target="upload" class="text-sm text-neutral-500 dark:text-neutral-400">Bestand wordt klaargezet…</div>
                     @error('upload') <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
