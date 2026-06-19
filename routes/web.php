@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             $user->hasRole('stagecommissie') => redirect()->route('applications.review'),
             $user->hasRole('docent') => redirect()->route('docent.dashboard'),
             $user->hasRole('mentor') => redirect()->route('mentor.dashboard'),
+            $user->hasRole('bedrijf') => redirect()->route('bedrijf.dashboard'),
             $user->hasRole('admin') => redirect()->route('admin.dashboard'),
             default => view('dashboard'),
         };
@@ -71,6 +72,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('role:mentor')->group(function () {
         Route::get('mentor', MentorDashboard::class)->name('mentor.dashboard');
+    });
+
+    Route::middleware('role:bedrijf')->group(function () {
+        Route::get('bedrijf', \App\Livewire\Bedrijf\Dashboard::class)->name('bedrijf.dashboard');
     });
 
     // Gedeeld: docent én mentor evalueren via hetzelfde formulier (scoping zit in EvaluationForm::mount()).

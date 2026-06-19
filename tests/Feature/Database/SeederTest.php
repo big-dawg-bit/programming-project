@@ -13,11 +13,11 @@ use Database\Seeders\StageSeeder;
  | Plaats in: tests/Feature/Database/SeederTest.php
  */
 
-it('seedt de vijf rollen', function () {
+it('seedt de zes rollen', function () {
     $this->seed();
 
     expect(Role::pluck('name')->sort()->values()->all())
-        ->toBe(['admin', 'docent', 'mentor', 'stagecommissie', 'student']);
+        ->toBe(['admin', 'bedrijf', 'docent', 'mentor', 'stagecommissie', 'student']);
 });
 
 it('seedt een student met subtype', function () {
