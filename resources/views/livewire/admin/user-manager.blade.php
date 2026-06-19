@@ -39,6 +39,15 @@
                 @error('selectedRole') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
             </div>
 
+            <div>
+                <label class="mb-1 block text-sm font-medium text-neutral-700">
+                    Wachtwoord <span class="font-normal text-neutral-400">(leeg = automatisch genereren)</span>
+                </label>
+                <input type="text" wire:model="password" placeholder="Min. 8 tekens, of laat leeg"
+                       class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                @error('password') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+            </div>
+
             {{-- Bedrijf enkel relevant voor een mentor --}}
             @if ($selectedRole === 'mentor')
                 <div>
@@ -67,40 +76,40 @@
     <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
         <table class="w-full text-sm">
             <thead class="bg-neutral-50 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
-                <tr>
-                    <th class="px-4 py-3">Naam</th>
-                    <th class="px-4 py-3">E-mail</th>
-                    <th class="px-4 py-3 w-44">Rol</th>
-                    <th class="px-4 py-3 w-32">Status</th>
-                </tr>
+            <tr>
+                <th class="px-4 py-3">Naam</th>
+                <th class="px-4 py-3">E-mail</th>
+                <th class="px-4 py-3 w-44">Rol</th>
+                <th class="px-4 py-3 w-32">Status</th>
+            </tr>
             </thead>
             <tbody class="divide-y divide-neutral-100">
-                @foreach ($users as $user)
-                    <tr wire:key="user-{{ $user->id }}">
-                        <td class="px-4 py-3 font-medium text-neutral-900">{{ $user->name }}</td>
-                        <td class="px-4 py-3 text-neutral-600">{{ $user->email }}</td>
-                        <td class="px-4 py-3">
-                            <select wire:change="changeRole({{ $user->id }}, $event.target.value)"
-                                    class="w-full rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
-                                @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}" @selected($user->role_id === $role->id)>
-                                        {{ ucfirst($role->name) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td class="px-4 py-3">
-                            <button wire:click="toggleActive({{ $user->id }})"
-                                    @class([
-                                        'rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset transition',
-                                        'bg-green-50 text-green-700 ring-green-200 hover:bg-green-100' => $user->is_active,
-                                        'bg-neutral-100 text-neutral-500 ring-neutral-200 hover:bg-neutral-200' => ! $user->is_active,
-                                    ])>
-                                {{ $user->is_active ? 'Actief' : 'Inactief' }}
-                            </button>
-                        </td>
-                    </tr>
-                @endforeach
+            @foreach ($users as $user)
+                <tr wire:key="user-{{ $user->id }}">
+                    <td class="px-4 py-3 font-medium text-neutral-900">{{ $user->name }}</td>
+                    <td class="px-4 py-3 text-neutral-600">{{ $user->email }}</td>
+                    <td class="px-4 py-3">
+                        <select wire:change="changeRole({{ $user->id }}, $event.target.value)"
+                                class="w-full rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                            @foreach ($roles as $role)
+                                <option value="{{ $role->id }}" @selected($user->role_id === $role->id)>
+                                    {{ ucfirst($role->name) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="px-4 py-3">
+                        <button wire:click="toggleActive({{ $user->id }})"
+                            @class([
+                                'rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset transition',
+                                'bg-green-50 text-green-700 ring-green-200 hover:bg-green-100' => $user->is_active,
+                                'bg-neutral-100 text-neutral-500 ring-neutral-200 hover:bg-neutral-200' => ! $user->is_active,
+                            ])>
+                            {{ $user->is_active ? 'Actief' : 'Inactief' }}
+                        </button>
+                    </td>
+                </tr>
+            @endforeach
             </tbody>
         </table>
     </div>

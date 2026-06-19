@@ -42,7 +42,6 @@ it('keurt een aanvraag goed en maakt een stage aan', function () {
     ]);
 
     Livewire::actingAs($lid)->test(ReviewQueue::class)
-        ->set("docentId.{$application->id}", Docent::first()->id)
         ->set("mentorId.{$application->id}", Mentor::first()->id)
         ->set("frameworkId.{$application->id}", CompetencyFramework::first()->id)
         ->call('approve', $application->id);

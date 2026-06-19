@@ -21,6 +21,12 @@ class EvaluationList extends Component
         return $this->tab === 'eind' ? 'final' : 'mid-term';
     }
 
+    /** De meest recente stage van de ingelogde student. */
+    protected function stage()
+    {
+        return auth()->user()->student?->stages()->latest('id')->first();
+    }
+
     public function evaluations(): Collection
     {
         $student = auth()->user()->student;
@@ -29,8 +35,7 @@ class EvaluationList extends Component
             return collect();
         }
 
-        // Scoping: enkel evaluaties van de eigen stages, en enkel ingediende
-        // (drafts van mentor/docent blijven verborgen voor de student).
+        // Scoping: enkel evaluaties van de eigen stages, en enkel ingediende.
         return Evaluation::query()
             ->whereIn('stage_id', $student->stages()->pluck('id'))
             ->where('type', $this->typeForTab())
@@ -40,10 +45,55 @@ class EvaluationList extends Component
             ->get();
     }
 
+    /**
+     * Gecombineerde eindevaluatie: per competentie de student- én mentorscore
+     * naast elkaar (voor de "Eind"-tab, zoals het eindevaluatie-scherm).
+     */
+    public function combined(): array
+    {
+        $stage = $this->stage();
+
+        if (! $stage || ! $stage->framework) {
+            return ['rows' => collect(), 'studentEval' => null, 'mentorEval' => null];
+        }
+
+        $type = $this->typeForTab();
+
+        $find = fn (string $role) => Evaluation::query()
+            ->where('stage_id', $stage->id)
+            ->where('evaluator_role', $role)
+            ->where('type', $type)
+            ->where('status', 'submitted')
+            ->with('scores')
+            ->latest('submitted_at')
+            ->first();
+
+        $studentEval = $find('student');
+        $mentorEval = $find('mentor');
+
+        $rows = $stage->framework->competencies()->orderBy('sort_order')->get()
+            ->map(function ($comp) use ($studentEval, $mentorEval) {
+                $s = $studentEval?->scores->firstWhere('competency_id', $comp->id);
+                $m = $mentorEval?->scores->firstWhere('competency_id', $comp->id);
+
+                return [
+                    'competency' => $comp,
+                    'studentDescription' => $s?->student_description,
+                    'mentorFeedback' => $m?->feedback,
+                    'studentScore' => $s?->score,
+                    'mentorScore' => $m?->score,
+                ];
+            });
+
+        return ['rows' => $rows, 'studentEval' => $studentEval, 'mentorEval' => $mentorEval];
+    }
+
     public function render()
     {
         return view('livewire.student.evaluations', [
             'evaluations' => $this->evaluations(),
+            'stage' => $this->stage(),
+            'combined' => $this->combined(),
         ]);
     }
 }
