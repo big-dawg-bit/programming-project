@@ -35,6 +35,23 @@ it('maakt een nieuwe gebruiker met rol aan', function () {
     expect(User::where('email', 'test@student.ehb.be')->exists())->toBeTrue();
 });
 
+it('toont een nieuw aangemaakte gebruiker meteen in de lijst, ook met paginatie', function () {
+    // Genoeg gebruikers om paginatie te forceren (>15 per pagina).
+    User::factory()->count(20)->create([
+        'role_id' => Role::where('name', 'student')->value('id'),
+    ]);
+
+    Livewire::actingAs(makeUser('admin'))
+        ->test(UserManager::class)
+        // Naam die alfabetisch achteraan zou staan (= vroeger op de laatste pagina, onzichtbaar).
+        ->set('name', 'Zzz Allerlaatste')
+        ->set('email', 'zzz@student.ehb.be')
+        ->set('selectedRole', 'student')
+        ->call('createUser')
+        ->assertHasNoErrors()
+        ->assertSee('Zzz Allerlaatste'); // nieuwste-eerst + resetPage -> staat bovenaan pagina 1
+});
+
 it('wijzigt de rol van een gebruiker', function () {
     $user = makeUser('student');
     $docentId = Role::where('name', 'docent')->value('id');
