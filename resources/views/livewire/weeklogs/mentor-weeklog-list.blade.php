@@ -71,7 +71,7 @@
                         <td class="px-4 py-3"><x-status-badge :status="$weeklog->status" /></td>
                         <td class="px-4 py-3 text-right">
                             @if ($teBeoordelen)
-                                <flux:button size="sm" variant="primary" wire:click="approve({{ $weeklog->id }})">
+                                <flux:button size="sm" variant="primary" wire:click="toggleComments({{ $weeklog->id }})">
                                     Reviewen
                                 </flux:button>
                             @else
