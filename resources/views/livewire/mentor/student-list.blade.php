@@ -61,7 +61,7 @@
                 </div>
 
                 {{-- Actieknop --}}
-                <a href="{{ route('mentor.weeklogs') }}" wire:navigate
+                <a href="{{ route('mentor.student.detail', ['stage' => $stage->id]) }}" wire:navigate
                    class="mt-5 block rounded-lg bg-[#E2231A] px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-[#c91e16]">
                     Student dashboard openen
                 </a>

@@ -49,6 +49,12 @@
                         ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
                     ];
 
+                    $bedrijfNav = [
+                        ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'bedrijf.dashboard'],
+                        ['label' => 'Logboeken',    'icon' => 'document-text', 'route' => 'bedrijf.logboeken'],
+                        ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
+                    ];
+
                     $adminNav = [
                         ['label' => 'Dashboard',      'icon' => 'squares-2x2', 'route' => 'admin.dashboard'],
                         ['label' => 'Gebruikers',     'icon' => 'users',       'route' => 'admin.users'],
@@ -68,6 +74,7 @@
                         $user?->hasRole('stagecommissie') => $commissieNav,
                         $user?->hasRole('docent') => $docentNav,
                         $user?->hasRole('mentor') => $mentorNav,
+                        $user?->hasRole('bedrijf') => $bedrijfNav,
                         default => $studentNav,
                     };
                 @endphp

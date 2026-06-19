@@ -57,11 +57,9 @@
                     @if ($overeenkomst)
                         <span class="rounded-full px-3 py-1 text-xs font-medium {{ $overeenkomst[1] }}">{{ $overeenkomst[0] }}</span>
                     @elseif ($stage->application_id)
-                        <flux:button size="sm" variant="primary" icon="check"
-                            wire:click="approve({{ $stage->id }})"
-                            wire:confirm="Akkoord geven op deze stage? Hiermee ontstaat de stageovereenkomst.">
-                            Akkoord geven
-                        </flux:button>
+                        <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                            Te beoordelen
+                        </span>
                     @else
                         <span class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
                             {{ ucfirst($stage->status ?? 'active') }}

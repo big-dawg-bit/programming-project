@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         // --- Roles (supertype/subtype design) ---
         $roles = [];
-        foreach (['student', 'stagecommissie', 'docent', 'mentor', 'admin'] as $name) {
+        foreach (['student', 'stagecommissie', 'docent', 'mentor', 'admin', 'bedrijf'] as $name) {
             $roles[$name] = Role::create(['name' => $name]);
         }
 
@@ -113,6 +113,17 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role_id' => $roles['admin']->id,
         ]);
+
+        // --- Bedrijf user (gekoppeld aan Easi) ---
+        $bedrijfUser = User::create([
+            'name' => 'Easi (bedrijf)',
+            'first_name' => 'Easi',
+            'last_name' => 'Bedrijf',
+            'email' => 'bedrijf@easi.net',
+            'password' => Hash::make('password'),
+            'role_id' => $roles['bedrijf']->id,
+        ]);
+        $easi->update(['user_id' => $bedrijfUser->id]);
 
         // --- Configurable competency framework (versioned) ---
         $framework = CompetencyFramework::create([
