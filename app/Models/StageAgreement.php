@@ -16,6 +16,7 @@ class StageAgreement extends Model
             'mentor_approved_at' => 'datetime',
             'student_signed_at' => 'datetime',
             'docent_signed_at' => 'datetime',
+            'company_signed_at' => 'datetime',
         ];
     }
 
@@ -45,7 +46,7 @@ class StageAgreement extends Model
             return;
         }
 
-        $this->status = ($this->student_signature && $this->docent_signature)
+        $this->status = ($this->student_signature && $this->company_signature)
             ? 'ingediend'
             : 'te_ondertekenen';
 
