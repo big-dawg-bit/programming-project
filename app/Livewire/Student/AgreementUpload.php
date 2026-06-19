@@ -122,6 +122,15 @@ class AgreementUpload extends Component
     {
         $application = $this->application();
 
+        // Alle partijgegevens voor het formele overeenkomst-document.
+        $application?->loadMissing([
+            'company',
+            'agreement',
+            'student.user',
+            'stage.mentor.user',
+            'stage.docent.user',
+        ]);
+
         return view('livewire.student.agreement-upload', [
             'application' => $application,
             'agreement' => $application?->agreement,
