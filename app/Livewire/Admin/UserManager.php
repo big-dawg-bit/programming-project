@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\AuditLog;
 use App\Models\Company;
 use App\Models\Role;
 use App\Models\User;
@@ -53,13 +52,6 @@ class UserManager extends Component
             default => null, // stagecommissie / admin: geen subtype nodig
         };
 
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => "Gebruiker aangemaakt: {$user->name} ({$data['selectedRole']})",
-            'entity_type' => 'User',
-            'entity_id' => $user->id,
-        ]);
-
         $this->reset('name', 'email', 'companyId');
         $this->selectedRole = 'student';
 
@@ -71,28 +63,13 @@ class UserManager extends Component
 
     public function changeRole(int $userId, int $roleId): void
     {
-        $user = User::findOrFail($userId);
-        $user->update(['role_id' => $roleId]);
-
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => "Rol gewijzigd voor {$user->name} naar ".(Role::find($roleId)?->name ?? '?'),
-            'entity_type' => 'User',
-            'entity_id' => $user->id,
-        ]);
+        User::findOrFail($userId)->update(['role_id' => $roleId]);
     }
 
     public function toggleActive(int $userId): void
     {
         $user = User::findOrFail($userId);
         $user->update(['is_active' => ! $user->is_active]);
-
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => ($user->is_active ? 'Gebruiker geactiveerd: ' : 'Gebruiker gedeactiveerd: ').$user->name,
-            'entity_type' => 'User',
-            'entity_id' => $user->id,
-        ]);
     }
 
     public function render()

@@ -53,7 +53,7 @@
                         ['label' => 'Dashboard',      'icon' => 'squares-2x2', 'route' => 'admin.dashboard'],
                         ['label' => 'Gebruikers',     'icon' => 'users',       'route' => 'admin.users'],
                         ['label' => 'Evaluatiekader', 'icon' => 'star',        'route' => 'admin.framework'],
-                        ['label' => 'Logboek',        'icon' => 'document-text', 'route' => 'admin.audit'],
+                        ['label' => 'Toewijzingen',   'icon' => 'user-plus',   'route' => 'admin.assignments'],
                         ['label' => 'Instellingen',   'icon' => 'cog-6-tooth', 'route' => 'profile.edit'],
                     ];
 

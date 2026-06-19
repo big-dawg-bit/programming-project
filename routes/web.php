@@ -42,7 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
         Route::get('/admin/users', UserManager::class)->name('admin.users');
         Route::get('/admin/framework', FrameworkManager::class)->name('admin.framework');
-        Route::get('/admin/logboek', \App\Livewire\Admin\AuditLogViewer::class)->name('admin.audit');
+        Route::get('/admin/toewijzingen', \App\Livewire\Admin\StudentAssignment::class)->name('admin.assignments');
     });
 
     Route::middleware('role:stagecommissie')->group(function () {
@@ -88,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('evaluaties', EvaluationList::class)->name('student.evaluaties');
         Route::get('documenten', DocumentList::class)->name('student.documenten');
         Route::get('eindrapport', FinalReportUpload::class)->name('final-report.edit');
+        Route::get('evaluaties/{stage}/invullen/{type}', \App\Livewire\Student\EvaluationForm::class)->name('student.evaluatie.invullen');
     });
 });
 

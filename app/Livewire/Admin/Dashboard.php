@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\AuditLog;
 use App\Models\Company;
 use App\Models\CompetencyFramework;
 use App\Models\Role;
@@ -33,8 +32,6 @@ class Dashboard extends Component
             'aantalGebruikers' => User::count(),
             'aantalBedrijven' => Company::count(),
             'aantalKaders' => CompetencyFramework::count(),
-            'aantalLogs' => AuditLog::count(),
-            'recenteLogs' => AuditLog::with('user')->latest()->take(5)->get(),
         ]);
     }
 }

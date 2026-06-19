@@ -107,19 +107,24 @@ class DatabaseSeeder extends Seeder
             'created_by' => $commissieUser->id,
         ]);
 
-        // Weights sum to 100 -- fully editable at runtime
+        // D1-D11 rubriek -- gewichten samen 100, volledig bewerkbaar at runtime
         $competencies = [
-            ['title' => 'Technische vaardigheden', 'weight' => 25],
-            ['title' => 'Communicatie', 'weight' => 15],
-            ['title' => 'Zelfstandigheid', 'weight' => 15],
-            ['title' => 'Samenwerking', 'weight' => 15],
-            ['title' => 'Probleemoplossend vermogen', 'weight' => 20],
-            ['title' => 'Professionaliteit', 'weight' => 10],
+            ['code' => 'D1',  'title' => 'De lerende professional beheerst het volledige project- of operationeel planningsproces', 'weight' => 10],
+            ['code' => 'D2',  'title' => 'De lerende professional ontwerpt IT-oplossingen volgens de industriestandaarden', 'weight' => 10],
+            ['code' => 'D3',  'title' => 'De lerende professional implementeert digitale producten in een professionele omgeving', 'weight' => 10],
+            ['code' => 'D4',  'title' => 'De lerende professional integreert technologie en infrastructuur binnen een professionele omgeving', 'weight' => 10],
+            ['code' => 'D5',  'title' => 'De lerende professional hanteert een onderzoekende houding om tot innovatieve oplossingen te komen', 'weight' => 9],
+            ['code' => 'D6',  'title' => 'De lerende professional communiceert helder en transparant in een professionele omgeving en/of in teamverband', 'weight' => 9],
+            ['code' => 'D7',  'title' => 'De lerende professional denkt kritisch na om problemen efficiënt en effectief op te lossen', 'weight' => 9],
+            ['code' => 'D8',  'title' => 'De lerende professional ziet persoonlijke ontwikkeling als de basis voor professionele groei', 'weight' => 9],
+            ['code' => 'D9',  'title' => 'De lerende professional ontwikkelt een professionele attitude en handelt kwaliteitsvol', 'weight' => 8],
+            ['code' => 'D10', 'title' => 'De lerende professional demonstreert ondernemend handelen in functie van waardecreatie', 'weight' => 8],
+            ['code' => 'D11', 'title' => 'De lerende professional handelt ethisch en deontologisch', 'weight' => 8],
         ];
         foreach ($competencies as $i => $c) {
             Competency::create([
                 'framework_id' => $framework->id,
-                'code' => 'C'.($i + 1),
+                'code' => $c['code'],
                 'title' => $c['title'],
                 'weight' => $c['weight'],
                 'sort_order' => $i + 1,
