@@ -50,12 +50,10 @@ it('laat een mentor van een ander bedrijf toekennen aan de aanvraag', function (
 
     // De geseeded mentor hoort bij Easi, maar moet tóch toewijsbaar zijn.
     $mentor = Mentor::first();
-    $docent = Docent::first();
     $framework = CompetencyFramework::first();
 
     Livewire::actingAs($this->commissie)
         ->test(ReviewQueue::class)
-        ->set("docentId.{$application->id}", $docent->id)
         ->set("mentorId.{$application->id}", $mentor->id)
         ->set("frameworkId.{$application->id}", $framework->id)
         ->call('approve', $application->id)

@@ -37,18 +37,7 @@
                 {{-- Acties --}}
                 <div class="flex w-full shrink-0 flex-col gap-2 lg:w-72">
 
-                    {{-- Toewijzing bij goedkeuring --}}
-                    <select wire:model="docentId.{{ $application->id }}"
-                            class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
-                        <option value="">— Kies docent —</option>
-                        @foreach ($docenten as $docent)
-                            <option value="{{ $docent->id }}">{{ $docent->user?->name ?? 'Docent #'.$docent->id }}</option>
-                        @endforeach
-                    </select>
-                    @error('docentId.'.$application->id)
-                    <span class="text-xs text-[#E2231A]">{{ $message }}</span>
-                    @enderror
-
+                    {{-- Toewijzing bij goedkeuring (de docent wordt apart via Beheer toegewezen) --}}
                     <select wire:model="mentorId.{{ $application->id }}"
                             class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
                         <option value="">— Kies mentor —</option>
