@@ -42,8 +42,12 @@ class EvaluationList extends Component
 
     public function render()
     {
+        $student = auth()->user()->student;
+
         return view('livewire.student.evaluations', [
             'evaluations' => $this->evaluations(),
+            // De meest recente stage van de student, om de zelfevaluatie te openen.
+            'stage' => $student?->stages()->latest('id')->first(),
         ]);
     }
 }

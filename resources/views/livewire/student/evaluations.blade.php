@@ -1,4 +1,15 @@
 <div class="mx-auto flex max-w-5xl flex-col gap-6">
+    {{-- Kop met knop naar de zelfevaluatie --}}
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-xl font-bold">Mijn evaluaties</h2>
+        @if ($stage)
+            <a href="{{ route('student.evaluatie.invullen', ['stage' => $stage, 'type' => $tab === 'eind' ? 'final' : 'mid-term']) }}" wire:navigate
+               class="rounded-lg bg-[#E2231A] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#c41e16]">
+                Zelfevaluatie invullen
+            </a>
+        @endif
+    </div>
+
     {{-- Tabs --}}
     <div class="border-b border-neutral-200 dark:border-neutral-800">
         <nav class="-mb-px flex gap-8">
