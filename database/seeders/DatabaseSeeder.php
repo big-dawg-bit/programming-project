@@ -130,5 +130,6 @@ class DatabaseSeeder extends Seeder
         // Koppelt een stage aan het framework hierboven, zodat er na het
         // seeden meteen een stage bestaat die geëvalueerd kan worden.
         $this->call(StageSeeder::class);
+        $this->call(FlowTestSeeder::class);
     }
 }
