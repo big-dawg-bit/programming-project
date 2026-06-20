@@ -30,13 +30,17 @@ class Aanvragen extends Component
             return;
         }
 
-        $application = $company->applications()->find($id);
-
+        // Enkel aanvragen die nog op een beslissing van het bedrijf wachten.
+        $application = $company->applications()->where('company_status', 'pending')->find($id);
         if (! $application) {
             return;
         }
 
-        $application->update(['company_status' => $status]);
+        $data = ['company_status' => $status];
+        if ($status === 'refused') {
+            $data['status'] = 'rejected';   // student ziet de afwijzing
+        }
+        $application->update($data);
 
         session()->flash('bedrijf-status', $status === 'accepted' ? 'Aanvraag geaccepteerd.' : 'Aanvraag geweigerd.');
     }
@@ -46,7 +50,7 @@ class Aanvragen extends Component
         $company = Company::where('user_id', Auth::id())->first();
 
         $applications = $company
-            ? $company->applications()->with('student.user')->latest()->get()
+            ? $company->applications()->where('company_status', 'pending')->with('student.user')->latest()->get()
             : collect();
 
         return view('livewire.bedrijf.aanvragen', [
