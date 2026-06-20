@@ -13,6 +13,9 @@ use Livewire\Component;
 #[Title('Eindbeoordeling')]
 class Eindbeoordeling extends Component
 {
+    /** Vanaf welk /20-cijfer is de student geslaagd (Belgisch: 10/20). */
+    private const GESLAAGD_VANAF = 10.0;
+
     public Stage $stage;
 
     /** Definitieve score per competency_id (Belgisch, /20). */
@@ -20,6 +23,9 @@ class Eindbeoordeling extends Component
 
     /** Onderbouwing per competency_id. */
     public array $feedback = [];
+
+    /** Geschreven eindconclusie van de docent. */
+    public string $conclusion = '';
 
     public function mount(Stage $stage): void
     {
@@ -46,6 +52,32 @@ class Eindbeoordeling extends Component
             ->get();
     }
 
+    /**
+     * Live gewogen totaal op /100 en geslaagd-status uit de ingevulde scores.
+     * Geeft null zolang nog niet elke competentie een score heeft.
+     */
+    public function liveResult(): array
+    {
+        $competencies = $this->competencies();
+
+        $allFilled = $competencies->isNotEmpty()
+            && $competencies->every(fn ($c) => is_numeric($this->scores[$c->id] ?? null));
+
+        if (! $allFilled) {
+            return ['total100' => null, 'passed' => null];
+        }
+
+        $totalWeight = (float) $competencies->sum('weight');
+        $weighted = $competencies->sum(fn ($c) => (float) $this->scores[$c->id] * $c->weight);
+
+        $overall20 = $totalWeight > 0 ? $weighted / $totalWeight : 0.0;
+
+        return [
+            'total100' => round($overall20 * 5, 1),
+            'passed' => $overall20 >= self::GESLAAGD_VANAF,
+        ];
+    }
+
     /** Ingediende eind-evaluatie van een rol (student/mentor) als read-only referentie. */
     private function contextEvaluation(string $role): ?Evaluation
     {
@@ -63,6 +95,7 @@ class Eindbeoordeling extends Component
         $this->validate([
             'scores.*' => 'required|numeric|min:0|max:20',
             'feedback.*' => 'nullable|string|max:2000',
+            'conclusion' => 'nullable|string|max:5000',
         ], [
             'scores.*.required' => 'Geef elke competentie een definitieve score.',
         ]);
@@ -86,7 +119,7 @@ class Eindbeoordeling extends Component
             ]);
         }
 
-        // Gewogen eindcijfer uit de snapshots (zelfde formule als de andere formulieren).
+        // Gewogen eindcijfer (/20) uit de snapshots.
         $scores = $evaluation->scores()->get();
         $totalWeight = $scores->sum('weight_snapshot');
 
@@ -94,7 +127,11 @@ class Eindbeoordeling extends Component
             ? $scores->sum(fn ($s) => $s->score * $s->weight_snapshot) / $totalWeight
             : 0;
 
-        $evaluation->update(['overall_score' => round($overall, 2)]);
+        $evaluation->update([
+            'overall_score' => round($overall, 2),
+            'conclusion' => $this->conclusion ?: null,
+            'result' => $overall >= self::GESLAAGD_VANAF ? 'geslaagd' : 'niet_geslaagd',
+        ]);
 
         // Dit is DE bindende eindbeoordeling: koppel ze als officieel resultaat aan de stage.
         $this->stage->update(['final_evaluation_id' => $evaluation->id]);
@@ -108,6 +145,7 @@ class Eindbeoordeling extends Component
             'competencies' => $this->competencies(),
             'studentEval' => $this->contextEvaluation('student'),
             'mentorEval' => $this->contextEvaluation('mentor'),
+            'result' => $this->liveResult(),
         ]);
     }
 }
