@@ -17,7 +17,7 @@ class EvaluationForm extends Component
     public Stage $stage;
     public string $type = 'mid-term';
 
-    // score per competency_id (1 t/m 5).
+    // score per competency_id (0 t/m 20).
     public array $scores = [];
 
     public string $generalFeedback = '';
@@ -48,7 +48,7 @@ class EvaluationForm extends Component
     }
 
     /**
-     * Geef een competentie een score (1-5).
+     * Geef een competentie een score (0-20).
      */
     public function setScore(int $competencyId, int $score): void
     {
@@ -70,7 +70,7 @@ class EvaluationForm extends Component
     public function submit()
     {
         $this->validate([
-            'scores.*' => 'required|integer|min:1|max:5',
+            'scores.*' => 'required|numeric|min:0|max:20',
         ], [
             'scores.*.required' => 'Geef elke competentie een score.',
         ]);

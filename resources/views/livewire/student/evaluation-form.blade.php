@@ -15,7 +15,7 @@
     <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
         <div class="flex flex-wrap items-baseline justify-between gap-2">
             <h3 class="font-semibold">Competenties</h3>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400">Score 0-5 — 0 = onvoldoende, 3 = middelmatig, 5 = goed</p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">Score 0-20 (Belgisch) — 10 = voldoende, 14 = goed, 18 = uitstekend</p>
         </div>
 
         <div class="mt-4 divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -30,17 +30,11 @@
                                 <p class="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">{{ $competency->description }}</p>
                             @endif
                         </div>
-                        <div class="flex shrink-0 gap-2">
-                            @for ($i = 0; $i <= 5; $i++)
-                                <button type="button" wire:click="setScore({{ $competency->id }}, {{ $i }})"
-                                    @class([
-                                        'grid size-9 place-items-center rounded-full border text-sm font-medium transition',
-                                        'border-[#E2231A] bg-[#E2231A] text-white' => ($scores[$competency->id] ?? null) === $i,
-                                        'border-neutral-300 text-neutral-600 hover:border-[#E2231A] hover:text-[#E2231A] dark:border-neutral-700 dark:text-neutral-300' => ($scores[$competency->id] ?? null) !== $i,
-                                    ])>
-                                    {{ $i }}
-                                </button>
-                            @endfor
+                        <div class="flex shrink-0 items-center gap-2">
+                            <input type="number" min="0" max="20" step="0.5"
+                                   wire:model="scores.{{ $competency->id }}"
+                                   class="w-20 rounded-lg border border-neutral-300 px-3 py-2 text-center text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none dark:border-neutral-700 dark:bg-neutral-800" />
+                            <span class="text-sm text-neutral-400">/20</span>
                         </div>
                     </div>
 

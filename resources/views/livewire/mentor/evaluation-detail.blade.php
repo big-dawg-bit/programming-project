@@ -31,17 +31,7 @@
             @foreach ($evaluation->scores as $score)
                 <div wire:key="score-{{ $score->id }}" class="flex items-center justify-between gap-4 py-4">
                     <span class="text-sm font-medium text-neutral-800">{{ $score->competency?->title ?? '—' }}</span>
-                    <div class="flex shrink-0 gap-2">
-                        @for ($i = 1; $i <= 5; $i++)
-                            <span @class([
-                                'grid size-9 place-items-center rounded-full border text-sm font-medium',
-                                'border-[#E2231A] bg-[#E2231A] text-white' => (int) $score->score === $i,
-                                'border-neutral-200 text-neutral-400' => (int) $score->score !== $i,
-                            ])>
-                                {{ $i }}
-                            </span>
-                        @endfor
-                    </div>
+                    <span class="shrink-0 text-sm font-semibold text-neutral-800">{{ $score->score !== null ? number_format((float) $score->score, 1).'/20' : '—' }}</span>
                 </div>
             @endforeach
         </div>

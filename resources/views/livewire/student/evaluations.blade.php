@@ -63,8 +63,8 @@
                                 </td>
                                 <td class="px-4 py-3 text-neutral-600 dark:text-neutral-300">{{ $row['studentDescription'] ?? '—' }}</td>
                                 <td class="px-4 py-3 text-neutral-600 dark:text-neutral-300">{{ $row['mentorFeedback'] ?? '—' }}</td>
-                                <td class="px-4 py-3 text-center font-semibold">{{ $row['studentScore'] !== null ? number_format((float) $row['studentScore'], 0).'/5' : '—' }}</td>
-                                <td class="px-4 py-3 text-center font-semibold">{{ $row['mentorScore'] !== null ? number_format((float) $row['mentorScore'], 0).'/5' : '—' }}</td>
+                                <td class="px-4 py-3 text-center font-semibold">{{ $row['studentScore'] !== null ? number_format((float) $row['studentScore'], 1).'/20' : '—' }}</td>
+                                <td class="px-4 py-3 text-center font-semibold">{{ $row['mentorScore'] !== null ? number_format((float) $row['mentorScore'], 1).'/20' : '—' }}</td>
                                 <td class="px-4 py-3 text-center font-semibold text-[#E2231A]">{{ $row['docentScore'] !== null ? number_format((float) $row['docentScore'], 1).'/20' : '—' }}</td>
                             </tr>
                         @endforeach
