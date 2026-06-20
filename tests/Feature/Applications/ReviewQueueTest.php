@@ -2,9 +2,6 @@
 
 use App\Livewire\Applications\ReviewQueue;
 use App\Models\Company;
-use App\Models\CompetencyFramework;
-use App\Models\Docent;
-use App\Models\Mentor;
 use App\Models\StageApplication;
 use App\Models\User;
 use Livewire\Livewire;
@@ -24,7 +21,7 @@ it('blokkeert een student op de wachtrij', function () {
 
 it('toont enkel ingediende aanvragen', function () {
     $lid = User::factory()->withRole('stagecommissie')->create();
-    StageApplication::factory()->create(['status' => 'submitted', 'position_title' => 'WEL']);
+    StageApplication::factory()->create(['status' => 'submitted', 'company_status' => 'accepted', 'position_title' => 'WEL']);
     StageApplication::factory()->create(['status' => 'approved', 'position_title' => 'NIET']);
 
     Livewire::actingAs($lid)->test(ReviewQueue::class)
@@ -39,11 +36,10 @@ it('keurt een aanvraag goed en maakt een stage aan', function () {
     $application = StageApplication::factory()->create([
         'company_id' => Company::first()->id,
         'status' => 'submitted',
+        'company_status' => 'accepted',
     ]);
 
     Livewire::actingAs($lid)->test(ReviewQueue::class)
-        ->set("mentorId.{$application->id}", Mentor::first()->id)
-        ->set("frameworkId.{$application->id}", CompetencyFramework::first()->id)
         ->call('approve', $application->id);
 
     $application->refresh();

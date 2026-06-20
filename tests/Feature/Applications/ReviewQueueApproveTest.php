@@ -2,81 +2,36 @@
 
 use App\Livewire\Applications\ReviewQueue;
 use App\Models\Company;
-use App\Models\CompetencyFramework;
-use App\Models\Docent;
-use App\Models\Mentor;
 use App\Models\Stage;
+use App\Models\StageAgreement;
 use App\Models\StageApplication;
 use App\Models\User;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->seed(); // rollen + bedrijf (Easi) + docent + mentor + framework
+    $this->seed();
     $this->commissie = User::factory()->withRole('stagecommissie')->create();
 });
 
-it('zet docent, mentor en framework op de stage bij goedkeuring', function () {
-    // Aanvraag op het geseeded bedrijf zodat de geseeded mentor bij dit bedrijf hoort.
+it('keurt goed en maakt automatisch stage, framework en overeenkomst aan', function () {
     $application = StageApplication::factory()->create([
         'company_id' => Company::first()->id,
         'status' => 'submitted',
+        'company_status' => 'accepted',
     ]);
-
-    $mentor = Mentor::first();
-    $framework = CompetencyFramework::first();
 
     Livewire::actingAs($this->commissie)
         ->test(ReviewQueue::class)
-        ->set("mentorId.{$application->id}", $mentor->id)
-        ->set("frameworkId.{$application->id}", $framework->id)
-        ->call('approve', $application->id)
-        ->assertHasNoErrors();
-
-    $stage = Stage::where('application_id', $application->id)->first();
-
-    expect($stage)->not->toBeNull();
-    expect($stage->mentor_id)->toBe($mentor->id);
-    expect($stage->framework_id)->toBe($framework->id);
-    expect($application->fresh()->status)->toBe('approved');
-});
-
-it('laat een mentor van een ander bedrijf toekennen aan de aanvraag', function () {
-    // Aanvraag bij een nieuw bedrijf dat zelf geen mentor heeft.
-    $anderBedrijf = Company::factory()->create();
-    $application = StageApplication::factory()->create([
-        'company_id' => $anderBedrijf->id,
-        'status' => 'submitted',
-    ]);
-
-    // De geseeded mentor hoort bij Easi, maar moet tóch toewijsbaar zijn.
-    $mentor = Mentor::first();
-    $framework = CompetencyFramework::first();
-
-    Livewire::actingAs($this->commissie)
-        ->test(ReviewQueue::class)
-        ->set("mentorId.{$application->id}", $mentor->id)
-        ->set("frameworkId.{$application->id}", $framework->id)
         ->call('approve', $application->id)
         ->assertHasNoErrors();
 
     $stage = Stage::where('application_id', $application->id)->first();
 
     expect($stage)->not->toBeNull()
-        ->and($stage->mentor_id)->toBe($mentor->id)
+        ->and($stage->framework_id)->not->toBeNull()
         ->and($application->fresh()->status)->toBe('approved');
-});
 
-it('keurt niet goed en maakt geen stage zonder docent, mentor en framework', function () {
-    $application = StageApplication::factory()->create(['status' => 'submitted']);
-
-    Livewire::actingAs($this->commissie)
-        ->test(ReviewQueue::class)
-        ->call('approve', $application->id)
-        ->assertHasErrors([
-            "mentorId.{$application->id}",
-            "frameworkId.{$application->id}",
-        ]);
-
-    expect(Stage::where('application_id', $application->id)->exists())->toBeFalse();
-    expect($application->fresh()->status)->toBe('submitted');
+    $agreement = StageAgreement::where('application_id', $application->id)->first();
+    expect($agreement)->not->toBeNull()
+        ->and($agreement->status)->toBe('te_ondertekenen');
 });
