@@ -96,6 +96,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('documenten', DocumentList::class)->name('student.documenten');
         Route::get('eindrapport', FinalReportUpload::class)->name('final-report.edit');
         Route::get('evaluaties/{stage}/invullen/{type}', \App\Livewire\Student\EvaluationForm::class)->name('student.evaluatie.invullen');
+        Route::get('docent/evaluaties/{stage}/eindbeoordeling', \App\Livewire\Docent\Eindbeoordeling::class)->name('docent.eindbeoordeling');
     });
 });
 
