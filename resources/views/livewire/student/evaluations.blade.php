@@ -27,8 +27,18 @@
     </div>
 
     @if ($tab === 'eind')
-        {{-- Gecombineerde eindevaluatie: student- en mentorscore naast elkaar --}}
-        @if ($combined['studentEval'] || $combined['mentorEval'])
+        {{-- Gecombineerde eindevaluatie: student-, mentor- én docentscore naast elkaar --}}
+        @if ($combined['studentEval'] || $combined['mentorEval'] || $combined['docentEval'])
+            @if ($combined['finalEval'])
+                <div class="flex items-center justify-between rounded-xl border border-[#E2231A]/30 bg-[#E2231A]/5 px-5 py-4">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-[#E2231A]">Definitieve eindbeoordeling</p>
+                        <p class="text-sm text-neutral-600 dark:text-neutral-300">Vastgelegd door de docent</p>
+                    </div>
+                    <span class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{{ number_format((float) $combined['finalEval']->overall_score, 1) }}<span class="text-base font-medium text-neutral-400">/20</span></span>
+                </div>
+            @endif
+
             <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
                 <div class="border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
                     <h3 class="font-semibold">Eindevaluatie</h3>
@@ -42,6 +52,7 @@
                             <th class="px-4 py-3 font-medium">Feedback mentor</th>
                             <th class="px-4 py-3 text-center font-medium">Score student</th>
                             <th class="px-4 py-3 text-center font-medium">Score mentor</th>
+                            <th class="px-4 py-3 text-center font-medium">Score docent</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -54,6 +65,7 @@
                                 <td class="px-4 py-3 text-neutral-600 dark:text-neutral-300">{{ $row['mentorFeedback'] ?? '—' }}</td>
                                 <td class="px-4 py-3 text-center font-semibold">{{ $row['studentScore'] !== null ? number_format((float) $row['studentScore'], 0).'/5' : '—' }}</td>
                                 <td class="px-4 py-3 text-center font-semibold">{{ $row['mentorScore'] !== null ? number_format((float) $row['mentorScore'], 0).'/5' : '—' }}</td>
+                                <td class="px-4 py-3 text-center font-semibold text-[#E2231A]">{{ $row['docentScore'] !== null ? number_format((float) $row['docentScore'], 1).'/20' : '—' }}</td>
                             </tr>
                         @endforeach
                         </tbody>
