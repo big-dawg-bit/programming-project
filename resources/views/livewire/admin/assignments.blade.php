@@ -2,7 +2,7 @@
 
     <div>
         <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Toewijzingen</h1>
-        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Wijs een begeleidende docent toe aan de stage van een student.</p>
+        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Wijs een begeleidende docent en mentor toe aan de stage van een student.</p>
     </div>
 
     @if (session('success'))
@@ -18,6 +18,7 @@
                     <th class="px-4 py-3">Student</th>
                     <th class="px-4 py-3">Bedrijf</th>
                     <th class="px-4 py-3 w-64">Begeleidende docent</th>
+                    <th class="px-4 py-3 w-64">Begeleidende mentor</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -40,10 +41,21 @@
                                 @endforeach
                             </select>
                         </td>
+                        <td class="px-4 py-3">
+                            <select wire:change="assignMentor({{ $stage->id }}, $event.target.value)"
+                                    class="w-full rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none dark:border-neutral-700 dark:bg-neutral-800">
+                                <option value="">— geen mentor —</option>
+                                @foreach ($mentoren as $mentor)
+                                    <option value="{{ $mentor->id }}" @selected($stage->mentor_id === $mentor->id)>
+                                        {{ $mentor->user?->name ?? 'Mentor #'.$mentor->id }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                        <td colspan="4" class="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
                             Nog geen stages om toe te wijzen.
                         </td>
                     </tr>

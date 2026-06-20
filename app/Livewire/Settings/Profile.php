@@ -21,13 +21,34 @@ class Profile extends Component
 
     public string $email = '';
 
+    // Mentor-specifiek: telefoon en adres zijn bewerkbaar; bedrijfsnaam en BTW niet.
+    public bool $isMentor = false;
+
+    public string $companyName = '';
+
+    public string $vatNumber = '';
+
+    public string $phone = '';
+
+    public string $address = '';
+
     /**
      * Mount the component.
      */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $user = Auth::user();
+
+        $this->name = $user->name;
+        $this->email = $user->email;
+
+        if ($user->mentor) {
+            $this->isMentor = true;
+            $this->phone = $user->mentor->phone ?? '';
+            $this->companyName = $user->mentor->company?->name ?? '';
+            $this->vatNumber = $user->mentor->company?->vat_number ?? '';
+            $this->address = $user->mentor->company?->address ?? '';
+        }
     }
 
     /**
@@ -46,6 +67,17 @@ class Profile extends Component
         }
 
         $user->save();
+
+        // Mentor mag enkel telefoon en adres aanpassen — bedrijfsnaam en BTW blijven vast.
+        if ($this->isMentor && $user->mentor) {
+            $this->validate([
+                'phone' => 'nullable|string|max:50',
+                'address' => 'nullable|string|max:255',
+            ]);
+
+            $user->mentor->update(['phone' => $this->phone]);
+            $user->mentor->company?->update(['address' => $this->address]);
+        }
 
         Flux::toast(variant: 'success', text: __('Profile updated.'));
     }

@@ -13,6 +13,36 @@
         </div>
     @endif
 
+    {{-- Bedrijfsgegevens --}}
+    @if ($mentor?->company)
+        <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
+            <div class="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-neutral-200">
+                <flux:icon name="building-office-2" class="size-4" /> Bedrijfsgegevens
+            </div>
+            <dl class="grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
+                <div class="flex justify-between gap-4 border-b border-neutral-100 py-1.5 dark:border-neutral-800">
+                    <dt class="text-neutral-500 dark:text-neutral-400">Bedrijfsnaam</dt>
+                    <dd class="font-medium">{{ $mentor->company->name ?? '—' }}</dd>
+                </div>
+                <div class="flex justify-between gap-4 border-b border-neutral-100 py-1.5 dark:border-neutral-800">
+                    <dt class="text-neutral-500 dark:text-neutral-400">BTW-nummer</dt>
+                    <dd class="font-medium">{{ $mentor->company->vat_number ?? '—' }}</dd>
+                </div>
+                <div class="flex justify-between gap-4 border-b border-neutral-100 py-1.5 dark:border-neutral-800">
+                    <dt class="text-neutral-500 dark:text-neutral-400">Telefoon</dt>
+                    <dd class="font-medium">{{ $mentor->phone ?? $mentor->company->contact_phone ?? '—' }}</dd>
+                </div>
+                <div class="flex justify-between gap-4 border-b border-neutral-100 py-1.5 dark:border-neutral-800">
+                    <dt class="text-neutral-500 dark:text-neutral-400">Adres</dt>
+                    <dd class="font-medium">{{ $mentor->company->address ?? '—' }}</dd>
+                </div>
+            </dl>
+            <p class="mt-3 text-xs text-neutral-400 dark:text-neutral-500">
+                Telefoon en adres pas je aan bij <a href="{{ route('profile.edit') }}" wire:navigate class="text-[#E2231A] hover:underline">Instellingen</a>.
+            </p>
+        </div>
+    @endif
+
     {{-- Statuskaarten --}}
     <div class="grid gap-4 md:grid-cols-2">
         <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">

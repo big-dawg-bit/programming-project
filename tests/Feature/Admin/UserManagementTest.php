@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Admin\UserManager;
-use App\Models\Company;
 use App\Models\Role;
 use App\Models\User;
 use Livewire\Livewire;
@@ -89,20 +88,59 @@ it('maakt een student-subtype aan zodat de student in zijn portaal kan', functio
     expect($user->student)->not->toBeNull();
 });
 
-it('maakt een mentor-subtype aan en koppelt het bedrijf', function () {
-    $company = Company::first();
-
+it('maakt een mentor-subtype aan met nieuwe bedrijfsgegevens', function () {
     Livewire::actingAs(makeUser('admin'))
         ->test(UserManager::class)
         ->set('name', 'Nieuwe Mentor')
         ->set('email', 'nieuw@easi.net')
         ->set('selectedRole', 'mentor')
-        ->set('companyId', $company->id)
+        ->set('companyName', 'Easi BV')
+        ->set('vatNumber', 'BE0821.385.112')
+        ->set('phone', '+32 2 123 45 67')
+        ->set('street', 'Teststraat')
+        ->set('houseNumber', '12')
+        ->set('postalCode', '1000')
+        ->set('municipality', 'Brussel')
         ->call('createUser')
         ->assertHasNoErrors();
 
     $user = User::where('email', 'nieuw@easi.net')->first();
 
     expect($user->mentor)->not->toBeNull()
-        ->and($user->mentor->company_id)->toBe($company->id);
+        ->and($user->mentor->phone)->toBe('+32 2 123 45 67')
+        ->and($user->mentor->company)->not->toBeNull()
+        ->and($user->mentor->company->name)->toBe('Easi BV')
+        ->and($user->mentor->company->vat_number)->toBe('BE0821.385.112')
+        ->and($user->mentor->company->address)->toBe('Teststraat 12, 1000 Brussel');
+});
+
+it('weigert een ongeldig BTW-nummer', function () {
+    Livewire::actingAs(makeUser('admin'))
+        ->test(UserManager::class)
+        ->set('name', 'Mentor Foute BTW')
+        ->set('email', 'fout@easi.net')
+        ->set('selectedRole', 'mentor')
+        ->set('companyName', 'Easi BV')
+        ->set('vatNumber', 'BE123')
+        ->set('phone', '02 123')
+        ->set('street', 'Teststraat')
+        ->set('houseNumber', '12')
+        ->set('postalCode', '1000')
+        ->set('municipality', 'Brussel')
+        ->call('createUser')
+        ->assertHasErrors(['vatNumber']);
+
+    expect(User::where('email', 'fout@easi.net')->exists())->toBeFalse();
+});
+
+it('vereist bedrijfsgegevens wanneer de rol mentor is', function () {
+    Livewire::actingAs(makeUser('admin'))
+        ->test(UserManager::class)
+        ->set('name', 'Mentor Zonder Bedrijf')
+        ->set('email', 'leeg@easi.net')
+        ->set('selectedRole', 'mentor')
+        ->call('createUser')
+        ->assertHasErrors(['companyName', 'vatNumber', 'phone', 'street', 'houseNumber', 'postalCode', 'municipality']);
+
+    expect(User::where('email', 'leeg@easi.net')->exists())->toBeFalse();
 });

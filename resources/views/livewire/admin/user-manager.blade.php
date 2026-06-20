@@ -48,18 +48,77 @@
                 @error('password') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
             </div>
 
-            {{-- Bedrijf enkel relevant voor een mentor --}}
+            {{-- Bedrijfsgegevens enkel relevant voor een mentor --}}
             @if ($selectedRole === 'mentor')
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-neutral-700">Bedrijf</label>
-                    <select wire:model="companyId"
-                            class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
-                        <option value="">— kies een bedrijf —</option>
-                        @foreach ($companies as $company)
-                            <option value="{{ $company->id }}">{{ $company->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('companyId') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                <div class="sm:col-span-2 grid gap-4 sm:grid-cols-2 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+                    <p class="sm:col-span-2 text-sm font-medium text-neutral-700">Bedrijfsgegevens van de mentor</p>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-neutral-700">Bedrijfsnaam</label>
+                        <input type="text" wire:model="companyName"
+                               class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                        @error('companyName') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div x-data="{
+                            display: @js($vatNumber ? \Illuminate\Support\Str::after($vatNumber, 'BE') : ''),
+                            onInput(e) {
+                                // Enkel cijfers, max 10, geformatteerd als 0821.385.112.
+                                let d = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                let f = d;
+                                if (d.length > 4) f = d.slice(0, 4) + '.' + d.slice(4);
+                                if (d.length > 7) f = d.slice(0, 4) + '.' + d.slice(4, 7) + '.' + d.slice(7);
+                                this.display = f;
+                                e.target.value = f;
+                                // Volledige waarde (incl. BE) doorgeven aan Livewire, zonder server-rondje.
+                                $wire.set('vatNumber', d.length ? 'BE' + f : '', false);
+                            }
+                         }">
+                        <label class="mb-1 block text-sm font-medium text-neutral-700">BTW-nummer</label>
+                        <div class="flex">
+                            <span class="inline-flex items-center rounded-l-lg border border-r-0 border-neutral-300 bg-neutral-100 px-3 text-sm font-medium text-neutral-600">BE</span>
+                            <input type="text" inputmode="numeric" maxlength="12"
+                                   x-bind:value="display" x-on:input="onInput($event)"
+                                   placeholder="0821.385.112"
+                                   class="w-full rounded-r-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                        </div>
+                        @error('vatNumber') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-neutral-700">Telefoonnummer</label>
+                        <input type="text" wire:model="phone"
+                               class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                        @error('phone') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Adres opgesplitst --}}
+                    <div class="sm:col-span-2 grid gap-4 sm:grid-cols-4">
+                        <div class="sm:col-span-2">
+                            <label class="mb-1 block text-sm font-medium text-neutral-700">Straat</label>
+                            <input type="text" wire:model="street"
+                                   class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                            @error('street') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-neutral-700">Nummer</label>
+                            <input type="text" wire:model="houseNumber"
+                                   class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                            @error('houseNumber') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-neutral-700">Postcode</label>
+                            <input type="text" inputmode="numeric" maxlength="4" wire:model="postalCode"
+                                   class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                            @error('postalCode') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="sm:col-span-3">
+                            <label class="mb-1 block text-sm font-medium text-neutral-700">Gemeente</label>
+                            <input type="text" wire:model="municipality"
+                                   class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                            @error('municipality') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>

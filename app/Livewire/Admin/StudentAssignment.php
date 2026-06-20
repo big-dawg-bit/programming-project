@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Docent;
+use App\Models\Mentor;
 use App\Models\Stage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,13 +23,24 @@ class StudentAssignment extends Component
         session()->flash('success', 'Docent toegewezen.');
     }
 
+    /** Wijs (of verwijder) de begeleidende mentor van een stage toe. */
+    public function assignMentor(int $stageId, ?int $mentorId): void
+    {
+        Stage::findOrFail($stageId)->update([
+            'mentor_id' => $mentorId ?: null,
+        ]);
+
+        session()->flash('success', 'Mentor toegewezen.');
+    }
+
     public function render()
     {
         return view('livewire.admin.assignments', [
-            'stages' => Stage::with(['student.user', 'company', 'docent.user'])
+            'stages' => Stage::with(['student.user', 'company', 'docent.user', 'mentor.user'])
                 ->latest('id')
                 ->get(),
             'docenten' => Docent::with('user')->get(),
+            'mentoren' => Mentor::with('user')->get(),
         ]);
     }
 }

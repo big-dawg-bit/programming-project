@@ -24,6 +24,19 @@
                 @endif
             </div>
 
+            @if ($isMentor)
+                <flux:separator variant="subtle" />
+
+                <flux:heading size="sm">{{ __('Bedrijfsgegevens') }}</flux:heading>
+
+                <flux:input wire:model="companyName" :label="__('Bedrijfsnaam')" type="text" readonly disabled />
+                <flux:input wire:model="vatNumber" :label="__('BTW-nummer')" type="text" readonly disabled />
+                <flux:text class="-mt-3 text-xs">{{ __('Bedrijfsnaam en BTW-nummer worden door de administratie beheerd.') }}</flux:text>
+
+                <flux:input wire:model="phone" :label="__('Telefoonnummer')" type="text" />
+                <flux:input wire:model="address" :label="__('Adres')" type="text" />
+            @endif
+
             <div class="flex items-center gap-4">
                 <flux:button variant="primary" type="submit">{{ __('Save') }}</flux:button>
             </div>
