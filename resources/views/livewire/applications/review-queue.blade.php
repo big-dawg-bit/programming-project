@@ -36,34 +36,6 @@
 
                 {{-- Acties --}}
                 <div class="flex w-full shrink-0 flex-col gap-2 lg:w-72">
-
-                    {{-- Toewijzing bij goedkeuring (de docent wordt apart via Beheer toegewezen) --}}
-                    <select wire:model="mentorId.{{ $application->id }}"
-                            class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
-                        <option value="">— Kies mentor —</option>
-                        @forelse ($mentors as $mentor)
-                            <option value="{{ $mentor->id }}">
-                                {{ $mentor->user?->name ?? 'Mentor #'.$mentor->id }}@if ($mentor->company) — {{ $mentor->company->name }}@endif
-                            </option>
-                        @empty
-                            <option value="" disabled>Nog geen mentors beschikbaar</option>
-                        @endforelse
-                    </select>
-                    @error('mentorId.'.$application->id)
-                    <span class="text-xs text-[#E2231A]">{{ $message }}</span>
-                    @enderror
-
-                    <select wire:model="frameworkId.{{ $application->id }}"
-                            class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
-                        <option value="">— Kies evaluatiekader —</option>
-                        @foreach ($frameworks as $framework)
-                            <option value="{{ $framework->id }}">{{ $framework->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('frameworkId.'.$application->id)
-                    <span class="text-xs text-[#E2231A]">{{ $message }}</span>
-                    @enderror
-
                     <button wire:click="approve({{ $application->id }})"
                             class="rounded-lg bg-[#E2231A] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#c41e16] focus:ring-2 focus:ring-[#E2231A]/40 focus:outline-none">
                         Goedkeuren
