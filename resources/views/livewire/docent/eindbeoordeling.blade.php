@@ -1,9 +1,12 @@
 <div class="mx-auto max-w-4xl px-4 py-8">
-    <div class="mb-6">
-        <h1 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Eindbeoordeling</h1>
-        <p class="text-sm text-neutral-500 dark:text-neutral-400">
-            Definitieve beoordeling voor {{ $stage->student?->user?->name ?? 'de student' }} — zelfevaluatie en mentorevaluatie staan ter referentie.
-        </p>
+    <div class="mb-6 flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Eindbeoordeling</h1>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                Definitieve beoordeling voor {{ $stage->student?->user?->name ?? 'de student' }} — zelfevaluatie en mentorevaluatie staan ter referentie.
+            </p>
+        </div>
+        <x-rubriek-modal :competencies="$competencies" />
     </div>
 
     @if (session('status'))

@@ -20,6 +20,9 @@ class FrameworkManager extends Component
     public string $title = '';
     public string $description = '';
     public int $weight = 0;
+    public string $levelFull = '';
+    public string $levelGood = '';
+    public string $levelLow = '';
 
     // Bewerken van een bestaande competentie (inline).
     public ?int $editId = null;
@@ -27,6 +30,9 @@ class FrameworkManager extends Component
     public string $editTitle = '';
     public string $editDescription = '';
     public int $editWeight = 0;
+    public string $editLevelFull = '';
+    public string $editLevelGood = '';
+    public string $editLevelLow = '';
 
     public function mount(): void
     {
@@ -71,6 +77,9 @@ class FrameworkManager extends Component
                 'description' => $competency->description,
                 'weight' => $competency->weight,
                 'sort_order' => $competency->sort_order,
+                'level_full' => $competency->level_full,
+                'level_good' => $competency->level_good,
+                'level_low' => $competency->level_low,
             ]);
         }
 
@@ -110,6 +119,9 @@ class FrameworkManager extends Component
             'code' => 'nullable|string|max:50',
             'description' => 'nullable|string|max:1000',
             'weight' => 'required|integer|min:0|max:100',
+            'levelFull' => 'nullable|string|max:1000',
+            'levelGood' => 'nullable|string|max:1000',
+            'levelLow' => 'nullable|string|max:1000',
         ]);
 
         Competency::create([
@@ -119,9 +131,12 @@ class FrameworkManager extends Component
             'description' => $data['description'] ?: null,
             'weight' => $data['weight'],
             'sort_order' => Competency::where('framework_id', $this->frameworkId)->count() + 1,
+            'level_full' => $data['levelFull'] ?: null,
+            'level_good' => $data['levelGood'] ?: null,
+            'level_low' => $data['levelLow'] ?: null,
         ]);
 
-        $this->reset('code', 'title', 'description', 'weight');
+        $this->reset('code', 'title', 'description', 'weight', 'levelFull', 'levelGood', 'levelLow');
     }
 
     public function startEdit(int $competencyId): void
@@ -133,6 +148,9 @@ class FrameworkManager extends Component
         $this->editTitle = $competency->title;
         $this->editDescription = $competency->description ?? '';
         $this->editWeight = $competency->weight;
+        $this->editLevelFull = $competency->level_full ?? '';
+        $this->editLevelGood = $competency->level_good ?? '';
+        $this->editLevelLow = $competency->level_low ?? '';
         $this->resetValidation();
     }
 
@@ -143,6 +161,9 @@ class FrameworkManager extends Component
             'editCode' => 'nullable|string|max:50',
             'editDescription' => 'nullable|string|max:1000',
             'editWeight' => 'required|integer|min:0|max:100',
+            'editLevelFull' => 'nullable|string|max:1000',
+            'editLevelGood' => 'nullable|string|max:1000',
+            'editLevelLow' => 'nullable|string|max:1000',
         ]);
 
         Competency::findOrFail($this->editId)->update([
@@ -150,6 +171,9 @@ class FrameworkManager extends Component
             'title' => $data['editTitle'],
             'description' => $data['editDescription'] ?: null,
             'weight' => $data['editWeight'],
+            'level_full' => $data['editLevelFull'] ?: null,
+            'level_good' => $data['editLevelGood'] ?: null,
+            'level_low' => $data['editLevelLow'] ?: null,
         ]);
 
         $this->cancelEdit();
@@ -157,7 +181,7 @@ class FrameworkManager extends Component
 
     public function cancelEdit(): void
     {
-        $this->reset('editId', 'editCode', 'editTitle', 'editDescription', 'editWeight');
+        $this->reset('editId', 'editCode', 'editTitle', 'editDescription', 'editWeight', 'editLevelFull', 'editLevelGood', 'editLevelLow');
         $this->resetValidation();
     }
 

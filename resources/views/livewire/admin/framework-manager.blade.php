@@ -4,7 +4,7 @@
         <div>
             <h1 class="text-2xl font-bold text-neutral-900">Evaluatiekader beheren</h1>
             <p class="mt-1 text-sm text-neutral-500">
-                {{ $framework?->name ?? 'Evaluatiekader' }} — beheer competenties, gewichten en omschrijving.
+                {{ $framework?->name ?? 'Evaluatiekader' }} — beheer competenties, gewichten, omschrijving en rubriek-niveaus.
             </p>
         </div>
         @php $gewichtOk = $totalWeight === 100; @endphp
@@ -76,73 +76,89 @@
     <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
         <table class="w-full text-sm">
             <thead class="bg-neutral-50 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
-                <tr>
-                    <th class="px-4 py-3 w-24">Code</th>
-                    <th class="px-4 py-3">Titel &amp; omschrijving</th>
-                    <th class="px-4 py-3 w-24">Gewicht</th>
-                    <th class="px-4 py-3 w-40"></th>
-                </tr>
+            <tr>
+                <th class="px-4 py-3 w-24">Code</th>
+                <th class="px-4 py-3">Titel, omschrijving &amp; rubriek-niveaus</th>
+                <th class="px-4 py-3 w-24">Gewicht</th>
+                <th class="px-4 py-3 w-40"></th>
+            </tr>
             </thead>
             <tbody class="divide-y divide-neutral-100">
-                @forelse ($competencies as $competency)
-                    <tr wire:key="comp-{{ $competency->id }}">
-                        @if ($editId === $competency->id)
-                            {{-- Bewerk-modus --}}
-                            <td class="px-4 py-3 align-top">
-                                <input type="text" wire:model="editCode"
-                                       class="w-20 rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
-                            </td>
-                            <td class="px-4 py-3">
-                                <input type="text" wire:model="editTitle"
-                                       class="w-full rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
-                                @error('editTitle') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
-                                <textarea wire:model="editDescription" rows="2" placeholder="Omschrijving"
-                                          class="mt-2 w-full resize-none rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
-                            </td>
-                            <td class="px-4 py-3 align-top">
-                                <input type="number" wire:model="editWeight" min="0" max="100"
-                                       class="w-20 rounded-lg border border-neutral-300 px-2 py-1.5 text-right text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
-                                @error('editWeight') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
-                            </td>
-                            <td class="px-4 py-3 align-top">
-                                <div class="flex gap-2">
-                                    <button wire:click="saveEdit"
-                                            class="rounded-lg bg-[#E2231A] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#c41e16]">
-                                        Opslaan
-                                    </button>
-                                    <button wire:click="cancelEdit"
-                                            class="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50">
-                                        Annuleer
-                                    </button>
-                                </div>
-                            </td>
-                        @else
-                            {{-- Weergave --}}
-                            <td class="px-4 py-3 align-top font-mono text-xs text-neutral-500">{{ $competency->code ?: '—' }}</td>
-                            <td class="px-4 py-3">
-                                <p class="font-medium text-neutral-900">{{ $competency->title }}</p>
-                                @if ($competency->description)
-                                    <p class="mt-0.5 text-xs text-neutral-500">{{ $competency->description }}</p>
-                                @endif
-                            </td>
-                            <td class="px-4 py-3 align-top font-semibold text-neutral-900">{{ $competency->weight }}</td>
-                            <td class="px-4 py-3 align-top">
-                                <div class="flex gap-3 text-sm">
-                                    <button wire:click="startEdit({{ $competency->id }})"
-                                            class="font-medium text-[#E2231A] hover:underline">Bewerken</button>
-                                    <button wire:click="deleteCompetency({{ $competency->id }})"
-                                            class="font-medium text-neutral-500 hover:underline">Verwijderen</button>
-                                </div>
-                            </td>
-                        @endif
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="px-4 py-8 text-center text-sm text-neutral-500">
-                            Nog geen competenties. Voeg er hieronder een toe.
+            @forelse ($competencies as $competency)
+                <tr wire:key="comp-{{ $competency->id }}">
+                    @if ($editId === $competency->id)
+                        {{-- Bewerk-modus --}}
+                        <td class="px-4 py-3 align-top">
+                            <input type="text" wire:model="editCode"
+                                   class="w-20 rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
                         </td>
-                    </tr>
-                @endforelse
+                        <td class="px-4 py-3">
+                            <input type="text" wire:model="editTitle" placeholder="Titel"
+                                   class="w-full rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                            @error('editTitle') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                            <textarea wire:model="editDescription" rows="2" placeholder="Omschrijving"
+                                      class="mt-2 w-full resize-none rounded-lg border border-neutral-300 px-2 py-1.5 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
+
+                            <div class="mt-2 grid gap-2 sm:grid-cols-3">
+                                    <textarea wire:model="editLevelFull" rows="3" placeholder="Volledig"
+                                              class="w-full resize-none rounded-lg border border-neutral-300 px-2 py-1.5 text-xs focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
+                                <textarea wire:model="editLevelGood" rows="3" placeholder="Goed"
+                                          class="w-full resize-none rounded-lg border border-neutral-300 px-2 py-1.5 text-xs focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
+                                <textarea wire:model="editLevelLow" rows="3" placeholder="Onvoldoende"
+                                          class="w-full resize-none rounded-lg border border-neutral-300 px-2 py-1.5 text-xs focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 align-top">
+                            <input type="number" wire:model="editWeight" min="0" max="100"
+                                   class="w-20 rounded-lg border border-neutral-300 px-2 py-1.5 text-right text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none">
+                            @error('editWeight') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+                        </td>
+                        <td class="px-4 py-3 align-top">
+                            <div class="flex gap-2">
+                                <button wire:click="saveEdit"
+                                        class="rounded-lg bg-[#E2231A] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#c41e16]">
+                                    Opslaan
+                                </button>
+                                <button wire:click="cancelEdit"
+                                        class="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50">
+                                    Annuleer
+                                </button>
+                            </div>
+                        </td>
+                    @else
+                        {{-- Weergave --}}
+                        <td class="px-4 py-3 align-top font-mono text-xs text-neutral-500">{{ $competency->code ?: '—' }}</td>
+                        <td class="px-4 py-3">
+                            <p class="font-medium text-neutral-900">{{ $competency->title }}</p>
+                            @if ($competency->description)
+                                <p class="mt-0.5 text-xs text-neutral-500">{{ $competency->description }}</p>
+                            @endif
+                            @if ($competency->level_full || $competency->level_good || $competency->level_low)
+                                <dl class="mt-2 space-y-1 text-xs text-neutral-500">
+                                    @if ($competency->level_full)<div><dt class="inline font-medium text-neutral-700">Volledig:</dt> {{ $competency->level_full }}</div>@endif
+                                    @if ($competency->level_good)<div><dt class="inline font-medium text-neutral-700">Goed:</dt> {{ $competency->level_good }}</div>@endif
+                                    @if ($competency->level_low)<div><dt class="inline font-medium text-neutral-700">Onvoldoende:</dt> {{ $competency->level_low }}</div>@endif
+                                </dl>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 align-top font-semibold text-neutral-900">{{ $competency->weight }}</td>
+                        <td class="px-4 py-3 align-top">
+                            <div class="flex gap-3 text-sm">
+                                <button wire:click="startEdit({{ $competency->id }})"
+                                        class="font-medium text-[#E2231A] hover:underline">Bewerken</button>
+                                <button wire:click="deleteCompetency({{ $competency->id }})"
+                                        class="font-medium text-neutral-500 hover:underline">Verwijderen</button>
+                            </div>
+                        </td>
+                    @endif
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="4" class="px-4 py-8 text-center text-sm text-neutral-500">
+                        Nog geen competenties. Voeg er hieronder een toe.
+                    </td>
+                </tr>
+            @endforelse
             </tbody>
         </table>
     </div>
@@ -172,6 +188,16 @@
         <textarea wire:model="description" rows="2" placeholder="Omschrijving (optioneel)"
                   class="mt-4 w-full resize-none rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
         @error('description') <p class="mt-1 text-xs text-[#E2231A]">{{ $message }}</p> @enderror
+
+        <p class="mt-4 mb-2 text-xs font-medium uppercase tracking-wide text-neutral-500">Rubriek-niveaus (optioneel)</p>
+        <div class="grid gap-3 sm:grid-cols-3">
+            <textarea wire:model="levelFull" rows="3" placeholder="Volledig — wat verdient de hoogste score?"
+                      class="w-full resize-none rounded-lg border border-neutral-300 px-3 py-2 text-xs focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
+            <textarea wire:model="levelGood" rows="3" placeholder="Goed — wat is een voldoende prestatie?"
+                      class="w-full resize-none rounded-lg border border-neutral-300 px-3 py-2 text-xs focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
+            <textarea wire:model="levelLow" rows="3" placeholder="Onvoldoende — wanneer schiet het tekort?"
+                      class="w-full resize-none rounded-lg border border-neutral-300 px-3 py-2 text-xs focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none"></textarea>
+        </div>
 
         <div class="mt-4 flex justify-end">
             <button wire:click="addCompetency"

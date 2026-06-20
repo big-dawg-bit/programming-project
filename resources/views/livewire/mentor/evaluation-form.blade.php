@@ -15,7 +15,10 @@
 
     {{-- Competenties --}}
     <div class="rounded-xl border border-neutral-200 bg-white p-5">
-        <h3 class="font-semibold">Competenties beoordelen</h3>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="font-semibold">Competenties beoordelen</h3>
+            <x-rubriek-modal :competencies="$competencies" />
+        </div>
         <p class="mt-1 text-sm text-neutral-500">Geef een score van 0 tot 20 voor elke competentie.</p>
 
         <div class="mt-4 divide-y divide-neutral-100">

@@ -13,9 +13,12 @@
 
     {{-- Competenties --}}
     <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
-        <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <h3 class="font-semibold">Competenties</h3>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400">Score 0-20 (Belgisch) — 10 = voldoende, 14 = goed, 18 = uitstekend</p>
+            <div class="flex items-center gap-3">
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">Score 0-20 (Belgisch) — 10 = voldoende, 14 = goed, 18 = uitstekend</p>
+                <x-rubriek-modal :competencies="$competencies" />
+            </div>
         </div>
 
         <div class="mt-4 divide-y divide-neutral-100 dark:divide-neutral-800">
