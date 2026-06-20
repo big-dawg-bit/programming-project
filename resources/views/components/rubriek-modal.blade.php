@@ -3,7 +3,7 @@
 <div x-data="{ open: false }" class="inline">
     {{-- Knop --}}
     <button type="button" x-on:click="open = true"
-            class="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 transition hover:border-[#E2231A] hover:text-[#E2231A] dark:border-neutral-700 dark:text-neutral-200">
+            class="inline-flex items-center gap-1.5 rounded-lg bg-[#E2231A] px-3 py-1.5 text-sm font-medium text-white transition hover:bg-[#c41e16]">
         Bekijk rubriek
     </button>
 
