@@ -11,6 +11,18 @@
             <p class="mt-1 text-sm">Er is nog geen bedrijf aan jouw account gekoppeld.</p>
         </div>
     @else
+        {{-- Nog te tekenen --}}
+        @if ($openAgreementsCount > 0)
+            <a href="{{ route('bedrijf.overeenkomsten') }}" wire:navigate
+               class="flex items-center justify-between rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 text-amber-900 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/60">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="document-check" class="size-5" />
+                    <span class="font-medium">{{ $openAgreementsCount }} overeenkomst(en) nog te tekenen</span>
+                </div>
+                <flux:icon name="arrow-right" class="size-4" />
+            </a>
+        @endif
+
         {{-- Aantallen --}}
         <div class="grid gap-4 md:grid-cols-2">
             <div class="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
