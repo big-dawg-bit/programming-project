@@ -59,7 +59,7 @@ it('laat de docent tekenen; status blijft te_ondertekenen tot de student ook tek
         ->and($agreement->status)->toBe('te_ondertekenen');
 });
 
-it('zet de overeenkomst op ingediend zodra student en docent beide getekend hebben', function () {
+it('houdt de status op te_ondertekenen na docent-handtekening, want het bedrijf moet tekenen', function () {
     [$docentUser, $stage, $agreement] = docentMetOvereenkomst([
         'student_signature' => GELDIGE_HANDTEKENING,
         'student_signed_at' => now(),
@@ -69,7 +69,8 @@ it('zet de overeenkomst op ingediend zodra student en docent beide getekend hebb
         ->call('openSign', $stage->id)
         ->call('signDocent', GELDIGE_HANDTEKENING);
 
-    expect($agreement->refresh()->status)->toBe('ingediend');
+    // De overeenkomst-status volgt nu uit student + bedrijf, niet uit de docent.
+    expect($agreement->refresh()->status)->toBe('te_ondertekenen');
 });
 
 it('laat een docent niet de stage van een andere docent tekenen', function () {

@@ -14,8 +14,8 @@
     @elseif (! $agreement)
         <div class="rounded-xl border border-dashed border-neutral-300 bg-white p-10 text-center text-sm text-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400">
             <flux:icon name="clock" class="mx-auto size-8 text-neutral-300 dark:text-neutral-600" />
-            <p class="mt-3 font-medium text-neutral-700 dark:text-neutral-200">Wacht op goedkeuring van je mentor</p>
-            <p class="mt-1">Zodra je mentor akkoord geeft, verschijnt hier de stageovereenkomst om te ondertekenen.</p>
+            <p class="mt-3 font-medium text-neutral-700 dark:text-neutral-200">Wacht op goedkeuring van de stagecommissie</p>
+            <p class="mt-1">Zodra de stagecommissie je aanvraag goedkeurt, verschijnt hier de stageovereenkomst om te ondertekenen.</p>
         </div>
 
     @else
@@ -32,7 +32,7 @@
             $ref   = 'STG-' . $jaar . '-' . $application->id;
 
             $studentGetekend = (bool) $agreement->student_signature;
-            $docentGetekend  = (bool) $agreement->docent_signature;
+            $bedrijfGetekend = (bool) $agreement->company_signature;
 
             $initialen = fn ($naam) => collect(explode(' ', trim($naam)))->filter()->map(fn ($d) => mb_strtoupper(mb_substr($d, 0, 1)))->take(2)->implode('');
             $datum = fn ($d) => $d ? \Illuminate\Support\Carbon::parse($d)->locale('nl')->translatedFormat('j M Y') : '—';
@@ -117,7 +117,7 @@
             <div class="mt-4 space-y-3">
                 @foreach ([
                     ['naam' => $studentNaam, 'rol' => 'Student', 'getekend' => $studentGetekend, 'op' => $agreement->student_signed_at, 'kleur' => 'bg-violet-500'],
-                    ['naam' => $docentNaam, 'rol' => 'Begeleider school', 'getekend' => $docentGetekend, 'op' => $agreement->docent_signed_at, 'kleur' => 'bg-[#E2231A]'],
+                    ['naam' => $company?->name ?? 'Bedrijf', 'rol' => 'Onderneming', 'getekend' => $bedrijfGetekend, 'op' => $agreement->company_signed_at, 'kleur' => 'bg-[#E2231A]'],
                 ] as $partij)
                     <div class="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 px-4 py-3 dark:border-neutral-800">
                         <div class="flex items-center gap-3">
