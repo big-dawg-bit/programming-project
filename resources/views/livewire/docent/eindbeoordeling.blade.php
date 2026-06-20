@@ -15,6 +15,18 @@
         </div>
     @endif
 
+    @if (! $studentEval || ! $mentorEval)
+        <div class="mb-6 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+            @if (! $studentEval && ! $mentorEval)
+                De student en de mentor hebben hun eindevaluatie nog niet ingediend. Je kan al beoordelen, maar er is nog geen referentie.
+            @elseif (! $studentEval)
+                De student heeft de zelfevaluatie nog niet ingediend.
+            @else
+                De mentor heeft de eindevaluatie nog niet ingediend.
+            @endif
+        </div>
+    @endif
+
     <form wire:submit="submit" class="space-y-4">
         @foreach ($competencies as $competency)
             @php
@@ -44,7 +56,7 @@
                 <div class="grid gap-3 sm:grid-cols-[8rem_1fr]">
                     <div>
                         <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400">Definitief (/20)</label>
-                        <input type="number" min="0" max="20" step="0.5" wire:model.blur="scores.{{ $competency->id }}"
+                        <input type="number" min="0" max="20" step="0.5" wire:model="scores.{{ $competency->id }}"
                                class="mt-1 w-full rounded-lg border-neutral-300 text-sm dark:border-neutral-700 dark:bg-neutral-800" />
                         @error("scores.{$competency->id}") <span class="mt-1 block text-xs text-red-600">{{ $message }}</span> @enderror
                     </div>
@@ -72,17 +84,11 @@
                         </span>
                     </div>
                     @if ($result['passed'] === true)
-                        <span class="rounded-full bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-700 ring-1 ring-inset ring-green-200 dark:bg-green-900/30 dark:text-green-300">
-                            Geslaagd
-                        </span>
+                        <span class="rounded-full bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-700 ring-1 ring-inset ring-green-200 dark:bg-green-900/30 dark:text-green-300">Geslaagd</span>
                     @elseif ($result['passed'] === false)
-                        <span class="rounded-full bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 ring-1 ring-inset ring-red-200 dark:bg-red-900/30 dark:text-red-300">
-                            Niet geslaagd
-                        </span>
+                        <span class="rounded-full bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 ring-1 ring-inset ring-red-200 dark:bg-red-900/30 dark:text-red-300">Niet geslaagd</span>
                     @else
-                        <span class="rounded-full bg-neutral-100 px-3 py-1.5 text-sm font-medium text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
-                            Vul alle scores in
-                        </span>
+                        <span class="rounded-full bg-neutral-100 px-3 py-1.5 text-sm font-medium text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">Vul alle scores in</span>
                     @endif
                 </div>
             </div>
