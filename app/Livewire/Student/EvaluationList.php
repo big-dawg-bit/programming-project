@@ -46,15 +46,15 @@ class EvaluationList extends Component
     }
 
     /**
-     * Gecombineerde eindevaluatie: per competentie de student- én mentorscore
-     * naast elkaar (voor de "Eind"-tab, zoals het eindevaluatie-scherm).
+     * Gecombineerde eindevaluatie: per competentie de student-, mentor- én
+     * docentscore naast elkaar, plus de bindende eindbeoordeling van de docent.
      */
     public function combined(): array
     {
         $stage = $this->stage();
 
         if (! $stage || ! $stage->framework) {
-            return ['rows' => collect(), 'studentEval' => null, 'mentorEval' => null];
+            return ['rows' => collect(), 'studentEval' => null, 'mentorEval' => null, 'docentEval' => null, 'finalEval' => null];
         }
 
         $type = $this->typeForTab();
@@ -70,11 +70,16 @@ class EvaluationList extends Component
 
         $studentEval = $find('student');
         $mentorEval = $find('mentor');
+        $docentEval = $find('docent');
+
+        // De officiële, bindende eindbeoordeling (door de docent vastgelegd op de stage).
+        $finalEval = $stage->finalEvaluation;
 
         $rows = $stage->framework->competencies()->orderBy('sort_order')->get()
-            ->map(function ($comp) use ($studentEval, $mentorEval) {
+            ->map(function ($comp) use ($studentEval, $mentorEval, $docentEval) {
                 $s = $studentEval?->scores->firstWhere('competency_id', $comp->id);
                 $m = $mentorEval?->scores->firstWhere('competency_id', $comp->id);
+                $d = $docentEval?->scores->firstWhere('competency_id', $comp->id);
 
                 return [
                     'competency' => $comp,
@@ -82,10 +87,12 @@ class EvaluationList extends Component
                     'mentorFeedback' => $m?->feedback,
                     'studentScore' => $s?->score,
                     'mentorScore' => $m?->score,
+                    'docentScore' => $d?->score,
+                    'docentFeedback' => $d?->feedback,
                 ];
             });
 
-        return ['rows' => $rows, 'studentEval' => $studentEval, 'mentorEval' => $mentorEval];
+        return ['rows' => $rows, 'studentEval' => $studentEval, 'mentorEval' => $mentorEval, 'docentEval' => $docentEval, 'finalEval' => $finalEval];
     }
 
     public function render()

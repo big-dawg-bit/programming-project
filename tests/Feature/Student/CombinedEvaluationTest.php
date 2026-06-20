@@ -44,7 +44,7 @@ function makeRoleEvaluation(Stage $stage, string $role, array $scores): Evaluati
             'weight_snapshot' => 50,
             'score' => $score,
             'student_description' => $role === 'student' ? $text : null,
-            'feedback' => $role === 'mentor' ? $text : null,
+            'feedback' => in_array($role, ['mentor', 'docent']) ? $text : null,
         ]);
     }
 
@@ -79,4 +79,29 @@ it('toont een lege eindevaluatie wanneer student noch mentor ingediend heeft', f
     Livewire::actingAs($user)->test(EvaluationList::class)
         ->set('tab', 'eind')
         ->assertSee('Nog geen eindevaluatie');
+});
+
+it('toont de definitieve docentbeoordeling in de gecombineerde eindevaluatie', function () {
+    [$user, $stage, $compA, $compB] = makeCombinedSetup();
+
+    makeRoleEvaluation($stage, 'student', [
+        $compA->id => [3, 'Mijn planning verliep vlot.'],
+        $compB->id => [4, 'Goed gecommuniceerd.'],
+    ]);
+
+    $docentEval = makeRoleEvaluation($stage, 'docent', [
+        $compA->id => [16, 'Solide aanpak.'],
+        $compB->id => [18, 'Uitstekend werk.'],
+    ]);
+    $docentEval->update(['overall_score' => 17]);
+
+    // De docent legt deze beoordeling vast als officieel resultaat van de stage.
+    $stage->update(['final_evaluation_id' => $docentEval->id]);
+
+    Livewire::actingAs($user)->test(EvaluationList::class)
+        ->set('tab', 'eind')
+        ->assertSee('Score docent')
+        ->assertSee('16.0/20')
+        ->assertSee('Definitieve eindbeoordeling')
+        ->assertSee('17.0');
 });

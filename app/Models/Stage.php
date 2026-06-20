@@ -55,4 +55,8 @@ class Stage extends Model
     {
         return $this->hasOne(FinalReport::class);
     }
+    public function finalEvaluation(): BelongsTo
+    {
+        return $this->belongsTo(Evaluation::class, 'final_evaluation_id');
+    }
 }
