@@ -16,23 +16,17 @@
     {{-- Competenties --}}
     <div class="rounded-xl border border-neutral-200 bg-white p-5">
         <h3 class="font-semibold">Competenties beoordelen</h3>
-        <p class="mt-1 text-sm text-neutral-500">Geef een score van 1 tot 5 voor elke competentie.</p>
+        <p class="mt-1 text-sm text-neutral-500">Geef een score van 0 tot 20 voor elke competentie.</p>
 
         <div class="mt-4 divide-y divide-neutral-100">
             @foreach ($competencies as $competency)
                 <div wire:key="comp-{{ $competency->id }}" class="flex items-center justify-between gap-4 py-4">
                     <span class="text-sm font-medium text-neutral-800">{{ $competency->title }}</span>
-                    <div class="flex shrink-0 gap-2">
-                        @for ($i = 1; $i <= 5; $i++)
-                            <button type="button" wire:click="setScore({{ $competency->id }}, {{ $i }})"
-                                @class([
-                                    'grid size-9 place-items-center rounded-full border text-sm font-medium transition',
-                                    'border-[#E2231A] bg-[#E2231A] text-white' => ($scores[$competency->id] ?? null) === $i,
-                                    'border-neutral-300 text-neutral-600 hover:border-[#E2231A] hover:text-[#E2231A]' => ($scores[$competency->id] ?? null) !== $i,
-                                ])>
-                                {{ $i }}
-                            </button>
-                        @endfor
+                    <div class="flex shrink-0 items-center gap-2">
+                        <input type="number" min="0" max="20" step="0.5"
+                               wire:model="scores.{{ $competency->id }}"
+                               class="w-20 rounded-lg border border-neutral-300 px-3 py-2 text-center text-sm focus:border-[#E2231A] focus:ring-1 focus:ring-[#E2231A] focus:outline-none" />
+                        <span class="text-sm text-neutral-400">/20</span>
                     </div>
                 </div>
             @endforeach

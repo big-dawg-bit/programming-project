@@ -69,8 +69,8 @@ it('toont de gecombineerde eindevaluatie met student- en mentorscore naast elkaa
         ->assertSee('Communicatie')
         ->assertSee('Mijn planning verliep vlot.')
         ->assertSee('Sterke planning.')
-        ->assertSee('3/5')
-        ->assertSee('5/5');
+        ->assertSee('3.0/20')
+        ->assertSee('5.0/20');
 });
 
 it('toont een lege eindevaluatie wanneer student noch mentor ingediend heeft', function () {

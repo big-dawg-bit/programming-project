@@ -16,7 +16,7 @@ class EvaluationForm extends Component
     public Stage $stage;
     public string $type = 'final';
 
-    /** Score per competency_id (0 t/m 5). */
+    /** Score per competency_id (0 t/m 20). */
     public array $scores = [];
 
     /** Beschrijving per competency_id (de "Studentenbeschrijving"). */
@@ -66,7 +66,7 @@ class EvaluationForm extends Component
     public function submit()
     {
         $this->validate([
-            'scores.*' => 'required|integer|min:0|max:5',
+            'scores.*' => 'required|numeric|min:0|max:20',
             'descriptions.*' => 'nullable|string|max:2000',
         ], [
             'scores.*.required' => 'Geef elke competentie een score.',
