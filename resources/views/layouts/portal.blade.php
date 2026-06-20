@@ -51,6 +51,9 @@
 
                     $bedrijfNav = [
                         ['label' => 'Dashboard',    'icon' => 'squares-2x2',   'route' => 'bedrijf.dashboard'],
+                        ['label' => 'Aanvragen',        'icon' => 'inbox-arrow-down', 'route' => 'bedrijf.aanvragen'],
+                        ['label' => 'Mentor toewijzen', 'icon' => 'user-plus',     'route' => 'bedrijf.toewijzen'],
+                        ['label' => 'Overeenkomsten',   'icon' => 'document-check',    'route' => 'bedrijf.overeenkomsten'],
                         ['label' => 'Logboeken',    'icon' => 'document-text', 'route' => 'bedrijf.logboeken'],
                         ['label' => 'Instellingen', 'icon' => 'cog-6-tooth',   'route' => 'profile.edit'],
                     ];
