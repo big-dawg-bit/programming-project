@@ -12,28 +12,6 @@ use Livewire\Component;
 #[Title('Dashboard')]
 class Dashboard extends Component
 {
-    public function assignMentor(int $stageId, $mentorId): void
-    {
-        $company = Company::where('user_id', Auth::id())->first();
-
-        if (! $company) {
-            return;
-        }
-
-        $stage = $company->stages()->find($stageId);
-
-        if (! $stage) {
-            return;
-        }
-
-        // De gekozen mentor moet bij dit bedrijf horen.
-        $mentorBelongs = $mentorId && $company->mentors()->whereKey($mentorId)->exists();
-
-        $stage->update(['mentor_id' => $mentorBelongs ? $mentorId : null]);
-
-        session()->flash('bedrijf-status', 'Mentor bijgewerkt.');
-    }
-
     public function render()
     {
         $company = Company::where('user_id', Auth::id())->first();
@@ -42,15 +20,12 @@ class Dashboard extends Component
             ? $company->stages()->with(['student.user', 'mentor.user'])->get()
             : collect();
 
-        $mentors = $company
-            ? $company->mentors()->with('user')->get()
-            : collect();
+        $mentorsCount = $company ? $company->mentors()->count() : 0;
 
         return view('livewire.bedrijf.dashboard', [
             'company' => $company,
             'stages' => $stages,
-            'mentors' => $mentors,
-            'mentorsCount' => $mentors->count(),
+            'mentorsCount' => $mentorsCount,
         ]);
     }
 }

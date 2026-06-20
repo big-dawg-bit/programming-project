@@ -77,6 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:bedrijf')->group(function () {
         Route::get('bedrijf', \App\Livewire\Bedrijf\Dashboard::class)->name('bedrijf.dashboard');
         Route::get('bedrijf/logboeken', \App\Livewire\Bedrijf\LogboekList::class)->name('bedrijf.logboeken');
+        Route::get('bedrijf/mentor-toewijzen', \App\Livewire\Bedrijf\MentorToewijzen::class)->name('bedrijf.toewijzen');
     });
 
     // Gedeeld: docent én mentor evalueren via hetzelfde formulier (scoping zit in EvaluationForm::mount()).
