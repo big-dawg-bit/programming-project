@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('stage_agreements', function (Blueprint $table) {
-            $table->string('company_signature')->nullable()->after('mentor_approved_at');
+            $table->longText('company_signature')->nullable()->after('mentor_approved_at');
             $table->timestamp('company_signed_at')->nullable()->after('company_signature');
         });
     }
