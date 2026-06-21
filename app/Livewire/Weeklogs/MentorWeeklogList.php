@@ -3,7 +3,6 @@
 namespace App\Livewire\Weeklogs;
 
 use App\Models\Mentor;
-use App\Models\Stage;
 use App\Models\Weeklog;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -24,15 +23,27 @@ class MentorWeeklogList extends Component
     public string $newComment = '';
 
     /**
-     * De stage die bij de ingelogde mentor hoort.
+     * De ingelogde mentor.
      */
-    private function currentStage(): ?Stage
+    private function mentor(): ?Mentor
     {
-        $mentor = Mentor::where('user_id', Auth::id())->first();
+        return Mentor::where('user_id', Auth::id())->first();
+    }
 
-        return $mentor
-            ? $mentor->stages()->with('student.user')->first()
-            : null;
+    /**
+     * Alle stage-id's van de ingelogde mentor (kan meerdere stagiairs hebben).
+     */
+    private function stageIds(): \Illuminate\Support\Collection
+    {
+        return $this->mentor()?->stages()->pluck('id') ?? collect();
+    }
+
+    /**
+     * Haal een weeklog op, maar enkel binnen de eigen stages van de mentor.
+     */
+    private function ownedWeeklog(int $weeklogId): Weeklog
+    {
+        return Weeklog::whereIn('stage_id', $this->stageIds())->findOrFail($weeklogId);
     }
 
     /**
@@ -52,7 +63,7 @@ class MentorWeeklogList extends Component
     {
         $this->validate(['newComment' => 'required|string|min:2']);
 
-        $weeklog = Weeklog::findOrFail($weeklogId);
+        $weeklog = $this->ownedWeeklog($weeklogId);
 
         $weeklog->comments()->create([
             'author_id' => Auth::id(),
@@ -67,7 +78,7 @@ class MentorWeeklogList extends Component
      */
         public function approve(int $weeklogId): void
     {
-        $weeklog = Weeklog::findOrFail($weeklogId);
+        $weeklog = $this->ownedWeeklog($weeklogId);
         $weeklog->update(['status' => 'goedgekeurd']);
 
         $this->openWeeklogId = null;
@@ -81,7 +92,7 @@ class MentorWeeklogList extends Component
      */
     public function requestChanges(int $weeklogId): void
     {
-        $weeklog = Weeklog::findOrFail($weeklogId);
+        $weeklog = $this->ownedWeeklog($weeklogId);
         $weeklog->update(['status' => 'aanpassing_gevraagd']);
 
         $this->openWeeklogId = null;
@@ -100,15 +111,19 @@ class MentorWeeklogList extends Component
 
     public function render()
     {
-        $stage = $this->currentStage();
+        // Weeklogs van ALLE stages van de mentor (kan meerdere stagiairs hebben).
+        $stageIds = $this->stageIds();
 
-        $query = $stage
-            ? $stage->weeklogs()->with('comments.author')->orderByDesc('week_number')
+        $query = $stageIds->isNotEmpty()
+            ? Weeklog::whereIn('stage_id', $stageIds)
+                ->with(['comments.author', 'stage.student.user'])
+                ->orderByDesc('submitted_at')
+                ->orderByDesc('week_number')
             : null;
 
         // Aantal weeklogs dat nog beoordeeld moet worden (voor de teller op de tab).
-        $teBeoordelenCount = $stage
-            ? $stage->weeklogs()->where('status', 'ingediend')->count()
+        $teBeoordelenCount = $stageIds->isNotEmpty()
+            ? Weeklog::whereIn('stage_id', $stageIds)->where('status', 'ingediend')->count()
             : 0;
 
         if ($query && ($statuses = self::FILTERS[$this->filter] ?? null)) {
@@ -116,7 +131,7 @@ class MentorWeeklogList extends Component
         }
 
         return view('livewire.weeklogs.mentor-weeklog-list', [
-            'stage' => $stage,
+            'hasStages' => $stageIds->isNotEmpty(),
             'weeklogs' => $query ? $query->get() : collect(),
             'teBeoordelenCount' => $teBeoordelenCount,
         ]);

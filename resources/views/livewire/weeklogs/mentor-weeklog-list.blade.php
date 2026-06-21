@@ -28,7 +28,7 @@
     </div>
 
     {{-- Lijst --}}
-    @if (! $stage)
+    @if (! $hasStages)
         <div class="rounded-xl border border-amber-300 bg-amber-50 p-6 text-amber-900">
             <p class="font-medium">Geen stagiair gevonden</p>
             <p class="mt-1 text-sm">Er is nog geen stage aan jou als mentor gekoppeld.</p>
@@ -64,7 +64,7 @@
                         $teBeoordelen = $weeklog->status === 'ingediend';
                     @endphp
                     <tr wire:key="{{ $weeklog->id }}" class="hover:bg-neutral-50">
-                        <td class="px-4 py-3 font-medium">{{ $stage->student?->user?->name ?? '—' }}</td>
+                        <td class="px-4 py-3 font-medium">{{ $weeklog->stage?->student?->user?->name ?? '—' }}</td>
                         <td class="px-4 py-3">Week {{ $weeklog->week_number }}</td>
                         <td class="px-4 py-3 text-neutral-600">{{ $periode ?: '—' }}</td>
                         <td class="px-4 py-3 text-neutral-600">{{ $ingediend }}</td>
