@@ -46,16 +46,23 @@
                 <flux:input type="date" wire:model="period_end" label="Tot" />
             </div>
 
-            <div x-data="{ count: @js(strlen($content)) }" x-on:input="count = $event.target.value.length">
-                <flux:textarea
-                    wire:model="content"
-                    label="Wat heb je deze week gedaan en geleerd?"
-                    rows="5"
-                    placeholder="Beschrijf je taken, reflectie en eventuele problemen…" />
-                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                    <span x-text="count">0</span> tekens (minimaal 5)
-                </p>
-            </div>
+            <flux:textarea
+                wire:model="tasksDescription"
+                label="Beschrijving van uitgevoerde taken"
+                rows="4"
+                placeholder="Welke taken heb je deze week uitgevoerd?" />
+
+            <flux:textarea
+                wire:model="reflection"
+                label="Reflectie"
+                rows="4"
+                placeholder="Wat heb je geleerd? Wat ging goed?" />
+
+            <flux:textarea
+                wire:model="learningPoints"
+                label="Eventuele problemen of leerpunten"
+                rows="3"
+                placeholder="Liep er iets moeilijk? Wat neem je mee? (optioneel)" />
 
             <flux:input type="number" step="0.5" wire:model="hours_worked" label="Gewerkte uren" min="0" max="80" />
 
@@ -106,7 +113,31 @@
                         </span>
                     </div>
 
-                    <p class="mt-3 line-clamp-2 text-sm text-neutral-600 dark:text-neutral-300">{{ $weeklog->content }}</p>
+                    @if ($weeklog->tasks_description || $weeklog->reflection || $weeklog->learning_points)
+                        <div class="mt-3 space-y-3 text-sm">
+                            @if ($weeklog->tasks_description)
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">Uitgevoerde taken</p>
+                                    <p class="mt-1 whitespace-pre-line text-neutral-600 dark:text-neutral-300">{{ $weeklog->tasks_description }}</p>
+                                </div>
+                            @endif
+                            @if ($weeklog->reflection)
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">Reflectie</p>
+                                    <p class="mt-1 whitespace-pre-line text-neutral-600 dark:text-neutral-300">{{ $weeklog->reflection }}</p>
+                                </div>
+                            @endif
+                            @if ($weeklog->learning_points)
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">Problemen / leerpunten</p>
+                                    <p class="mt-1 whitespace-pre-line text-neutral-600 dark:text-neutral-300">{{ $weeklog->learning_points }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    @else
+                        {{-- Oudere weeklogs zonder opsplitsing --}}
+                        <p class="mt-3 whitespace-pre-line text-sm text-neutral-600 dark:text-neutral-300">{{ $weeklog->content }}</p>
+                    @endif
 
                     {{-- Reacties --}}
                     <button type="button" wire:click="toggleComments({{ $weeklog->id }})"

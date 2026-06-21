@@ -36,8 +36,15 @@ class WeeklogList extends Component
     #[Validate('nullable|date|after_or_equal:period_start')]
     public ?string $period_end = null;
 
+    // Inhoud opgesplitst in drie delen.
     #[Validate('required|string|min:5')]
-    public string $content = '';
+    public string $tasksDescription = '';
+
+    #[Validate('required|string|min:5')]
+    public string $reflection = '';
+
+    #[Validate('nullable|string')]
+    public string $learningPoints = '';
 
     #[Validate('nullable|numeric|min:0|max:80')]
     public $hours_worked = null;
@@ -83,16 +90,41 @@ class WeeklogList extends Component
         }
 
         $stage->weeklogs()->create([
-            ...$validated,
+            'week_number' => $validated['week_number'],
+            'period_start' => $validated['period_start'],
+            'period_end' => $validated['period_end'],
+            'hours_worked' => $validated['hours_worked'],
+            'tasks_description' => $validated['tasksDescription'],
+            'reflection' => $validated['reflection'],
+            'learning_points' => $validated['learningPoints'] ?: null,
+            // content blijft gevuld (samengevoegd) voor docent/mentor/bedrijf-overzichten.
+            'content' => $this->combinedContent($validated),
             'status' => 'ingediend',
             'submitted_at' => now(),
         ]);
 
-        $this->reset(['period_start', 'period_end', 'content', 'hours_worked']);
+        $this->reset(['period_start', 'period_end', 'tasksDescription', 'reflection', 'learningPoints', 'hours_worked']);
         $this->week_number++;
         $this->showForm = false;
 
         session()->flash('weeklog-saved', 'Logboek opgeslagen.');
+    }
+
+    /**
+     * Voeg de drie delen samen tot één leesbare tekst (voor bestaande overzichten).
+     */
+    private function combinedContent(array $validated): string
+    {
+        $parts = [
+            'Uitgevoerde taken:' . PHP_EOL . trim($validated['tasksDescription']),
+            'Reflectie:' . PHP_EOL . trim($validated['reflection']),
+        ];
+
+        if (! empty($validated['learningPoints'])) {
+            $parts[] = 'Problemen / leerpunten:' . PHP_EOL . trim($validated['learningPoints']);
+        }
+
+        return implode(PHP_EOL . PHP_EOL, $parts);
     }
 
     /**
