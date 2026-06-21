@@ -29,8 +29,8 @@ class DatabaseSeeder extends Seeder
             'contact_email' => 'contact@easi.net',
             'vat_number' => 'BE0123456789',
         ]);
-        Company::create(['name' => 'Odoo', 'contact_email' => 'contact@odoo.com']);
-        Company::create(['name' => 'Ingram Micro', 'contact_email' => 'contact@ingrammicro.be']);
+        $odoo = Company::create(['name' => 'Odoo', 'contact_email' => 'contact@odoo.com']);
+        $ingram = Company::create(['name' => 'Ingram Micro', 'contact_email' => 'contact@ingrammicro.be']);
 
         // --- Student user + subtype ---
         $studentUser = User::create([
@@ -124,6 +124,20 @@ class DatabaseSeeder extends Seeder
             'role_id' => $roles['bedrijf']->id,
         ]);
         $easi->update(['user_id' => $bedrijfUser->id]);
+
+        // --- Bedrijf-logins voor de overige bedrijven, zodat élk demo-bedrijf de
+        //     volledige flow kan doorlopen (accepteren + ondertekenen) net als Easi. ---
+        foreach ([$odoo, $ingram] as $bedrijf) {
+            $user = User::create([
+                'name' => $bedrijf->name.' (bedrijf)',
+                'first_name' => $bedrijf->name,
+                'last_name' => 'Bedrijf',
+                'email' => $bedrijf->contact_email,
+                'password' => Hash::make('password'),
+                'role_id' => $roles['bedrijf']->id,
+            ]);
+            $bedrijf->update(['user_id' => $user->id]);
+        }
 
         // --- Configurable competency framework (versioned) ---
         $framework = CompetencyFramework::create([
