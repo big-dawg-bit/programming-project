@@ -43,11 +43,13 @@
                             <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">
                                 Getekend op {{ \Illuminate\Support\Carbon::parse($agreement->company_signed_at)->locale('nl')->translatedFormat('j M Y') }}
                             </span>
-                        @else
+                        @elseif ($agreement->docent_signed_at && $agreement->mentor_approved_at)
                             <button wire:click="sign({{ $agreement->id }})"
                                     class="rounded-lg bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700">
                                 Tekenen
                             </button>
+                        @else
+                            <span class="text-xs text-neutral-500 dark:text-neutral-400">Wacht op docent en mentor</span>
                         @endif
                     </div>
                 </div>

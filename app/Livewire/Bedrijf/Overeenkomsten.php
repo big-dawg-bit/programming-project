@@ -29,6 +29,10 @@ class Overeenkomsten extends Component
             return;
         }
 
+        // Guard: bedrijf tekent pas nadat docent én mentor getekend hebben
+        if (! $agreement->docent_signed_at || ! $agreement->mentor_approved_at) {
+            return;
+        }
         $agreement->update([
             'company_signature' => $company->name,
             'company_signed_at' => now(),
