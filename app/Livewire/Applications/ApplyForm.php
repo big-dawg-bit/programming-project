@@ -97,7 +97,7 @@ class ApplyForm extends Component
             'company_id' => ['required', 'exists:companies,id'],
             'position_title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'start_date' => ['required', 'date'],
+            'start_date' => ['required', 'date', 'after_or_equal:today'],
             'end_date' => ['required', 'date', 'after:start_date'],
             'proposed_mentor_name' => ['nullable', 'string', 'max:255'],
         ]);

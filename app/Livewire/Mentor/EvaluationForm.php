@@ -4,6 +4,7 @@ namespace App\Livewire\Mentor;
 
 use App\Models\Evaluation;
 use App\Models\EvaluationScore;
+use App\Models\Mentor;
 use App\Models\Stage;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -23,7 +24,6 @@ class EvaluationForm extends Component
     public string $generalFeedback = '';
     public string $recommendations = '';
 
-    // De labels van de twee evaluatietypes.
     public const TYPES = [
         'mid-term' => 'Tussentijdse evaluatie',
         'final' => 'Eindevaluatie',
@@ -31,6 +31,16 @@ class EvaluationForm extends Component
 
     public function mount(Stage $stage, string $type): void
     {
+        // Scoping: enkel de mentor die aan DEZE stage is toegewezen mag evalueren.
+        $mentor = Mentor::where('user_id', Auth::id())->first();
+        abort_unless($mentor && $stage->mentor_id === $mentor->id, 403);
+
+        // Enkel geldige types.
+        abort_unless(array_key_exists($type, self::TYPES), 404);
+
+        // Zonder evaluatiekader kan er niet geëvalueerd worden (anders crasht competencies()).
+        abort_unless($stage->framework !== null, 404);
+
         $this->stage = $stage;
         $this->type = $type;
 
@@ -47,26 +57,17 @@ class EvaluationForm extends Component
             ->get();
     }
 
-    /**
-     * Geef een competentie een score (0-20).
-     */
     public function setScore(int $competencyId, int $score): void
     {
         $this->scores[$competencyId] = $score;
     }
 
-    /**
-     * Opslaan als concept (status 'draft').
-     */
     public function saveDraft(): void
     {
         $this->persist('draft');
         session()->flash('evaluatie-opgeslagen', 'Evaluatie opgeslagen als concept.');
     }
 
-    /**
-     * Indienen (status 'submitted').
-     */
     public function submit()
     {
         $this->validate([
@@ -81,20 +82,28 @@ class EvaluationForm extends Component
     }
 
     /**
-     * Maak/­update de evaluatie + scores in de database.
+     * Eén evaluatie per (stage + type + rol): updateOrCreate i.p.v. altijd nieuw,
+     * zodat concept → indienen geen dubbele rijen maakt.
      */
     private function persist(string $status): void
     {
-        $evaluation = Evaluation::create([
-            'stage_id' => $this->stage->id,
-            'framework_id' => $this->stage->framework_id,
-            'type' => $this->type,
-            'evaluator_role' => 'mentor',
-            'status' => $status,
-            'general_feedback' => $this->generalFeedback ?: null,
-            'recommendations' => $this->recommendations ?: null,
-            'submitted_at' => $status === 'submitted' ? now() : null,
-        ]);
+        $evaluation = Evaluation::updateOrCreate(
+            [
+                'stage_id' => $this->stage->id,
+                'type' => $this->type,
+                'evaluator_role' => 'mentor',
+            ],
+            [
+                'framework_id' => $this->stage->framework_id,
+                'status' => $status,
+                'general_feedback' => $this->generalFeedback ?: null,
+                'recommendations' => $this->recommendations ?: null,
+                'submitted_at' => $status === 'submitted' ? now() : null,
+            ]
+        );
+
+        // Scores opnieuw opbouwen.
+        $evaluation->scores()->delete();
 
         foreach ($this->competencies() as $competency) {
             EvaluationScore::create([
@@ -105,7 +114,7 @@ class EvaluationForm extends Component
             ]);
         }
 
-        // Gewogen eindcijfer berekenen.
+        // Gewogen eindcijfer.
         $scores = $evaluation->scores()->get();
         $totalWeight = $scores->sum('weight_snapshot');
 
