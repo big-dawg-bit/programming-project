@@ -3,7 +3,6 @@
 namespace App\Livewire\Mentor;
 
 use App\Models\Mentor;
-use App\Models\Stage;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,44 +21,50 @@ class EvaluationList extends Component
         'final' => 'Eindevaluatie',
     ];
 
-    /**
-     * De stage die bij de ingelogde mentor hoort.
-     */
-    private function currentStage(): ?Stage
+    public function render()
     {
         $mentor = Mentor::where('user_id', Auth::id())->first();
 
-        return $mentor
-            ? $mentor->stages()->with('student.user', 'company')->first()
-            : null;
-    }
-
-    public function render()
-    {
-        $stage = $this->currentStage();
-
-        // Reeds ingediende mentor-evaluaties van deze stage.
-        $ingediend = $stage
-            ? $stage->evaluations()
-                ->where('evaluator_role', 'mentor')
-                ->where('status', 'submitted')
-                ->latest('submitted_at')
+        // ALLE stagiairs van de mentor (nieuw → oud), met hun ingediende mentor-evaluaties.
+        // (Vroeger werd enkel de eerste stage getoond, waardoor extra stagiairs onzichtbaar bleven.)
+        $stages = $mentor
+            ? $mentor->stages()
+                ->with([
+                    'student.user',
+                    'company',
+                    'evaluations' => fn ($q) => $q->where('evaluator_role', 'mentor')
+                        ->where('status', 'submitted')
+                        ->latest('submitted_at'),
+                ])
+                ->latest()
                 ->get()
             : collect();
 
-        // Welke types zijn al ingediend?
-        $ingediendeTypes = $ingediend->pluck('type')->all();
+        // Per stagiair: de ingediende evaluaties + de nog te doen evaluatiemomenten.
+        $studenten = $stages->map(function ($stage) {
+            $ingediend = $stage->evaluations;
+            $ingediendeTypes = $ingediend->pluck('type')->all();
 
-        // "Te doen" = de types die nog niet ingediend zijn.
-        $teDoen = collect(self::TYPES)
-            ->reject(fn ($label, $type) => in_array($type, $ingediendeTypes, true))
-            ->map(fn ($label, $type) => ['type' => $type, 'label' => $label]);
+            $teDoen = collect(self::TYPES)
+                ->reject(fn ($label, $type) => in_array($type, $ingediendeTypes, true))
+                ->map(fn ($label, $type) => ['type' => $type, 'label' => $label])
+                ->values();
+
+            return [
+                'stage' => $stage,
+                'student' => $stage->student?->user?->name ?? 'Onbekende student',
+                'bedrijf' => $stage->company?->name ?? '—',
+                'heeftKader' => $stage->framework_id !== null,
+                'ingediend' => $ingediend,
+                'teDoen' => $teDoen,
+            ];
+        });
 
         return view('livewire.mentor.evaluation-list', [
-            'stage' => $stage,
-            'teDoen' => $teDoen,
-            'ingediend' => $ingediend,
-            'teDoenCount' => $teDoen->count(),
+            'studenten' => $studenten,
+            'heeftStudenten' => $stages->isNotEmpty(),
+            'teDoenCount' => $studenten->sum(fn ($r) => $r['teDoen']->count()),
+            'ingediendCount' => $studenten->sum(fn ($r) => $r['ingediend']->count()),
         ]);
     }
 }
