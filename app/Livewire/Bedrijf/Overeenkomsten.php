@@ -33,7 +33,9 @@ class Overeenkomsten extends Component
         }
 
         $applicationIds = $company->applications()->pluck('id');
-        $agreement = StageAgreement::whereIn('application_id', $applicationIds)->find($this->signingAgreementId);
+        $agreement = StageAgreement::whereIn('application_id', $applicationIds)
+            ->with('application.stage')
+            ->find($this->signingAgreementId);
         if (! $agreement) {
             return;
         }
@@ -42,7 +44,18 @@ class Overeenkomsten extends Component
             'signature' => 'required|string|starts_with:data:image/png;base64,|max:500000',
         ])->validate();
 
-        if ($agreement->status !== 'bevestigd') {
+        // Ondertekenen kan pas zodra de stage een begeleidende docent én een
+        // stagementor heeft (dezelfde regel als aan de studentzijde).
+        $stage = $agreement->application?->stage;
+        if (! $stage || ! $stage->mentor_id || ! $stage->docent_id) {
+            session()->flash('bedrijf-status', 'Je kan pas tekenen zodra de begeleidende docent en de stagementor zijn toegewezen.');
+            $this->closeSign();
+
+            return;
+        }
+
+        // Een al getekende of bevestigde overeenkomst wordt niet opnieuw getekend.
+        if ($agreement->status !== 'bevestigd' && ! $agreement->company_signature) {
             $agreement->fill([
                 'company_signature' => $signature,
                 'company_signed_at' => now(),

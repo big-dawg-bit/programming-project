@@ -6,6 +6,12 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
+            {{ session('error') }}
+        </div>
+    @endif
+
     @if (! $application)
         <div class="rounded-xl border border-dashed border-neutral-300 bg-white p-10 text-center text-sm text-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400">
             Je hebt nog geen goedgekeurde stage. Zodra je aanvraag is goedgekeurd, verschijnt de overeenkomst hier.
@@ -146,8 +152,12 @@
             @elseif ($studentGetekend)
                 <div class="mt-5 flex flex-wrap items-center gap-4 rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
                     <img src="{{ $agreement->student_signature }}" alt="Handtekening" class="h-16 rounded-lg border border-neutral-200 bg-white p-1 dark:border-neutral-700" />
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Je hebt ondertekend op {{ $datum($agreement->student_signed_at) }}.</p>
-                    <button type="button" wire:click="clearStudentSignature" class="ml-auto text-sm font-medium text-[#E2231A] hover:underline">Opnieuw tekenen</button>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">Je hebt ondertekend op {{ $datum($agreement->student_signed_at) }}. Een handtekening is definitief.</p>
+                </div>
+            @elseif (! $mentorDocentKlaar)
+                <div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+                    <p class="font-medium">Nog niet klaar om te ondertekenen</p>
+                    <p class="mt-1">Je kan pas tekenen zodra de stagecommissie een begeleidende docent heeft toegewezen én het bedrijf een stagementor heeft aangeduid. Je ziet hen hierboven verschijnen zodra dat gebeurd is.</p>
                 </div>
             @else
                 <div class="mt-5">

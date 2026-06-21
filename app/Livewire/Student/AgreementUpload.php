@@ -89,8 +89,17 @@ class AgreementUpload extends Component
 
         $agreement = StageAgreement::firstOrNew(['application_id' => $application->id]);
 
-        // Na bevestiging door de commissie kan er niet meer (her)tekend worden.
-        if ($agreement->status === 'bevestigd') {
+        // Na bevestiging, of wanneer de student al getekend heeft, kan er niet
+        // (opnieuw) getekend worden — een handtekening is definitief.
+        if ($agreement->status === 'bevestigd' || $agreement->student_signature) {
+            return;
+        }
+
+        // Ondertekenen kan pas zodra de begeleidende docent (door de admin) én de
+        // bedrijfsmentor (door het bedrijf) aan de stage zijn toegewezen.
+        if (! $this->mentorEnDocentToegewezen($application)) {
+            session()->flash('error', 'Je kan pas tekenen zodra je begeleidende docent én je bedrijfsmentor zijn toegewezen.');
+
             return;
         }
 
@@ -100,22 +109,21 @@ class AgreementUpload extends Component
             'uploaded_by' => Auth::id(),
         ])->save();
 
-        // Status volgt uit beide handtekeningen (student + docent).
+        // Status volgt uit beide handtekeningen (student + bedrijf).
         $agreement->syncSignatureStatus();
 
-        session()->flash('success', 'Je handtekening is opgeslagen. Zodra de docent ook tekent, gaat de overeenkomst naar de stagecommissie.');
+        session()->flash('success', 'Je handtekening is opgeslagen. Zodra ook het bedrijf tekent, gaat de overeenkomst naar de stagecommissie.');
     }
 
     /**
-     * Wis een eerder gezette handtekening, zodat de student opnieuw kan tekenen.
+     * De overeenkomst mag pas getekend worden zodra de stage zowel een docent
+     * als een mentor heeft. Vóór die koppeling is ondertekenen geblokkeerd.
      */
-    public function clearStudentSignature(): void
+    private function mentorEnDocentToegewezen(StageApplication $application): bool
     {
-        $agreement = $this->application()?->agreement;
+        $stage = $application->stage;
 
-        if ($agreement && $agreement->status !== 'bevestigd') {
-            $agreement->update(['student_signature' => null, 'student_signed_at' => null]);
-        }
+        return $stage !== null && $stage->mentor_id !== null && $stage->docent_id !== null;
     }
 
     public function render()
@@ -134,6 +142,7 @@ class AgreementUpload extends Component
         return view('livewire.student.agreement-upload', [
             'application' => $application,
             'agreement' => $application?->agreement,
+            'mentorDocentKlaar' => $application ? $this->mentorEnDocentToegewezen($application) : false,
         ]);
     }
 }

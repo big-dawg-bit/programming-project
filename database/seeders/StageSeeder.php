@@ -8,6 +8,7 @@ use App\Models\Docent;
 use App\Models\Mentor;
 use App\Models\Role;
 use App\Models\Stage;
+use App\Models\StageAgreement;
 use App\Models\StageApplication;
 use App\Models\Student;
 use App\Models\User;
@@ -75,6 +76,7 @@ class StageSeeder extends Seeder
         $lina = $linaStage->student;
         $aanvraagLina = $this->aanvraag($lina, $companies->first(), 'approved', 'Stagiair Software Development');
         $linaStage->update(['application_id' => $aanvraagLina->id]);
+        $this->overeenkomst($aanvraagLina);
         $this->weeklogs($linaStage, 6);
         if ($framework) {
             $this->evaluatie($linaStage, $framework, 'mid-term');
@@ -112,6 +114,7 @@ class StageSeeder extends Seeder
             // Goedgekeurd -> actieve stage met weeklogs + mid-term en final evaluatie.
             if ($s['status'] === 'approved') {
                 $stage = $this->stageVoor($student, $company, $mentor, $docent, $framework, $aanvraag);
+                $this->overeenkomst($aanvraag);
                 $this->weeklogs($stage, 4);
                 if ($framework) {
                     $this->evaluatie($stage, $framework, 'mid-term');
@@ -176,6 +179,19 @@ class StageSeeder extends Seeder
                 'start_date' => now()->subWeeks(4)->toDateString(),
                 'end_date' => now()->addWeeks(8)->toDateString(),
             ]
+        );
+    }
+
+    /**
+     * Maakt de stageovereenkomst aan die bij een goedgekeurde aanvraag hoort.
+     * Status 'te_ondertekenen': de stage heeft al een mentor + docent (zie
+     * stageVoor), dus student en bedrijf kunnen ze meteen ondertekenen.
+     */
+    private function overeenkomst(StageApplication $aanvraag): void
+    {
+        StageAgreement::firstOrCreate(
+            ['application_id' => $aanvraag->id],
+            ['status' => 'te_ondertekenen'],
         );
     }
 

@@ -108,6 +108,11 @@
                     <img src="{{ $agreement->company_signature }}" alt="Handtekening" class="h-16 rounded-lg border border-neutral-200 bg-white p-1 dark:border-neutral-700" />
                     <p class="text-sm text-neutral-500 dark:text-neutral-400">Getekend op {{ $datum($agreement->company_signed_at) }}.</p>
                 </div>
+            @elseif (! $stage?->mentor_id || ! $stage?->docent_id)
+                <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+                    <p class="font-medium">Nog niet klaar om te ondertekenen</p>
+                    <p class="mt-1">Je kan pas tekenen zodra je een stagementor hebt toegewezen én de stagecommissie/admin een begeleidende docent heeft aangeduid voor deze stage.</p>
+                </div>
             @else
                 <div class="mt-4" x-data="signaturePad()">
                     <p class="mb-2 text-sm font-medium">Onderteken hieronder met je muis, trackpad of vinger.</p>

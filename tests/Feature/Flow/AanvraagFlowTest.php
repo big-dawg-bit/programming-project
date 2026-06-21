@@ -3,8 +3,10 @@
 use App\Livewire\Applications\ReviewQueue;
 use App\Livewire\Bedrijf\Aanvragen;
 use App\Livewire\Bedrijf\Overeenkomsten;
-use App\Models\CompetencyFramework;
 use App\Models\Company;
+use App\Models\CompetencyFramework;
+use App\Models\Docent;
+use App\Models\Mentor;
 use App\Models\StageApplication;
 use App\Models\Student;
 use App\Models\User;
@@ -62,6 +64,14 @@ it('zet de overeenkomst op ingediend zodra student en bedrijf tekenen', function
     [$bedrijfUser, $application] = maakAanvraag('accepted');
     $commissie = User::where('email', 'commissie@ehb.be')->first();
     Livewire::actingAs($commissie)->test(ReviewQueue::class)->call('approve', $application->id);
+
+    // Admin koppelt een docent + bedrijf koppelt een mentor: vereist vóór tekenen.
+    $mentor = Mentor::create([
+        'user_id' => User::factory()->withRole('mentor')->create()->id,
+        'company_id' => $application->company_id,
+    ]);
+    $docent = Docent::create(['user_id' => User::factory()->withRole('docent')->create()->id]);
+    $application->fresh()->stage->update(['mentor_id' => $mentor->id, 'docent_id' => $docent->id]);
 
     $handtekening = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
     $agreement = $application->fresh()->agreement;

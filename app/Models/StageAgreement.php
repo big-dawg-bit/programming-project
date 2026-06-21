@@ -37,7 +37,7 @@ class StageAgreement extends Model
 
     /**
      * Werkt de status bij op basis van de handtekeningen: pas wanneer zowel de
-     * student als de docent getekend heeft, gaat de overeenkomst naar 'ingediend'
+     * student als het bedrijf getekend heeft, gaat de overeenkomst naar 'ingediend'
      * (klaar voor de stagecommissie). Een al bevestigde overeenkomst blijft staan.
      */
     public function syncSignatureStatus(): void
