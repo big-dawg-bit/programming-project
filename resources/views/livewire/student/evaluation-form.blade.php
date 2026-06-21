@@ -54,11 +54,7 @@
     </div>
 
     {{-- Acties --}}
-    <div class="flex gap-3">
-        <button type="button" wire:click="saveDraft"
-                class="flex-1 rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200">
-            Opslaan als concept
-        </button>
+    <div class="flex">
         <button type="button" wire:click="submit"
                 class="flex-1 rounded-lg bg-[#E2231A] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#c41e16]">
             Indienen

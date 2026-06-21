@@ -14,6 +14,7 @@ use Livewire\Component;
 class EvaluationForm extends Component
 {
     public Stage $stage;
+
     public string $type = 'final';
 
     /** Score per competency_id (0 t/m 20). */
@@ -55,12 +56,6 @@ class EvaluationForm extends Component
     public function setScore(int $competencyId, int $score): void
     {
         $this->scores[$competencyId] = $score;
-    }
-
-    public function saveDraft(): void
-    {
-        $this->persist('draft');
-        session()->flash('evaluatie-opgeslagen', 'Zelfevaluatie opgeslagen als concept.');
     }
 
     public function submit()
