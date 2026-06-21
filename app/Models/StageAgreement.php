@@ -15,7 +15,6 @@ class StageAgreement extends Model
             'uploaded_at' => 'datetime',
             'mentor_approved_at' => 'datetime',
             'student_signed_at' => 'datetime',
-            'docent_signed_at' => 'datetime',
             'company_signed_at' => 'datetime',
         ];
     }

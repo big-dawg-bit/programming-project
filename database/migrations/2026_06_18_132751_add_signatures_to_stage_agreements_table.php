@@ -15,8 +15,6 @@ return new class extends Migration
         Schema::table('stage_agreements', function (Blueprint $table) {
             $table->longText('student_signature')->nullable()->after('status');
             $table->timestamp('student_signed_at')->nullable()->after('student_signature');
-            $table->longText('docent_signature')->nullable()->after('student_signed_at');
-            $table->timestamp('docent_signed_at')->nullable()->after('docent_signature');
         });
     }
 
@@ -29,8 +27,6 @@ return new class extends Migration
             $table->dropColumn([
                 'student_signature',
                 'student_signed_at',
-                'docent_signature',
-                'docent_signed_at',
             ]);
         });
     }
