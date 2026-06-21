@@ -17,60 +17,48 @@ class DocumentList extends Component
 {
     use WithFileUploads;
 
-    // Actieve documentcategorie.
-    public string $categorie = 'Stage-aanvraag';
+    // De tabbladen in de zijbalk. De eerste drie tonen bestaande documenten
+    // (leesbaar), het laatste tabblad bevat de eigen geüploade bestanden.
+    public const TABS = ['Stageaanvraag', 'Stageovereenkomst', 'Logboeken', 'Eigen documenten'];
+
+    // Soorten voor een eigen upload (vrij in te vullen, vastgelegd in description).
+    public const SOORTEN = ['CV', 'Motivatiebrief', 'Andere'];
+
+    public string $tab = 'Stageaanvraag';
 
     // Of de upload-modal open staat.
     public bool $showUpload = false;
 
-    // Het gekozen bestand: documenten (PDF/DOCX) of foto's voor de logboeken, max 10 MB.
+    // Het gekozen bestand: PDF/DOCX of een foto, max 10 MB.
     #[Validate('required|file|mimes:pdf,docx,jpg,jpeg,png,webp|max:10240')]
     public $upload = null;
 
-    // Categorie waaronder het bestand wordt opgeslagen.
-    #[Validate('required|string')]
-    public string $uploadCategorie = 'Stage-aanvraag';
+    // Soort eigen document (CV, motivatiebrief, …).
+    #[Validate('required|string|max:100')]
+    public string $soort = 'CV';
 
-    #[Validate('nullable|string|max:500')]
-    public string $beschrijving = '';
-
-    public const CATEGORIEEN = [
-        'Stage-aanvraag',
-        'Stageovereenkomst',
-        'Logboeken',
-    ];
-
-    /**
-     * Open de modal; de categorie-select start op de actieve categorie.
-     */
     public function openUpload(): void
     {
-        $this->uploadCategorie = $this->categorie;
+        $this->tab = 'Eigen documenten';
         $this->showUpload = true;
     }
 
     public function closeUpload(): void
     {
         $this->showUpload = false;
-        $this->reset(['upload', 'beschrijving']);
+        $this->reset(['upload', 'soort']);
         $this->resetValidation();
     }
 
     /**
-     * Sla het bestand op schijf op en registreer het in de files-tabel.
+     * Sla een eigen document op. Het krijgt categorie 'Eigen' zodat begeleiders
+     * (mentor) het bij de student terugvinden; de soort bewaren we als beschrijving.
      */
     public function save(): void
     {
         $this->validate();
 
-        if (! in_array($this->uploadCategorie, self::CATEGORIEEN, true)) {
-            $this->addError('uploadCategorie', 'Ongeldige categorie.');
-
-            return;
-        }
-
-        // Metadata uitlezen vóór store(): die verplaatst het tijdelijke bestand,
-        // waarna getSize()/getMimeType() niet meer werken.
+        // Metadata uitlezen vóór store(): die verplaatst het tijdelijke bestand.
         $originalName = $this->upload->getClientOriginalName();
         $mimeType = $this->upload->getMimeType();
         $sizeBytes = $this->upload->getSize();
@@ -82,14 +70,13 @@ class DocumentList extends Component
             'storage_path' => $path,
             'mime_type' => $mimeType,
             'size_bytes' => $sizeBytes,
-            'category' => $this->uploadCategorie,
-            'description' => $this->beschrijving ?: null,
+            'category' => 'Eigen',
+            'description' => $this->soort,
             'uploaded_by' => Auth::id(),
             'uploaded_at' => now(),
         ]);
 
-        // Spring naar de categorie waarin het bestand terechtkwam.
-        $this->categorie = $this->uploadCategorie;
+        $this->tab = 'Eigen documenten';
         $this->closeUpload();
 
         session()->flash('document-uploaded', 'Document geüpload.');
@@ -107,14 +94,33 @@ class DocumentList extends Component
 
     public function render()
     {
-        // Enkel de eigen documenten van de ingelogde student; student A ziet nooit die van B.
-        $files = File::where('uploaded_by', Auth::id())
-            ->where('category', $this->categorie)
+        $student = Auth::user()?->student;
+
+        // Alle aanvragen van de student (nieuw → oud).
+        $applications = $student
+            ? $student->applications()->with('company')->latest()->get()
+            : collect();
+
+        // De goedgekeurde aanvraag draagt de overeenkomst.
+        $approved = $applications->firstWhere('status', 'approved');
+        $approved?->loadMissing(['company', 'agreement', 'student.user', 'stage.mentor.user', 'stage.docent.user']);
+
+        // Weeklogs van de (laatste) stage.
+        $stage = $student?->stages()->latest()->first();
+        $weeklogs = $stage
+            ? $stage->weeklogs()->orderByDesc('week_number')->get()
+            : collect();
+
+        // Eigen uploads van de student (nieuw → oud).
+        $eigenFiles = File::where('uploaded_by', Auth::id())
             ->orderByDesc('uploaded_at')
             ->get();
 
         return view('livewire.student.documents', [
-            'files' => $files,
+            'applications' => $applications,
+            'approved' => $approved,
+            'weeklogs' => $weeklogs,
+            'eigenFiles' => $eigenFiles,
         ]);
     }
 }

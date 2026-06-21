@@ -7,9 +7,9 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
-// Een student moet via de upload-modal een document kunnen toevoegen,
-// dat daarna in de gekozen categorie verschijnt.
-it('uploadt een document naar de gekozen categorie', function () {
+// Een student moet via de upload-modal een eigen document kunnen toevoegen.
+// Dat krijgt categorie 'Eigen'; de gekozen soort wordt als beschrijving bewaard.
+it('uploadt een eigen document met een soort', function () {
     Storage::fake('local');
     $user = User::factory()->create();
 
@@ -17,8 +17,7 @@ it('uploadt een document naar de gekozen categorie', function () {
         ->test(DocumentList::class)
         ->call('openUpload')
         ->set('upload', UploadedFile::fake()->create('verslag.pdf', 120, 'application/pdf'))
-        ->set('uploadCategorie', 'Stageovereenkomst')
-        ->set('beschrijving', 'Ondertekende overeenkomst')
+        ->set('soort', 'CV')
         ->call('save')
         ->assertHasNoErrors()
         ->assertSet('showUpload', false);
@@ -26,8 +25,8 @@ it('uploadt een document naar de gekozen categorie', function () {
     $file = File::first();
     expect($file)->not->toBeNull()
         ->and($file->original_name)->toBe('verslag.pdf')
-        ->and($file->category)->toBe('Stageovereenkomst')
-        ->and($file->description)->toBe('Ondertekende overeenkomst')
+        ->and($file->category)->toBe('Eigen')
+        ->and($file->description)->toBe('CV')
         ->and($file->uploaded_by)->toBe($user->id);
 
     Storage::disk('local')->assertExists($file->storage_path);
