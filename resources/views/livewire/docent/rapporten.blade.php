@@ -16,7 +16,7 @@
                     <th class="px-5 py-3 font-medium">Bedrijf</th>
                     <th class="px-5 py-3 font-medium">Weeklogs</th>
                     <th class="px-5 py-3 font-medium">Eindcijfer</th>
-                    <th class="px-5 py-3 font-medium">Eindrapport</th>
+                    <th class="px-5 py-3 font-medium">Resultaat</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -33,10 +33,12 @@
                             @endif
                         </td>
                         <td class="px-5 py-4">
-                            @if ($r['rapport'])
-                                <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">ingediend</span>
+                            @if ($r['resultaat'] === 'geslaagd')
+                                <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">Geslaagd</span>
+                            @elseif ($r['resultaat'] === 'niet_geslaagd')
+                                <span class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700 dark:bg-red-900/40 dark:text-red-300">Niet geslaagd</span>
                             @else
-                                <span class="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">ontbreekt</span>
+                                <span class="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">Nog te beoordelen</span>
                             @endif
                         </td>
                     </tr>

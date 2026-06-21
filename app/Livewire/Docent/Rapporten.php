@@ -19,19 +19,21 @@ class Rapporten extends Component
 
         $stages = $docent
             ? $docent->stages()
-                ->with(['student.user', 'company', 'weeklogs', 'evaluations', 'finalReport'])
+                ->with(['student.user', 'company', 'weeklogs', 'finalEvaluation'])
                 ->get()
             : collect();
 
         $rapporten = $stages->map(function ($stage) {
-            $eind = $stage->evaluations->where('type', 'final')->where('status', 'submitted')->first();
+            // DE bindende eindbeoordeling van de docent (final_evaluation_id),
+            // niet zomaar de eerste zelf-/mentorevaluatie.
+            $eind = $stage->finalEvaluation;
 
             return [
                 'naam' => $stage->student?->user?->name ?? 'Onbekende student',
                 'bedrijf' => $stage->company?->name ?? '—',
                 'weeklogs' => $stage->weeklogs->whereNotNull('submitted_at')->count(),
                 'eindcijfer' => $eind ? number_format((float) $eind->overall_score, 1) : null,
-                'rapport' => $stage->finalReport !== null,
+                'resultaat' => $eind?->result,   // 'geslaagd' | 'niet_geslaagd' | null
             ];
         });
 
