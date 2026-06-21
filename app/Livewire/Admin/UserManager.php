@@ -15,6 +15,9 @@ class UserManager extends Component
 {
     use WithPagination;
 
+    // Actieve rolfilter voor de gebruikerslijst ('' = alle rollen).
+    public string $roleFilter = '';
+
     public string $name = '';
 
     public string $email = '';
@@ -81,9 +84,9 @@ class UserManager extends Component
         // Bijhorend subtype, zodat de gebruiker echt in zijn eigen portaal terechtkan.
         match ($data['selectedRole']) {
             'student' => $user->student()->create([
-                'student_number' => 'EHB' . now()->format('Y') . str_pad((string)$user->id, 4, '0', STR_PAD_LEFT),
+                'student_number' => 'EHB'.now()->format('Y').str_pad((string) $user->id, 4, '0', STR_PAD_LEFT),
                 'study_program' => 'Toegepaste Informatica',
-                'academic_year' => now()->format('Y') . '-' . now()->addYear()->format('Y'),
+                'academic_year' => now()->format('Y').'-'.now()->addYear()->format('Y'),
             ]),
             'docent' => $user->docent()->create([]),
             'mentor' => $this->createMentor($user, $data),
@@ -131,6 +134,12 @@ class UserManager extends Component
         ]);
     }
 
+    /** Reset naar de eerste pagina wanneer de rolfilter verandert. */
+    public function updatedRoleFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function changeRole(int $userId, int $roleId): void
     {
         User::findOrFail($userId)->update(['role_id' => $roleId]);
@@ -139,13 +148,19 @@ class UserManager extends Component
     public function toggleActive(int $userId): void
     {
         $user = User::findOrFail($userId);
-        $user->update(['is_active' => !$user->is_active]);
+        $user->update(['is_active' => ! $user->is_active]);
     }
 
     public function render()
     {
         return view('livewire.admin.user-manager', [
-            'users' => User::with('role')->latest('id')->paginate(15),
+            'users' => User::with('role')
+                ->when($this->roleFilter !== '', fn ($q) => $q->whereHas(
+                    'role',
+                    fn ($r) => $r->where('name', $this->roleFilter)
+                ))
+                ->latest('id')
+                ->paginate(15),
             'roles' => Role::orderBy('name')->get(),
             'companies' => Company::orderBy('name')->get(),
         ]);

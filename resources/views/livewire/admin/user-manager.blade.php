@@ -131,6 +131,29 @@
         </div>
     </div>
 
+    {{-- Filter op rol --}}
+    <div class="flex flex-wrap items-center gap-2">
+        <span class="mr-1 text-sm font-medium text-neutral-500">Filter:</span>
+        <button type="button" wire:click="$set('roleFilter', '')"
+            @class([
+                'rounded-full px-4 py-1.5 text-sm font-medium transition',
+                'bg-[#E2231A] text-white' => $roleFilter === '',
+                'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50' => $roleFilter !== '',
+            ])>
+            Alle
+        </button>
+        @foreach ($roles as $role)
+            <button type="button" wire:click="$set('roleFilter', '{{ $role->name }}')"
+                @class([
+                    'rounded-full px-4 py-1.5 text-sm font-medium transition',
+                    'bg-[#E2231A] text-white' => $roleFilter === $role->name,
+                    'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50' => $roleFilter !== $role->name,
+                ])>
+                {{ ucfirst($role->name) }}
+            </button>
+        @endforeach
+    </div>
+
     {{-- Gebruikerslijst --}}
     <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
         <table class="w-full text-sm">
