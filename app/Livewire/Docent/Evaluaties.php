@@ -17,6 +17,7 @@ class Evaluaties extends Component
         $stages = $docent
             ? $docent->stages()
                 ->with(['student.user', 'company', 'evaluations', 'finalEvaluation'])
+                ->latest()
                 ->get()
             : collect();
 

@@ -4,6 +4,7 @@ namespace App\Livewire\Mentor;
 
 use App\Models\Mentor;
 use App\Models\Stage;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -39,8 +40,8 @@ class StudentDetail extends Component
         $huidigeWeek = null;
         $totaalWeken = null;
         if ($this->stage->start_date && $this->stage->end_date) {
-            $start = \Illuminate\Support\Carbon::parse($this->stage->start_date);
-            $eind = \Illuminate\Support\Carbon::parse($this->stage->end_date);
+            $start = Carbon::parse($this->stage->start_date);
+            $eind = Carbon::parse($this->stage->end_date);
             $totaalWeken = max(1, (int) ceil($start->diffInDays($eind) / 7));
             $huidigeWeek = max(1, min((int) floor($start->diffInDays(now(), false) / 7) + 1, $totaalWeken));
         }
@@ -51,7 +52,7 @@ class StudentDetail extends Component
             : collect();
 
         $evaluaties = $this->tab === 'evaluaties'
-            ? $this->stage->evaluations()->where('evaluator_role', 'mentor')->where('status', 'submitted')->get()
+            ? $this->stage->evaluations()->where('evaluator_role', 'mentor')->where('status', 'submitted')->latest('submitted_at')->get()
             : collect();
 
         return view('livewire.mentor.student-detail', [

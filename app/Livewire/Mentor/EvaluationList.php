@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Mentor;
 
-use App\Models\Evaluation;
 use App\Models\Mentor;
 use App\Models\Stage;
 use Illuminate\Support\Facades\Auth;
@@ -44,6 +43,7 @@ class EvaluationList extends Component
             ? $stage->evaluations()
                 ->where('evaluator_role', 'mentor')
                 ->where('status', 'submitted')
+                ->latest('submitted_at')
                 ->get()
             : collect();
 
